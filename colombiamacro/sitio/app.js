@@ -8,7 +8,7 @@
   function extentX(fig) {
     var lo = Infinity, hi = -Infinity;
     fig.data.forEach(function (tr) {
-      Array.prototype.forEach.call(tr.x || [], function (x) { var t = toDate(x); if (t < lo) lo = t; if (t > hi) hi = t; });
+      Array.prototype.forEach.call(tr.x || [], function (x) { if (x === null || x === undefined || x === '') return; var t = toDate(x); if (isNaN(t)) return; if (t < lo) lo = t; if (t > hi) hi = t; });
     });
     return [lo, hi];
   }
@@ -22,7 +22,7 @@
       var xs = tr.x || [], ys = tr.y || [];
       for (var i = 0; i < xs.length; i++) {
         var t = toDate(xs[i]), y = ys[i];
-        if (y === null || y === undefined || isNaN(y) || t < x0 || t > x1) continue;
+        if (xs[i] === null || isNaN(t) || y === null || y === undefined || isNaN(y) || t < x0 || t > x1) continue;
         if (y < lo) lo = y; if (y > hi) hi = y;
       }
     });
@@ -80,7 +80,8 @@
     var app = document.getElementById('curva-app');
     if (!app) return;
     var lang = app.dataset.lang === 'en' ? 'en' : 'es', X = TXT[lang];
-    var src = document.querySelector('script[src$="app.js"]').src.replace(/app\.js$/, 'curva_tes.json');
+    var scr = document.querySelector('script[src*="assets/app.js"]');
+    var src = scr.src.replace(/app\.js(\?.*)?$/, 'curva_tes.json$1');
     function fmt(v, dec, signo) {
       if (v === null || v === undefined || isNaN(v)) return '—';
       var s = Math.abs(v).toFixed(dec);
@@ -381,23 +382,32 @@
     var ultimo = window.scrollY, movil = function () { return window.matchMedia('(max-width:980px)').matches; };
     window.addEventListener('scroll', function () {
       var y = window.scrollY, bajando = y > ultimo + 4, subiendo = y < ultimo - 4;
-      if (bajando && y > 120) { top.classList.add('oculta'); document.body.classList.add('top-oculta'); document.body.classList.remove('menu-abierto'); }
+      if (bajando && y > 120) { top.classList.add('oculta'); document.body.classList.add('top-oculta'); document.body.classList.remove('menu-abierto'); if (btn && movil()) btn.classList.remove('abierto'); }
       else if (subiendo || y < 60) { top.classList.remove('oculta'); document.body.classList.remove('top-oculta'); }
       if (bajando || subiendo) ultimo = y;
     }, { passive: true });
     if (!btn) return;
+    var txt = btn.querySelector('.mt-txt');
+    function pintar() {
+      var visible = movil() ? document.body.classList.contains('menu-abierto') : !document.body.classList.contains('sin-menu');
+      btn.setAttribute('aria-expanded', visible ? 'true' : 'false');
+      btn.classList.toggle('abierto', visible);
+      if (txt) txt.textContent = visible ? btn.dataset.ocultar : btn.dataset.mostrar;
+    }
     var guardado = null;
     try { guardado = localStorage.getItem('cm-sin-menu'); } catch (e) {}
-    if (guardado === '1') { document.body.classList.add('sin-menu'); btn.setAttribute('aria-expanded', 'false'); }
+    if (guardado === '1') document.body.classList.add('sin-menu');
     btn.addEventListener('click', function () {
-      if (movil()) { document.body.classList.toggle('menu-abierto'); return; }
+      if (movil()) { document.body.classList.toggle('menu-abierto'); pintar(); return; }
       var oculto = document.body.classList.toggle('sin-menu');
-      btn.setAttribute('aria-expanded', oculto ? 'false' : 'true');
       try { localStorage.setItem('cm-sin-menu', oculto ? '1' : '0'); } catch (e) {}
+      pintar();
     });
     document.querySelectorAll('.menu a').forEach(function (a) {
-      a.addEventListener('click', function () { document.body.classList.remove('menu-abierto'); });
+      a.addEventListener('click', function () { document.body.classList.remove('menu-abierto'); pintar(); });
     });
+    window.addEventListener('resize', pintar);
+    pintar();
   }
 
   // ---------------------------------------------------------------- utilidades comunes
@@ -449,50 +459,30 @@
       Plotly.react(el, trazos, lay, { displayModeBar: false, responsive: true });
       cap.textContent = base + ' (' + q.q + ')';
     }
-    sel.addEventListener('change', function () { dibujar(parseInt(sel.value, 10)); });
+    function elegir(k) { if (k < 0 || k >= D.length) return; sel.value = String(k); dibujar(k); }
+    sel.addEventListener('change', function () { elegir(parseInt(sel.value, 10)); });
+    sel.addEventListener('input', function () { elegir(parseInt(sel.value, 10)); });
+    // clic en una columna del mapa: ver ese trimestre en las barras
+    var mapa = document.getElementById('g-sec-mapa');
+    if (mapa && mapa.on) mapa.on('plotly_click', function (ev) {
+      var pt = ev && ev.points && ev.points[0]; if (!pt) return;
+      var t = new Date(pt.x).getTime(), mejor = -1, dist = Infinity;
+      D.forEach(function (q, i) { var dd = Math.abs(new Date(q.f).getTime() - t); if (dd < dist) { dist = dd; mejor = i; } });
+      if (mejor >= 0 && dist < 60 * 864e5) { elegir(mejor); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    });
     document.getElementById('sec-ultimo').addEventListener('click', function () { sel.value = D.length - 1; dibujar(D.length - 1); });
   }
 
-  // ---------------------------------------------------------------- informalidad: una ciudad
-  function ciudadSelector() {
-    var sel = document.getElementById('inf-ciudad'), el = document.getElementById('g-inf-ciudad');
-    if (!sel || !el) return;
-    var D = JSON.parse(document.getElementById('inf-ciudad-datos').textContent);
-    var X = JSON.parse(document.getElementById('inf-ciudad-textos').textContent);
-    var lang = document.documentElement.lang === 'en' ? 'en' : 'es';
-    function dibujar() {
-      var c = sel.value, y = D.c[c].y;
-      var trazos = [
-        { x: D.f, y: D.nal, name: X.inf_nal, mode: 'lines', line: { color: '#a3a19b', width: 1.6, dash: 'dot' }, hovertemplate: '%{y:.1f}%' },
-        { x: D.f, y: D.c13, name: X.inf_13, mode: 'lines', line: { color: '#1baf7a', width: 1.6, dash: 'dot' }, hovertemplate: '%{y:.1f}%' },
-        { x: D.f, y: y, name: c, mode: 'lines', line: { color: '#2a78d6', width: 3 }, hovertemplate: '%{y:.1f}%' }
-      ];
-      var lay = Object.assign(BASE_LAYOUT(lang), {
-        height: 360, hovermode: 'x unified', showlegend: true,
-        xaxis: { type: 'date', showgrid: false, showline: true, linecolor: '#dcdad4', fixedrange: true, automargin: true, hoverformat: '%m/%Y', tickfont: { color: '#7a7974' } },
-        yaxis: { ticksuffix: '%', gridcolor: '#eeede8', zeroline: false, fixedrange: true, automargin: true, tickfont: { color: '#7a7974' } }
-      });
-      Plotly.react(el, trazos, lay, { displayModeBar: false, responsive: true });
-      var n = y.length, ult = y[n - 1], ant = n > 12 ? y[n - 13] : null, ch = ant === null ? null : ult - ant;
-      var cl = ch === null ? '' : (ch > 0.005 ? 'up' : (ch < -0.005 ? 'down' : 'flat'));
-      document.getElementById('inf-ciudad-stats').innerHTML = '<div class="stat"><span class="stat-n">' + c + '</span><span class="stat-v">' +
-        numTxt(ult, 1, lang) + '%</span><span class="stat-f">' + D.f[n - 1].slice(0, 7) + '</span><span class="stat-c">' +
-        (ch === null ? '' : '<span class="chg ' + cl + '">' + (ch > 0 ? '▲ ' : '▼ ') + numTxt(ch, 1, lang, true) + ' pp</span> <small>' + X.vs_ano + '</small>') + '</span></div>';
-    }
-    sel.addEventListener('change', dibujar);
-    dibujar();
-    var barras = document.getElementById('g-inf-ciudades');
-    if (barras && barras.on) barras.on('plotly_click', function (ev) {
-      if (ev.points && ev.points.length && D.c[ev.points[0].y]) { sel.value = ev.points[0].y; dibujar(); }
-    });
-  }
+
+  function seguro(fn) { try { fn(); } catch (e) { if (window.console) console.error(e); } }
 
   function init() {
+    seguro(cabecera);   // primero: el menu funciona aunque falle algun grafico
     document.querySelectorAll('script[data-for]').forEach(function (s) {
       var el = document.getElementById(s.getAttribute('data-for'));
       if (!el) return;
       var fig = JSON.parse(s.textContent);
-      Plotly.newPlot(el, fig.data, fig.layout, CONFIG);
+      try { Plotly.newPlot(el, fig.data, fig.layout, CONFIG); } catch (e) { if (window.console) console.error(e); return; }
       var notime = el.dataset.notime === '1';
       // el.data contiene los arreglos ya decodificados por Plotly (incluye datos binarios).
       var live = { data: el.data, layout: el.layout };
@@ -515,11 +505,9 @@
     }
     buttons.forEach(function (b) { b.addEventListener('click', function () { select(parseInt(b.dataset.years, 10)); }); });
     select(isNaN(saved) ? 10 : saved);
-    curvaTES();
-    relojCiclo();
-    cabecera();
-    sectoresSelector();
-    ciudadSelector();
+    seguro(curvaTES);
+    seguro(relojCiclo);
+    seguro(sectoresSelector);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

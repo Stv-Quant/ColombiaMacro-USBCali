@@ -31,11 +31,11 @@ FICHAS = {
                      "(λ = 1.600, una cola: cada trimestre solo usa datos disponibles hasta ese momento), excluyendo el choque "
                      "de 2020T2–2021T2. Brecha = 100 × (ln PIB − ln capacidad). Como contraste se calculan también un HP de "
                      "dos colas y el método de Hamilton (2018); los tres coinciden en el signo casi siempre. Valores en billones "
-                     "de pesos de 2015 por trimestre.",
+                     "de COP (pesos colombianos) de 2015 por trimestre.",
                      "Capacity (potential GDP) = GDP trend from a real-time Hodrick-Prescott filter (λ = 1,600, one-sided: each "
                      "quarter only uses data available then), excluding the 2020Q2–2021Q2 shock. Gap = 100 × (ln GDP − ln "
                      "capacity). A two-sided HP and Hamilton's (2018) method are computed as checks; the three usually agree on "
-                     "the sign. Values in trillions of 2015 pesos per quarter.")),
+                     "the sign. Values in COP (Colombian peso) trillions at 2015 prices per quarter.")),
     "g-pib-pesos": (("DANE, PIB a precios corrientes y constantes; Banco de la República, TRM",
                      "DANE, GDP at current and constant prices; Banco de la República, exchange rate (TRM)"),
                     ("Suma de los últimos 4 trimestres. A precios corrientes = valor en pesos de cada momento (incluye "

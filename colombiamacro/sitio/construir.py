@@ -411,9 +411,9 @@ class Graficos:
         fig.add_trace(go.Bar(x=x, y=[None if pd.isna(v) else round(v, 1) for v in nom], name=t("pp_nom", L),
                              marker=dict(color=C1, line=dict(width=0)),
                              customdata=[num(v, 1, L, True, "%") if pd.notna(v) else "" for v in (nom / nom.shift(4) - 1) * 100],
-                             hovertemplate="$%{y:,.0f} bill.  <span style='color:" + MUTED + "'>%{customdata} " + t("vs_ano", L) + "</span>"))
+                             hovertemplate="COP $%{y:,.0f} bill.  <span style='color:" + MUTED + "'>%{customdata} " + t("vs_ano", L) + "</span>"))
         fig.add_trace(go.Scatter(x=x, y=[None if pd.isna(v) else round(v, 1) for v in real], name=t("pp_real", L), mode="lines",
-                                 line=dict(color=C2, width=2.2), hovertemplate="$%{y:,.0f} bill."))
+                                 line=dict(color=C2, width=2.2), hovertemplate="COP $%{y:,.0f} bill."))
         usd = None
         trm = d.extra.get("trm")
         if trm is not None and not trm.empty:
@@ -424,13 +424,15 @@ class Graficos:
                                      mode="lines", yaxis="y3", line=dict(color=C3, width=2, dash="dot"),
                                      hovertemplate="US$%{y:,.0f} mil M"))
             fig.update_layout(yaxis3=dict(overlaying="y", side="right", tickprefix="US$", tickformat=",.0f", showgrid=False,
-                                          fixedrange=True, tickfont=dict(size=11, color=C3), automargin=True))
-        fig.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", ticksuffix=""))
+                                          fixedrange=True, tickfont=dict(size=11, color=C3), automargin=True,
+                                          title=dict(text=t("pp_eje_usd", L), font=dict(size=11, color=C3))))
+        fig.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", ticksuffix="",
+                                     title=dict(text=t("pp_eje", L), font=dict(size=12))))
         fig.update_layout(bargap=0.25)
         fig.update_xaxes(range=rango_inicial(max(x)))
         u = {"nom": nom.dropna().iloc[-1], "real": real.dropna().iloc[-1], "q": p.index[-1],
              "usd": None if usd is None or usd.dropna().empty else usd.dropna().iloc[-1]}
-        items = [(t("pp_nom", L), x, nom, "pct", "a", "q", 0, "$ bill.")]
+        items = [(t("pp_nom", L), x, nom, "pct", "a", "q", 0, "$ bill. COP")]
         return fig, {"franja": franja(L, items), "noy": True}, u
 
     # --- sectores (PIB por actividad)
@@ -762,7 +764,7 @@ def selector_sectores(d, L):
         f = pd.Timestamp(f)
         u = sc[sc["fecha"] == f]
         a = sc[sc["fecha"] == f - pd.DateOffset(years=1)].set_index("codigo")["yoy"]
-        trimestres.append({"q": fecha(f, "q", L), "qa": fecha(f - pd.DateOffset(years=1), "q", L),
+        trimestres.append({"f": qend(pd.Series([f])).iloc[0].strftime("%Y-%m-%d"), "q": fecha(f, "q", L), "qa": fecha(f - pd.DateOffset(years=1), "q", L),
                            "s": [[r.sector, round(r.yoy, 2), None if pd.isna(a.get(r.codigo)) else round(float(a.get(r.codigo)), 2),
                                   round(r.peso, 2), round(r.contribucion, 3)] for r in u.itertuples()]})
     datos = json.dumps(trimestres, ensure_ascii=False, separators=(",", ":"))
@@ -775,33 +777,9 @@ def selector_sectores(d, L):
             f'<script type="application/json" id="sec-textos">{txt}</script>')
 
 
-def selector_ciudad(d, L):
-    ic, inf = d.informalidad_ciudades, d.informalidad
-    if ic is None or ic.empty or inf is None:
-        return ""
-    ciudades = {}
-    for c_, g_ in ic.groupby("ciudad"):
-        g_ = g_.sort_values("fecha")
-        ciudades[c_] = {"g": g_["grupo"].iloc[0], "y": [round(v, 2) for v in g_["tasa"]]}
-    fechas = sorted(ic["fecha"].dt.strftime("%Y-%m-%d").unique())
-    nal = inf.set_index(inf["fecha"].dt.strftime("%Y-%m-%d"))
-    datos = {"f": fechas, "c": ciudades, "nal": [round(float(nal["nacional"].get(f_, float("nan"))), 2) for f_ in fechas],
-             "c13": [round(float(nal["ciudades_13"].get(f_, float("nan"))), 2) for f_ in fechas]}
-    trece = [c_ for c_ in ciudades if ciudades[c_]["g"] == "13"]
-    otras = [c_ for c_ in ciudades if ciudades[c_]["g"] != "13"]
-    ops = (f'<optgroup label="{t("inf_13c", L)}">' + "".join(f'<option{" selected" if c_.startswith("Cali") else ""}>{esc(c_)}</option>' for c_ in sorted(trece))
-           + f'</optgroup><optgroup label="{t("inf_23c", L)}">' + "".join(f"<option>{esc(c_)}</option>" for c_ in sorted(otras)) + "</optgroup>")
-    txt = json.dumps({k: t(k, L) for k in ("inf_nal", "inf_13", "vs_ano")}, ensure_ascii=False)
-    return (f'<div class="picker"><label>{t("inf_ver_ciudad", L)} <select id="inf-ciudad">{ops}</select></label></div>'
-            f'<div class="stats" id="inf-ciudad-stats"></div>'
-            f'<div class="plot" id="g-inf-ciudad" style="height:360px"></div>'
-            f'<script type="application/json" id="inf-ciudad-datos">{json.dumps(datos, ensure_ascii=False, separators=(",", ":")).replace("NaN", "null")}</script>'
-            f'<script type="application/json" id="inf-ciudad-textos">{txt}</script>')
-
-
 # ------------------------------------------------------------------ publicaciones oficiales
-def bloque_noticias(d, s, L, n=12):
-    """Nota lateral discreta al final: ultimos datos oficiales con enlace a la fuente."""
+def bloque_noticias(d, s, L, n=10):
+    """Nota discreta al final: ultimos datos oficiales, una linea cada uno, con enlace a la fuente."""
     from colombiamacro import noticias as nt
     items = nt.publicaciones(d, s, L)[:n]
     if not items:
@@ -810,12 +788,13 @@ def bloque_noticias(d, s, L, n=12):
     for it in items:
         cuando = t("nt_dato", L) if it["aprox"] else fecha(it["fecha"], "d", L)
         filas.append(
-            f'<li><a href="{esc(it["enlace"])}" target="_blank" rel="noopener">'
-            f'<span class="nm">{esc(it["fuente"])} · {cuando}</span>'
-            f'<span class="nt">{esc(it["titular"])}</span><span class="nd">{esc(it["detalle"])}</span></a></li>')
+            f'<li><span class="n-meta"><span class="n-src">{esc(it["fuente"])}</span><span class="n-date">{cuando}</span></span>'
+            f'<span class="n-body"><a href="{esc(it["enlace"])}" target="_blank" rel="noopener">{esc(it["titular"])}</a>'
+            f'<span class="n-det">{esc(it["detalle"])}</span></span></li>')
     salas = " · ".join(f'<a href="{u}" target="_blank" rel="noopener">{esc(nombre)}</a>' for nombre, u in nt.SALAS)
-    return (f'<aside id="noticias" class="notes"><h3>{t("q_noticias", L)}</h3><p class="note">{t("resp_noticias", L)}</p>'
-            f'<ul>{"".join(filas)}</ul><p class="note">{t("nt_salas", L)}: {salas}</p></aside>')
+    return (f'<aside id="noticias" class="notes"><div class="notes-head"><h3>{t("q_noticias", L)}</h3>'
+            f'<span>{t("resp_noticias", L)}</span></div><ul>{"".join(filas)}</ul>'
+            f'<p class="notes-foot">{t("nt_salas", L)}: {salas}</p></aside>')
 
 
 # ------------------------------------------------------------------ reloj del ciclo interactivo
@@ -953,6 +932,7 @@ def bloque_grafico(titulo, fig_html_str, como_leer, nota=None, ancho=False):
 
 
 LANG_ACTUAL = ["es"]
+VERSION_ACTIVOS = ["0", "0"]  # huella de estilo.css + app.js (+ datos) y de plotly: evita versiones viejas en cache
 
 
 def bloque_grafico_html(titulo, cuerpo, como_leer, gid_ficha):
@@ -1105,8 +1085,7 @@ def pagina(d, s, lang, generado):
                          bloque_grafico(t("g_inf_ramas", L).format(p=ventana + " " + str(ult["fecha"].year)),
                                         fig_html(fir, mir, "g-inf-ramas"), t("h_inf_ramas", L)),
                          bloque_grafico(t("g_inf_ciudades", L).format(p=ventana + " " + str(ult["fecha"].year)),
-                                        fig_html(fic, mic, "g-inf-ciudades"), t("h_inf_ciudades", L)),
-                         bloque_grafico_html(t("g_inf_ciudad", L), selector_ciudad(d, L), t("h_inf_ciudad", L), "g-inf-ciudades")],
+                                        fig_html(fic, mic, "g-inf-ciudades"), t("h_inf_ciudades", L), ancho=True)],
                         f'<p>{t("x_informal", L).format(lista=trece_txt)}</p>', L)
 
     fi, mi = g.inflacion()
@@ -1216,14 +1195,14 @@ def pagina(d, s, lang, generado):
 <title>{t("titulo_pagina", L)}</title>
 <meta name="description" content="{esc(t('meta_desc', L))}">
 <link rel="icon" href="{raiz}assets/favicon.svg">
-<link rel="stylesheet" href="{raiz}assets/estilo.css">
-<script src="{raiz}assets/plotly.min.js" defer></script>
-<script src="{raiz}assets/app.js" defer></script>
+<link rel="stylesheet" href="{raiz}assets/estilo.css?v={VERSION_ACTIVOS[0]}">
+<script src="{raiz}assets/plotly.min.js?v={VERSION_ACTIVOS[1]}" defer></script>
+<script src="{raiz}assets/app.js?v={VERSION_ACTIVOS[0]}" defer></script>
 </head><body>
 <header class="top"><div class="wrap top-in">
   <a class="brand" href="#inicio"><img src="{raiz}assets/logo_usb.png" alt="USB Cali"><span><b>ColombiaMacro</b><small>{t("sub_marca", L)}</small></span></a>
   <nav class="menu" id="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a></nav>
-  <button class="menu-toggle" id="menu-toggle" aria-controls="menu" aria-expanded="true" title="{t("menu_ocultar", L)}">☰</button>
+  <button class="menu-toggle" id="menu-toggle" aria-controls="menu" aria-expanded="true" title="{t("menu_ocultar", L)}" data-ocultar="{t("menu_btn_ocultar", L)}" data-mostrar="{t("menu_btn_mostrar", L)}"><span class="mt-ico" aria-hidden="true">☰</span><span class="mt-txt">{t("menu_btn_ocultar", L)}</span></button>
   <a class="lang" href="{otro}">{t("otro_idioma", L)}</a>
 </div></header>
 <main id="inicio" class="wrap">
@@ -1315,6 +1294,12 @@ def construir(salida: Path = SITE_DIR) -> Path:
         if (DATA_DIR / f).exists():
             shutil.copy(DATA_DIR / f, salida / "datos" / f)
     (salida / "assets" / "curva_tes.json").write_text(json.dumps(datos_curva(d), separators=(",", ":")), encoding="utf-8")
+    import hashlib
+    h = hashlib.sha256()
+    for f in ("estilo.css", "app.js", "curva_tes.json"):
+        h.update((salida / "assets" / f).read_bytes())
+    VERSION_ACTIVOS[0] = h.hexdigest()[:10]
+    VERSION_ACTIVOS[1] = hashlib.sha256((salida / "assets" / "plotly.min.js").read_bytes()).hexdigest()[:10]
     (salida / "index.html").write_text(numerar_secciones(pagina(d, s, "es", generado)), encoding="utf-8")
     (salida / "en" / "index.html").write_text(numerar_secciones(pagina(d, s, "en", generado)), encoding="utf-8")
     (salida / ".nojekyll").write_text("")
