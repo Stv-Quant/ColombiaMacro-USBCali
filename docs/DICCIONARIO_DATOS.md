@@ -10,6 +10,9 @@ dato se conocio. Cada archivo mantiene su frecuencia propia.
 | `inflacion_clean.csv` | Un mes, fechado al primer dia | [DANE, IPC](https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc/ipc-informacion-tecnica) y BanRep, serie 15000 | Inflacion |
 | `tasas_interes_clean.csv` | Dia de observacion | BanRep, series 15272 a 15277 | Curva cero cupon TES |
 | `colcap_oficial.csv` | Dia de mercado | [BanRep/BVC, indice COLCAP](https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/2500/indice_mercado_accionario_colcap), serie 6 | Mercado accionario oficial |
+| `pib_sectores.csv` | Sector × trimestre (largo) | DANE, anexo PIB producción a precios constantes (Cuadro 1) | Crecimiento, peso y aporte de las 12 agrupaciones |
+| `informalidad.csv` | Trimestre móvil, fechado al último mes | [DANE, empleo informal y seguridad social](https://www.dane.gov.co/index.php/estadisticas-por-tema/mercado-laboral/empleo-informal-y-seguridad-social) | Proporción de informales: nacional, 13 y 23 ciudades |
+| `informalidad_ramas.csv` | Rama × trimestre móvil (largo) | DANE, mismo anexo (hoja Ramas de actividad) | Ocupados, informales y tasa por sector |
 | `colcap_canasta.csv` | Una accion de la canasta vigente | [iShares MSCI COLCAP (BlackRock)](https://www.blackrock.com/co/productos/251708/ishares-colcap-fund), composicion diaria | Pesos del COLCAP y 7 Magnificas |
 | `acciones_semanal.csv` | Accion × semana (largo), fechada al viernes | Yahoo Finance, simbolos `<TICKER>.CL` | Equiponderado y 7 Magnificas |
 | `series_banrep.csv` | Serie × fecha (largo) | BanRep, ids en `colombiamacro/fuentes/complementarias.py` | Politica, TRM, inflacion basica, externo, fiscal |
@@ -80,6 +83,21 @@ grafico senala esta fecha cuando esta dentro del periodo visible. Se refresca
 la historia completa para captar correcciones de la fuente.
 La transicion y la continuidad de niveles estan documentadas en la
 [metodologia MSCI COLCAP de mayo de 2021](https://www.msci.com/eqb/methodology/meth_docs/MSCI_COLCAP_Index_Methodology_May2021.pdf).
+
+## PIB por sectores
+
+`pib_sectores.csv`: `fecha` (primer día del trimestre), `codigo` (secciones CIIU, p. ej. `G + H + I`),
+`sector` (nombre corto), `nivel` (miles de millones de pesos de 2015, datos originales), `yoy` (%),
+`peso` (% del valor agregado del mismo trimestre), `contribucion` (pp: cambio anual del nivel del
+sector / valor agregado de hace un año). Los volúmenes encadenados no son aditivos: pesos y aportes
+suman aproximadamente, no exactamente, 100 % y el crecimiento total.
+
+## Informalidad
+
+`informalidad.csv`: `fecha` (último mes del trimestre móvil), `periodo`, `nacional`, `ciudades_13`,
+`ciudades_23` (% de ocupados informales). `informalidad_ramas.csv`: `fecha`, `rama`, `ocupados` e
+`informales` (miles de personas, total nacional) y `tasa` (%). Serie desde 2021 (definición vigente
+del DANE); no se empalma con la serie anterior.
 
 ## Acciones del COLCAP
 

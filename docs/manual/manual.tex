@@ -7,6 +7,7 @@
   \tl_set:Nn \l_tmpa_tl {#1}
   \tl_replace_all:Nnn \l_tmpa_tl {/} {/\allowbreak}
   \tl_replace_all:Nnn \l_tmpa_tl {\_} {\_\allowbreak}
+  \tl_replace_all:Nnn \l_tmpa_tl {.} {.\allowbreak}
   \texttt{\l_tmpa_tl}
 }
 \ExplSyntaxOff
@@ -68,15 +69,18 @@ desplegable \emph{Detalle técnico (para economistas)}.
 \textbf{Sección} & \textbf{Pregunta} & \textbf{Indicador principal (y detalle técnico)}\\
 \midrule
 {\fontspec{DejaVu Sans}◷} Ciclo (sin número) & ¿En qué parte del ciclo está la economía? & Reloj del ciclo interactivo: fase, nivel y dirección de la brecha, trimestre a trimestre\\
+{\fontspec{DejaVu Sans}◉} Noticias (sin número) & Últimas publicaciones oficiales & Hasta 12 tarjetas generadas con los datos descargados, con enlace a la fuente\\
 1. Crecimiento & ¿Está creciendo la economía? & PIB e ISE frente al ritmo habitual; desempleo (brecha del producto)\\
-2. Precios & ¿Cómo están los precios? & Inflación total y de fondo frente a la meta; inflación esperada (5y5y)\\
-3. Banco de la República & ¿Qué está haciendo el Banco? & Tasa de política frente a inflación (tasa real frente a la neutral)\\
-4. Curva TES & ¿Cuánto cobra el mercado por prestarle al Gobierno? & Curva cero cupón TES pesos y UVR, explorable desde 2003\\
-5. Dólar y bolsa & ¿Cómo están el dólar y la bolsa? & TRM y COLCAP (ITCR)\\
-6. Empresas & ¿Qué empresas mueven la bolsa? & COLCAP frente a un equiponderado y a las 7 Magníficas; peso de cada acción\\
-7. Externo y fiscal & Cuentas externas y fiscales & Cuenta corriente y deuda del Gobierno\\
-8. Indicadores & Todos los indicadores & Último dato, cambio y nivel frente a su historia desde 2010\\
-9. Fuentes & ¿De dónde salen los datos? & Estado de cada fuente, descargas CSV y glosario\\
+2. Sectores & ¿Qué sectores impulsan la economía? & Crecimiento anual y aporte de 12 sectores; mapa de calor trimestre a trimestre\\
+3. Informalidad & ¿Cuánto del empleo es informal? & Proporción de ocupados informales (nacional y 13 ciudades) y por sector\\
+4. Precios & ¿Cómo están los precios? & Inflación total y de fondo frente a la meta; inflación esperada (5y5y)\\
+5. Banco de la República & ¿Qué está haciendo el Banco? & Tasa de política frente a inflación (tasa real frente a la neutral)\\
+6. Curva TES & ¿Cuánto cobra el mercado por prestarle al Gobierno? & Curva cero cupón TES pesos y UVR, explorable desde 2003\\
+7. Dólar y bolsa & ¿Cómo están el dólar y la bolsa? & TRM y COLCAP (ITCR)\\
+8. Empresas & ¿Qué empresas mueven la bolsa? & COLCAP frente a un equiponderado y a las 7 Magníficas; peso de cada acción\\
+9. Externo y fiscal & Cuentas externas y fiscales & Cuenta corriente y deuda del Gobierno\\
+10. Indicadores & Todos los indicadores & Último dato, cambio y nivel frente a su historia desde 2010\\
+11. Fuentes & ¿De dónde salen los datos? & Estado de cada fuente, descargas CSV y glosario\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -119,7 +123,9 @@ El sitio es un conjunto de páginas HTML estáticas con gráficos Plotly: la ver
 calculó al construir el sitio a partir de los CSV validados.
 
 \textbf{1. La barra superior.} Los botones de \emph{horizonte} (3, 5, 10 años o \emph{Todo}) recortan todos
-los gráficos de series de tiempo a la misma ventana; el enlace ES/EN cambia de idioma.
+los gráficos de series de tiempo a la misma ventana (si una serie empieza después del inicio de la ventana,
+como la informalidad en 2021, el gráfico arranca en su primer dato, sin espacio vacío); el enlace ES/EN
+cambia de idioma.
 
 \textbf{2. El resumen} (figura~\ref{fig:hero}). Un párrafo en lenguaje sencillo dice si la economía crece
 por encima o por debajo de su ritmo habitual, cómo va la inflación frente a la meta y qué hace el Banco de
@@ -132,12 +138,16 @@ barra de horizonte y de la sección~1, un bloque interactivo sin número respond
 está la economía?}: la fase actual, cuánto produce la economía frente a su capacidad y hacia dónde se mueve
 (sección~\ref{sec:reloj}).
 
+\textbf{Últimas publicaciones oficiales} (menú \emph{Noticias}, ancla \texttt{\#noticias}). A continuación del reloj,
+otro bloque sin número con hasta 12 tarjetas que resumen en una línea lo más reciente que publicaron el DANE,
+el Banco de la República y la BVC, cada una con enlace a la fuente oficial (sección~\ref{sec:noticias}).
+
 \begin{figure}[htbp]\centering
 \includegraphics[width=\linewidth]{hero_es.png}
 \caption{Resumen y seis tarjetas principales (vista en español).}\label{fig:hero}
 \end{figure}
 
-\textbf{3. Nueve secciones}, cada una con un número, una pregunta, un párrafo de respuesta generado a partir
+\textbf{3. Once secciones}, cada una con un número, una pregunta, un párrafo de respuesta generado a partir
 de los datos, los gráficos (cada uno con su \emph{franja de cambios} encima y su \emph{panel de cambios} debajo,
 secciones~\ref{sec:franja} y~\ref{sec:delta}) y un panel
 desplegable \emph{Detalle técnico (para economistas)} con la brecha del producto por tres métodos, la tasa
@@ -168,7 +178,7 @@ la bolsa son diarias. El tablero nunca rellena una frecuencia con otra.
 \node[src] (acc) at (0,-2.7) {iShares · Yahoo Finance\\canasta y acciones\\del COLCAP};
 \node[box] (upd) at (3.9,0) {Descarga\\\texttt{colombiamacro/}\\\texttt{fuentes/}};
 \node[box] (csv) at (7.8,0) {Tablas CSV en \texttt{data/}\\versionadas en Git};
-\node[box] (val) at (7.8,-1.9) {\texttt{python -m}\\\texttt{colombiamacro.validar}\\+ 47 pruebas};
+\node[box] (val) at (7.8,-1.9) {\texttt{python -m}\\\texttt{colombiamacro.validar}\\+ 57 pruebas};
 \node[box] (app) at (11.7,0) {\texttt{analitica} · \texttt{modelo}\\\texttt{sitio/construir}\\$\rightarrow$ \texttt{site/}};
 \node[box] (web) at (11.7,-1.9) {Sitio estático\\GitHub Pages};
 \node[src] (user) at (11.7,-3.6) {Navegador ES / EN};
@@ -183,9 +193,10 @@ y se sirve como archivos estáticos.}
 
 \subsection{Capas}
 \begin{description}[style=nextline,leftmargin=0pt]
-\item[Captura] Los módulos de \archivo{colombiamacro/fuentes/} descargan cada fuente: \archivo{pib.py},
+\item[Captura] Los módulos de \archivo{colombiamacro/fuentes/} descargan cada fuente: \archivo{pib.py} (PIB
+total y por sectores),
 \archivo{ipc.py}, \archivo{tes.py}, \archivo{colcap.py}, \archivo{complementarias.py} (16 series de BanRep,
-ISE y GEIH) y \archivo{acciones.py} (canasta del COLCAP según iShares y precios semanales de sus acciones en
+ISE y GEIH), \archivo{informalidad.py} (empleo informal de la GEIH) y \archivo{acciones.py} (canasta del COLCAP según iShares y precios semanales de sus acciones en
 Yahoo Finance). Todas las series de BanRep pasan por \archivo{banrep.py}. El orquestador es
 \archivo{colombiamacro/actualizar.py}, que deja un registro en \archivo{data/registro\_actualizacion.log}.
 \item[Validación] \archivo{colombiamacro/validar.py} recalcula fórmulas, revisa fechas, rangos y saltos, y
@@ -211,11 +222,14 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 \archivo{colombiamacro/analitica.py} & Fórmulas y filtros; parámetros HP, Hamilton y ventana COVID.\\
 \archivo{colombiamacro/modelo.py} & Carga, instantánea, resumen, veredicto, tabla de indicadores y bolsa por dentro; parámetros \texttt{NEUTRAL\_REAL}, \texttt{UMBRAL\_*}, \texttt{N\_MAGNIFICAS}, \texttt{SALTO\_MAX}, \texttt{NOMBRES\_CORTOS}.\\
 \archivo{colombiamacro/fuentes/banrep.py} & Cliente BanRep con cadena TLS completa.\\
-\archivo{colombiamacro/fuentes/pib.py}, \archivo{ipc.py}, \archivo{tes.py}, \archivo{colcap.py} & Descarga de PIB, IPC, curvas TES y COLCAP.\\
+\archivo{colombiamacro/fuentes/pib.py} & PIB total y por sectores (\texttt{read\_sector\_levels}, \texttt{build\_sectores}).\\
+\archivo{colombiamacro/fuentes/ipc.py}, \archivo{tes.py}, \archivo{colcap.py} & Descarga de IPC, curvas TES y COLCAP.\\
+\archivo{colombiamacro/fuentes/informalidad.py} & Anexo DANE de empleo informal (nacional, ciudades y 13 ramas).\\
 \archivo{colombiamacro/fuentes/complementarias.py} & 16 series BanRep + ISE + GEIH.\\
 \archivo{colombiamacro/fuentes/acciones.py} & Canasta del COLCAP (fondo iShares) y cierres semanales de sus acciones (Yahoo Finance); empalme de tickers (\texttt{ALIAS}).\\
 \archivo{colombiamacro/sitio/construir.py} & Generador del sitio estático (clase \texttt{Graficos}).\\
 \archivo{colombiamacro/sitio/textos.py} & Textos del sitio en español e inglés.\\
+\archivo{colombiamacro/noticias.py} & Tarjetas de \emph{Últimas publicaciones oficiales} (\texttt{publicaciones()}).\\
 \archivo{colombiamacro/sitio/app.js}, \archivo{estilo.css} & Interacción en el navegador y estilos.\\
 \archivo{data/} & CSV publicados y \archivo{registro\_actualizacion.log}.\\
 \archivo{scripts/lanzar\_local.py} & Lanzador local con búsqueda de puerto libre.\\
@@ -224,7 +238,7 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 \archivo{certs/} & Certificado intermedio de BanRep.\\
 \archivo{docs/METODOLOGIA.md} & Nota metodológica breve.\\
 \archivo{.github/workflows/actualizar-y-publicar.yml} & Actualización diaria y publicación en GitHub Pages.\\
-\archivo{tests/} & 47 pruebas: fórmulas, datos y sitio.\\
+\archivo{tests/} & 57 pruebas: fórmulas, datos y sitio.\\
 \bottomrule
 \end{longtable}
 
@@ -233,7 +247,7 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 python -m colombiamacro.actualizar        # descarga DANE, BanRep, iShares y Yahoo
 python -m colombiamacro.validar           # controles de calidad
 python -m colombiamacro.sitio.construir   # genera site/
-python -m unittest discover -s tests      # 47 pruebas
+python -m unittest discover -s tests      # 57 pruebas
 python scripts/generar_figuras.py         # figuras de documentos
 python scripts/lanzar_local.py            # abre el sitio en local
 \end{lstlisting}
@@ -243,7 +257,7 @@ La aplicación Dash de versiones anteriores (\archivo{dashboard\_colombia.py}, \
 \archivo{render.yaml}, el \archivo{Dockerfile} y el laboratorio de canastas bursátiles heredadas (ICOLCAP,
 índice sintético, canasta de “grandes”) fueron retirados del proyecto en la v10; siguen disponibles en el
 historial del repositorio original \texttt{GRAFICO-ECONOMIA-COLOMBIANA}. La idea de la canasta de las siete
-grandes sobrevive, ahora automatizada, como las \emph{7 Magníficas} de la sección~6 del sitio
+grandes sobrevive, ahora automatizada, como las \emph{7 Magníficas} de la sección~8 del sitio
 (sección~\ref{sec:empresas}).
 \end{alerta}
 
@@ -308,6 +322,8 @@ PIB (DANE) & Trimestral & $\approx$45 días después & El dato de T2 llega a med
 ISE (DANE) & Mensual & $\approx$50 días después & Adelanta el PIB del trimestre en curso.\\
 IPC (DANE) & Mensual & 5–8 días después & El IPC de agosto se conoce en la primera semana de septiembre.\\
 Desempleo GEIH & Mensual & $\approx$30 días después & Serie desestacionalizada del DANE.\\
+Informalidad GEIH & Trimestre móvil & $\approx$45 días después & Rezago similar al de la GEIH mensual.\\
+PIB por sectores & Trimestral & Con el PIB total & Mismo anexo, mismo rezago.\\
 TES, COLCAP, TRM, TPM & Diaria & Mismo día o siguiente & Base de la lectura de mercado.\\
 Canasta COLCAP (iShares) & Diaria & Día hábil siguiente & Pesos de cada acción.\\
 Acciones (Yahoo Finance) & Semanal & Mismo día & Índices equiponderado y 7 Magníficas.\\
@@ -383,6 +399,46 @@ Salario mínimo, variación & 15418 & \% anual & Contexto de precios\\
 \bottomrule
 \end{longtable}
 
+\subsection{PIB por sectores (DANE)}
+\label{sec:datos-sectores}
+\textbf{Archivo:} \archivo{pib\_sectores.csv}, columnas \texttt{(fecha, codigo, sector, nivel, yoy, peso,
+contribucion)}. \textbf{Origen:} el mismo anexo del PIB (\texttt{anex-ProduccionConstantes}), Cuadro~1, datos
+originales en volumen encadenado, agrupados en 12 ramas CIIU Rev.~4:
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lXlX@{}}
+\toprule
+\textbf{Cód.} & \textbf{Sector} & \textbf{Cód.} & \textbf{Sector}\\\midrule
+A & Agro y pesca & J & Información y comunicaciones\\
+B & Minería & K & Finanzas y seguros\\
+C & Industria & L & Inmobiliarias\\
+D+E & Electricidad, gas y agua & M+N & Servicios profesionales\\
+F & Construcción & O+P+Q & Gobierno, educación y salud\\
+G+H+I & Comercio, transporte y turismo & R+S+T & Arte, hogares y otros\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\texttt{yoy} es el crecimiento anual, \texttt{peso} la participación en el valor agregado del mismo trimestre y
+\texttt{contribucion} el aporte en pp (sección~\ref{sec:aportes}). La lectura está dentro de
+\archivo{colombiamacro/fuentes/pib.py} (\texttt{read\_sector\_levels}, \texttt{build\_sectores}); si falla, el PIB
+total se guarda igual. Serie desde 2009, como el PIB total; crecimientos por encima de $\pm80\%$ detienen la
+lectura como error de control.
+
+\subsection{Informalidad laboral (DANE)}
+\label{sec:datos-informalidad}
+\textbf{Archivos:} \archivo{informalidad.csv} (columnas \texttt{fecha}, \texttt{periodo}, \texttt{nacional},
+\texttt{ciudades\_13}, \texttt{ciudades\_23}) y \archivo{informalidad\_ramas.csv} (\texttt{fecha}, \texttt{rama},
+\texttt{ocupados}, \texttt{informales}, \texttt{tasa}; ocupados e informales en miles). \textbf{Origen:} anexo \emph{Empleo informal y seguridad social} de la GEIH
+(archivo \texttt{anex-GEIHEISS-}\allowbreak\texttt{<periodo>.xlsx}), que descarga \archivo{colombiamacro/fuentes/informalidad.py}.
+\begin{itemize}
+\item Definición de la resolución 0203 de 2023 (basada en la OIT): ocupados sin seguridad social o en
+negocios no registrados. La serie empieza en 2021 y \textbf{no es comparable} con las series anteriores.
+\item Cada columna del anexo es un trimestre móvil consecutivo; \texttt{fecha} es su último mes
+(\texttt{2026-07} = may–jul 2026). Como los rótulos del DANE no siempre traen el año, el lector valida el
+mes final de cada rótulo contra la secuencia esperada.
+\item Por rama: \texttt{tasa} $=100\cdot$ informales$/$ocupados, 13 ramas. Una prueba automática comprueba que
+la suma de informales entre la suma de ocupados de todas las ramas reproduce la tasa nacional ($\pm0{,}2$~pp).
+\end{itemize}
+
 \subsection{ISE y mercado laboral (DANE)}
 \textbf{ISE} (\archivo{ise\_mensual.csv}): anexo \emph{ISE 9 actividades}; Cuadro~1 (serie original) y Cuadro~2
 (serie desestacionalizada), base 2015=100, total y grandes ramas (primarias, secundarias, terciarias).
@@ -392,7 +448,7 @@ $TD = 100\,(1-TO/TGP)$.
 
 \subsection{Canasta del COLCAP y precios de sus acciones}
 \label{sec:datos-acciones}
-Dos tablas alimentan la sección~6 del sitio (\emph{¿Qué empresas mueven la bolsa?}); las descarga
+Dos tablas alimentan la sección~8 del sitio (\emph{¿Qué empresas mueven la bolsa?}); las descarga
 \archivo{colombiamacro/fuentes/acciones.py}.
 \begin{description}[style=nextline,leftmargin=0pt]
 \item[\archivo{colcap\_canasta.csv}] Columnas \texttt{(ticker, nombre, emisor, sector, peso, precio,
@@ -452,6 +508,28 @@ $i_5=12{,}90$, $i_{10}=13{,}06$ $\Rightarrow f^{nom}=13{,}22\%$; $r_5=6{,}48$, $
 $\Rightarrow f^{real}=6{,}80\%$; $\pi^{5y5y}=1{,}1322/1{,}0680-1=6{,}01\%$. Por encima del techo de 4\%:
 expectativas \emph{desancladas}.
 \end{dato}
+
+\subsection{Trayectoria esperada de inflación a 10 años}
+\label{sec:trayectoria}
+Con las inflaciones implícitas cero cupón $b_1$, $b_5$ y $b_{10}$ (sección anterior), la inflación promedio que
+el mercado descuenta en cada tramo es:
+\[
+\text{año 1: } b_1,\qquad
+f_{1,5}=\left[\frac{(1+b_5)^5}{1+b_1}\right]^{1/4}\!-1,\qquad
+f_{5,10}=\left[\frac{(1+b_{10})^{10}}{(1+b_5)^5}\right]^{1/5}\!-1 .
+\]
+$f_{5,10}$ es exactamente la 5y5y de la fórmula anterior. Los tres
+tramos encadenan exactamente la implícita a 10 años: $(1+b_1)(1+f_{1,5})^4(1+f_{5,10})^5=(1+b_{10})^{10}$.
+\begin{dato}[Valores de ejemplo al 25 de septiembre de 2026]
+$b_1=7{,}1\%$, $f_{1,5}=5{,}8\%$ y $f_{5,10}=6{,}0\%$. Con $b_5\approx6{,}0\%$:
+$f_{1,5}=(1{,}0603^5/1{,}0708)^{1/4}-1\approx5{,}8\%$.
+\end{dato}
+El gráfico repite el cálculo con las tasas de hace un año (septiembre de 2025) para comparar.
+\begin{alerta}[Cautelas]
+Las implícitas incluyen una \textbf{prima por riesgo inflacionario} y una \textbf{prima por liquidez} de los TES UVR,
+por lo que la trayectoria es más bien una \emph{cota superior} de la expectativa pura. Además, la UVR se indexa con
+\textbf{rezago} a la inflación del mes anterior, lo que afecta sobre todo al tramo de 1 año.
+\end{alerta}
 
 \subsection{Tasa de política real}
 \[
@@ -516,6 +594,39 @@ Variación anual con la serie original (comparable con el PIB) y ritmo trimestra
 desestacionalizada: $100\,[(\bar{x}_{t,3}/\bar{x}_{t-3,3})^4-1]$, donde $\bar{x}_{t,3}$ es el promedio de los
 últimos tres meses.
 
+\subsection{Crecimiento y aporte por sector}
+\label{sec:aportes}
+Para el sector $i$ con volumen $Y_{i,t}$ y valor agregado total $VA_t$:
+\[
+g_{i,t}=100\left(\frac{Y_{i,t}}{Y_{i,t-4}}-1\right),\qquad
+w_{i,t}=100\,\frac{Y_{i,t}}{VA_{t}},\qquad
+c_{i,t}=100\,\frac{Y_{i,t}-Y_{i,t-4}}{VA_{t-4}}=\frac{w_{i,t-4}\,g_{i,t}}{100}.
+\]
+$w_{i,t}$ es el peso que muestra la caja emergente; el aporte $c_{i,t}$ (pp) combina cuánto crece el sector y
+cuánto pesaba hace un año. Los volúmenes encadenados no son
+aditivos: la suma de los 12 sectores no es exactamente el valor agregado, así que los pesos suman
+$\approx100{,}6\%$ y los aportes suman aproximadamente el crecimiento del valor agregado.
+\begin{dato}[Ejemplo T2 2026]
+Gobierno, educación y salud: $g=10{,}0\%$, peso actual $19{,}4\%$ $\Rightarrow c=1{,}8$~pp de los 3,9 puntos de
+crecimiento del valor agregado (el PIB, que incluye impuestos, crece 3,5\%).
+\end{dato}
+
+\subsection{Últimas publicaciones: cómo se generan}
+\label{sec:noticias-metodo}
+\archivo{colombiamacro/noticias.py} (\texttt{publicaciones()}) arma las tarjetas con los mismos datos descargados y
+validados: una por indicador (PIB, IPC, ISE, desempleo, informalidad, TPM, TES, TRM, COLCAP, cuenta corriente,
+etc.), ordenadas de la más reciente a la más antigua, hasta 12. La fecha es exacta cuando se conoce —fecha de
+publicación del PIB y del IPC (vintages), fecha del último cambio de la TPM, fecha de mercado de TES, TRM y
+COLCAP—; si no, la tarjeta dice \emph{dato más reciente}. El titular lleva la cifra en una línea (por ejemplo
+\emph{“La inflación anual fue 6,24\% en agosto de 2026”}) y un detalle corto, y cada tarjeta enlaza a la página
+oficial. Debajo hay enlaces fijos a las salas de prensa oficiales (BanRep comunicados y minutas, DANE sala de
+prensa, MinHacienda, Superfinanciera).
+
+\textbf{Por qué no titulares de prensa.} El sitio del Banco de la República bloquea los lectores automáticos con
+un captcha (Radware), y los agregadores comerciales (por ejemplo, el RSS de Google News) prohíben republicar sus
+contenidos. Generar las tarjetas a partir de los datos oficiales es verificable, no depende de terceros y se
+actualiza cada día con la descarga.
+
 \subsection{Percentil histórico}
 Para cada indicador, la proporción de observaciones desde 2010 menores o iguales al último dato.
 Un percentil de 96 significa que el dato actual es mayor que el 96\% de su propia historia desde 2010.
@@ -558,7 +669,7 @@ solo se excluyen de los cálculos y se registran.
 \section{Guía de lectura, sección por sección}
 \label{sec:lectura}
 
-El sitio sigue nueve secciones numeradas. Cada una responde su pregunta con un párrafo en lenguaje sencillo
+El sitio sigue once secciones numeradas, que se numeran automáticamente en el orden de la página (el reloj del ciclo, al inicio, no lleva número). Cada una responde su pregunta con un párrafo en lenguaje sencillo
 generado a partir de los datos; debajo de cada gráfico hay una nota \emph{?} que explica cómo leerlo. Los
 cálculos técnicos quedan en el panel desplegable \emph{Detalle técnico (para economistas)} al final de la
 sección.
@@ -600,6 +711,7 @@ cuándo una variable aceleró, frenó o cambió de dirección, algo que en el ni
 \textbf{Serie} & \textbf{Barra del panel de cambios}\\\midrule
 PIB y brecha del producto & frente al trimestre anterior, en pp\\
 Tasas: inflación, desempleo (promedio 3 meses), TPM, inflación esperada a 1 año, tasa real, 5y5y & frente a hace 1 año, en pp\\
+Informalidad (nacional) & frente a hace 1 año, en pp\\
 Niveles: TRM, COLCAP, ITCR & frente a hace 1 año, en \%\\
 \bottomrule
 \end{tabularx}
@@ -669,6 +781,19 @@ trimestres de $+15{,}3$~pp. La fase es recuperación aunque la economía sigue m
 la dirección, no el nivel, define el cuadrante.
 \end{dato}
 
+\subsection{Últimas publicaciones oficiales}
+\label{sec:noticias}
+\captura[0.9]{sec_noticias.png}{Bloque \emph{Últimas publicaciones oficiales}: tarjetas generadas con los datos
+descargados y enlaces a las salas de prensa.}
+Bloque sin número (menú \emph{Noticias}, icono {\fontspec{DejaVu Sans}◉}, ancla \texttt{\#noticias}) entre el reloj del ciclo y la barra de
+horizonte. Cada tarjeta muestra la fuente (DANE, Banco de la República o BVC) y la fecha, un titular con la cifra
+y un detalle corto; está ordenada de la más reciente a la más antigua y enlaza a la página oficial.
+\begin{leer}
+La fecha dice cuándo se publicó o se observó el dato; \emph{dato más reciente} indica que la fuente no trae fecha
+de publicación y se muestra el último período disponible. Para comunicados completos, use los enlaces fijos a las
+salas de prensa al pie del bloque. Cómo se generan: sección~\ref{sec:noticias-metodo}.
+\end{leer}
+
 \subsection{Sección 1 · ¿Está creciendo la economía?}
 \captura[1]{sec_crecimiento.png}{Sección 1: crecimiento del PIB e ISE frente al ritmo habitual, y desempleo.}
 \begin{leer}
@@ -700,19 +825,93 @@ supuesto. Debajo del gráfico, un texto resume los métodos. El reloj del ciclo,
 panel, es ahora el bloque interactivo del inicio (sección~\ref{sec:reloj}).
 \end{leer}
 
-\subsection{Sección 2 · ¿Cómo están los precios?}
-\captura[1]{sec_precios.png}{Sección 2: inflación total y de fondo frente a la meta, e inflación esperada a 1 año.}
+\subsection{Sección 2 · ¿Qué sectores impulsan la economía?}
+\label{sec:sectores}
+\captura[1]{sec_sectores.png}{Sección 2: crecimiento anual por sector y mapa del crecimiento trimestre a trimestre.}
+El párrafo de respuesta nombra los sectores que más crecieron, el que más aportó y los que se contrajeron. En
+T2 2026: crecen más Gobierno, educación y salud (10,0\%) y Arte, hogares y otros (9,5\%); el que más aporta
+es Gobierno, educación y salud, con 1,8 de los 3,9 puntos de crecimiento del valor agregado; se contraen
+Información y comunicaciones ($-0{,}1\%$) y Agro y pesca ($-2{,}1\%$).
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[Crecimiento anual por sector] Barras horizontales ordenadas de mayor a menor: azul si el sector crece,
+naranja si cae. La \textbf{raya negra} es el mismo dato \emph{hace un año} (T2 2025): si la barra pasa la raya,
+el sector se aceleró; si no la alcanza, se frenó. La caja emergente muestra el peso del sector en la economía
+y su aporte en pp.
+\item[Mapa del crecimiento por sector] Mapa de calor: una fila por sector (ordenados por tamaño, el más grande
+arriba) y una columna por trimestre, coloreada por el crecimiento anual con escala divergente: azul intenso
+= crecimiento alto, blanco $\approx0$, naranja = caída. La escala se recorta en $\pm12\%$ para que 2020 no
+opaque el resto; la caja emergente muestra el valor verdadero. Sigue los botones de horizonte.
+\end{description}
+\begin{leer}
+En el mapa, la columna naranja de 2020 muestra qué sectores cayeron con la pandemia (construcción, minería,
+comercio) y la franja azul de 2021–2022, el rebote. Una fila que se vuelve azul de forma sostenida identifica
+un motor de crecimiento; un sector grande con crecimiento moderado puede aportar más que uno pequeño que
+crece mucho (fórmula en la sección~\ref{sec:aportes}).
+\end{leer}
+
+\subsection{Sección 3 · ¿Cuánto del empleo es informal?}
+\label{sec:informalidad}
+\captura[1]{sec_informalidad.png}{Sección 3: proporción de ocupados informales e informalidad por sector.}
+\begin{dato}[May–jul 2026]
+El 54,6\% de las personas ocupadas es informal (13,4 millones), frente a 55,0\% un año antes. En las 13
+principales ciudades, 40,6\%. Al inicio de la serie, en 2021, era 60,7\%.
+\end{dato}
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[Proporción de ocupados informales] Total nacional (azul) y 13 ciudades (verde), trimestres móviles desde
+2021. La franja muestra $-0{,}4$~pp y $-1{,}4$~pp frente a hace un año; el panel de cambios, la variación del
+total nacional (barras naranjas = la informalidad bajó).
+\item[Informalidad por sector] Porcentaje de ocupados informales en cada una de las 13 ramas, de mayor a menor
+(Agro y pesca 85\%, Alojamiento y comida 73\%, \dots, Finanzas y seguros 12\%), con la misma convención de la
+\textbf{raya negra = hace un año}. La caja emergente muestra informales y ocupados en personas.
+\end{description}
+\begin{leer}
+La informalidad es estructural y baja despacio: medio punto en un año es un movimiento relevante. La brecha
+entre el total nacional y las 13 ciudades refleja el peso del campo, donde casi nueve de cada diez ocupados
+son informales. Cada punto es un trimestre móvil, así que dos meses consecutivos comparten dos de sus tres
+meses.
+\end{leer}
+\begin{alerta}[Comparabilidad]
+La serie usa la definición de la resolución 0203 de 2023 y empieza en 2021: no se puede empalmar con las
+cifras de informalidad publicadas antes con la definición anterior.
+\end{alerta}
+
+\subsection{Sección 4 · ¿Cómo están los precios?}
+\captura[0.78]{sec_precios.png}{Sección 4: inflación total y de fondo frente a la meta, inflación esperada a 1 año y
+trayectoria esperada a 10 años.}
 \begin{leer}
 La franja verde es el rango meta de BanRep (3\% $\pm$ 1~pp). La \emph{inflación de fondo} (sin alimentos ni
 regulados) mide la presión persistente: si la total sube pero la de fondo no, el choque es probablemente
 transitorio. A la derecha, la inflación que el mercado espera para el próximo año (implícita en los TES a
 1 año) frente a la observada: si la línea morada está sobre la franja, el mercado cree que la inflación
-seguirá alta. En el detalle técnico está la 5y5y: si se mantiene dentro del rango, las expectativas de largo
-plazo están \emph{ancladas}; por encima de 4\%, \emph{desancladas}.
+seguirá alta. Debajo, a todo el ancho, la trayectoria que el mercado espera para los próximos 10 años
+(sección~\ref{sec:leer5y5y}). En el detalle técnico está la historia de la 5y5y: si se mantiene dentro del rango,
+las expectativas de largo plazo están \emph{ancladas}; por encima de 4\%, \emph{desancladas}.
 \end{leer}
 
-\subsection{Sección 3 · ¿Qué está haciendo el Banco de la República?}
-\captura[1]{sec_banco.png}{Sección 3: tasa de política frente a la inflación.}
+\subsubsection*{Cómo leer la 5y5y y la trayectoria esperada de inflación}
+\label{sec:leer5y5y}
+\captura[1]{trayectoria_inflacion.png}{\emph{La inflación que el mercado espera para los próximos 10 años}
+(valores de ejemplo al 25 de septiembre de 2026).}
+A la izquierda de la línea punteada \emph{hoy $\rightarrow$}, la inflación observada de los últimos 4 años (gris).
+A la derecha, tres escalones morados con lo que hoy descuentan los TES: 7,1\% el próximo año, 5,8\% por año entre
+el año 1 y el 5, y 6,0\% por año entre el 5 y el 10 (la 5y5y); fórmulas en la sección~\ref{sec:trayectoria}. La
+línea punteada gris es la misma lectura de hace un año (septiembre de 2025) y la franja verde, la meta de 2\% a 4\%.
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[¿Es una proyección?] Sí, pero del \emph{mercado}: es la inflación promedio que descuentan los bonos del
+Gobierno, no un pronóstico del Banco de la República ni del DANE, y lleva primas (sección~\ref{sec:trayectoria}).
+\item[¿Cómo la comparo con la inflación actual?] Compare el primer escalón (1 año) con la inflación observada
+(6,24\% en agosto): 7,1\% indica que el mercado espera más inflación el próximo año. Compare la 5y5y con la meta
+de 3\%: 6,0\% está lejos, por eso las expectativas se leen \emph{desancladas}.
+\item[¿Cómo veo el futuro?] En este gráfico: los tres escalones se dibujan hacia adelante hasta 2036. Si los
+escalones morados están por encima de los grises punteados, el mercado espera hoy más inflación que hace un año;
+si bajan hacia la franja verde, cree que la inflación volverá a la meta.
+\item[¿Por qué la historia de la 5y5y termina hoy?] Porque cada punto del gráfico de anclaje del detalle técnico
+es lo que el mercado esperaba \emph{ese día} para la inflación promedio de los años 5 a 10: no es un pronóstico
+de su propia línea. La proyección completa está en este gráfico.
+\end{description}
+
+\subsection{Sección 5 · ¿Qué está haciendo el Banco de la República?}
+\captura[1]{sec_banco.png}{Sección 5: tasa de política frente a la inflación.}
 \begin{leer}
 La distancia entre la tasa de política y la inflación es, en esencia, la tasa real. La postura depende de la
 tasa \emph{real}, no de la nominal: en el detalle técnico, la tasa real ex ante (con la inflación que descuenta
@@ -720,9 +919,9 @@ el mercado) se compara con la neutral estimada de 2,7–3,0\%. Por encima, la po
 debajo, la estimula.
 \end{leer}
 
-\subsection{Sección 4 · ¿Cuánto cobra el mercado por prestarle al Gobierno?}
+\subsection{Sección 6 · ¿Cuánto cobra el mercado por prestarle al Gobierno?}
 \label{sec:curva}
-\captura[1]{sec_curva.png}{Sección 4: explorador interactivo de la curva cero cupón de los TES.}
+\captura[1]{sec_curva.png}{Sección 6: explorador interactivo de la curva cero cupón de los TES.}
 Esta sección es un explorador interactivo de la curva cero cupón que estima BanRep. Todos los datos (cada
 día hábil desde 2003) viajan con la página, así que la interacción es inmediata y funciona sin conexión.
 \begin{description}[style=nextline,leftmargin=0pt]
@@ -753,8 +952,8 @@ de $+3{,}0$ a $+1{,}3$~pp. Al cierre de 2023, con el mercado anticipando recorte
 queda por encima de la de 5 años (9,59\%).
 \end{dato}
 
-\subsection{Sección 5 · ¿Cómo están el dólar y la bolsa?}
-\captura[1]{sec_mercados.png}{Sección 5: TRM (pesos por dólar) y COLCAP.}
+\subsection{Sección 7 · ¿Cómo están el dólar y la bolsa?}
+\captura[1]{sec_mercados.png}{Sección 7: TRM (pesos por dólar) y COLCAP.}
 \begin{leer}
 Una TRM que baja significa un peso más fuerte. La franja de ambos gráficos muestra el cambio en un año y en un
 mes. Para un inversionista extranjero el retorno relevante combina el precio de las acciones y la tasa de
@@ -765,9 +964,9 @@ reales que en 2010. Los paneles de cambios muestran la variación en \% frente a
 COLCAP y el ITCR.
 \end{leer}
 
-\subsection{Sección 6 · ¿Qué empresas mueven la bolsa?}
+\subsection{Sección 8 · ¿Qué empresas mueven la bolsa?}
 \label{sec:empresas}
-\captura[0.62]{sec_empresas.png}{Sección 6: COLCAP frente al equiponderado y a las 7 Magníficas, peso de cada
+\captura[0.62]{sec_empresas.png}{Sección 8: COLCAP frente al equiponderado y a las 7 Magníficas, peso de cada
 acción y tabla de las 7 Magníficas.}
 El COLCAP pondera cada acción por su capitalización ajustada, así que unas pocas empresas grandes pueden mover
 todo el índice. Esta sección responde si la bolsa sube \emph{en general} o solo por unas cuantas empresas.
@@ -803,16 +1002,16 @@ adquisición) y tienden a sobrestimar el retorno pasado. Sirven para comparar co
 exacta de la bolsa.
 \end{alerta}
 
-\subsection{Sección 7 · Cuentas externas y fiscales}
-\captura[1]{sec_externo.png}{Sección 7: cuenta corriente y deuda bruta del Gobierno Nacional Central.}
+\subsection{Sección 9 · Cuentas externas y fiscales}
+\captura[1]{sec_externo.png}{Sección 9: cuenta corriente y deuda bruta del Gobierno Nacional Central.}
 \begin{leer}
 Un déficit de cuenta corriente significa que el país gasta más de lo que produce y lo financia con capital
 externo; tiene rezago largo, así que conviene leer la tendencia. La deuda del Gobierno, como porcentaje del
 PIB, da el contexto fiscal de las primas en los TES largos.
 \end{leer}
 
-\subsection{Sección 8 · Todos los indicadores}
-\captura[1]{sec_indicadores.png}{Sección 8: tabla de todos los indicadores con su nivel frente a la historia.}
+\subsection{Sección 10 · Todos los indicadores}
+\captura[1]{sec_indicadores.png}{Sección 10: tabla de todos los indicadores con su nivel frente a la historia.}
 \begin{leer}
 Cada fila tiene el último dato, su período, el cambio (en pp para tasas y en \% para niveles como COLCAP o TRM)
 y una barra con su posición frente a su propia historia desde 2010 (percentil), traducida a palabras:
@@ -820,8 +1019,8 @@ y una barra con su posición frente a su propia historia desde 2010 (percentil),
 alejan de su normalidad histórica y merecen atención.
 \end{leer}
 
-\subsection{Sección 9 · Fuentes}
-\captura[1]{sec_fuentes.png}{Sección 9: estado de cada fuente, descargas CSV, documentación y glosario.}
+\subsection{Sección 11 · Fuentes}
+\captura[1]{sec_fuentes.png}{Sección 11: estado de cada fuente, descargas CSV, documentación y glosario.}
 \begin{leer}
 Cada fuente aparece con su último período y un estado: \emph{Al día}, \emph{Retrasado} (supera el umbral de
 días esperado para su frecuencia) o \emph{Pendiente} (aún no descargada). Desde aquí se descargan todos los
@@ -869,12 +1068,17 @@ automáticamente; las pruebas verifican que las frases citen las cifras correcta
 \item Rangos plausibles por serie; historia mínima (1000 días, 60 meses, 40 trimestres, 10 años).
 \item Fechas sin duplicados, sin futuros, sin meses o trimestres faltantes.
 \item Recalculo de fórmulas en cada corrida: PIB (tres tasas), IPC, ISE, identidad de la GEIH, COLCAP base 100.
+\item PIB por sectores: 12 agrupaciones por trimestre sin duplicados y último trimestre igual al del PIB total.
+Informalidad: tasas por rama entre 0 y 100 y sin duplicados; en las pruebas, la suma de las ramas reproduce la
+tasa nacional ($\pm0{,}2$~pp).
 \item Saltos aislados listados en \archivo{alertas\_datos.csv}.
 \item Cada serie de BanRep se valida por separado: si una no pasa (identidad, rango o historia), se excluye y
 se conserva su versión anterior, sin bloquear las demás.
 \item Canasta del COLCAP y precios de acciones: sin tickers duplicados y pesos que suman cerca de 100\%; sin
 pares ticker/fecha duplicados, precios no positivos ni fechas futuras; rezago máximo de 10 días para ambas tablas.
-\item 47 pruebas en tres grupos: fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de
+\item 57 pruebas en tres grupos (las últimas ampliaciones cubren sectores e informalidad —lectura de las 12
+agrupaciones, aportes, fechas de los trimestres móviles y suma de ramas—, la trayectoria esperada de inflación
+y las tarjetas de publicaciones): fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de
 información futura en el HP en tiempo real, Hamilton en una caminata con deriva, índice equiponderado,
 selección de las 7 Magníficas con clases sumadas, descarte de saltos semanales), datos (cliente BanRep,
 lectores DANE, canasta iShares, precios de Yahoo con fechas en viernes, empalme de tickers, rangos y fechas) y sitio (construcción completa en ambos
@@ -922,8 +1126,9 @@ corre todos los días a las 00:30 UTC (19:30 Colombia) y también a demanda (\em
 \begin{enumerate}
 \item instala dependencias y corre las pruebas;
 \item descarga las fuentes con \archivo{python -m colombiamacro.actualizar}: IPC, curvas TES, PIB, COLCAP,
-series BanRep, ISE y GEIH y, como último paso, \emph{Canasta COLCAP (iShares) y acciones (Yahoo Finance)}
-(\archivo{colombiamacro.fuentes.acciones}). Como el paso usa
+series BanRep, ISE y GEIH, \emph{Informalidad laboral — DANE} (\archivo{colombiamacro.fuentes.informalidad}) y,
+como último paso, \emph{Canasta COLCAP (iShares) y acciones (Yahoo Finance)}
+(\archivo{colombiamacro.fuentes.acciones}). El PIB por sectores se lee en el mismo paso del PIB. Como el paso usa
 \texttt{continue-on-error}, si una fuente falla las demás continúan y el sitio se publica igual;
 \item emite un aviso (\emph{warning}) visible en el resumen del run por cada fuente con falla, tomado de
 \archivo{data/registro\_actualizacion.log}; los avisos \textbf{no} detienen la publicación;
@@ -946,7 +1151,7 @@ complementarias. Hoy el rango es $(-1000,\ 500000)$ y una serie inválida ya no 
 
 \subsection{Estado de las fuentes}
 \archivo{estado\_fuentes.csv} lista cada fuente con su último período y uno de tres estados, que el sitio
-muestra en la sección~9: \emph{Al día}, \emph{Retrasado} (supera el umbral de días esperado) o
+muestra en la sección~11: \emph{Al día}, \emph{Retrasado} (supera el umbral de días esperado) o
 \emph{Pendiente} (aún no descargada). Umbrales de rezago:
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
@@ -960,6 +1165,8 @@ Series diarias (TES, COLCAP, TRM, TPM) & 7\\
 Canasta COLCAP (iShares, diaria) & 10\\
 Acciones del COLCAP (Yahoo Finance, semanal) & 10\\
 Deuda del Gobierno (anual) & 800\\
+Informalidad – GEIH (mensual, trimestre móvil) & 110\\
+PIB por sectores (trimestral, desde el inicio del trimestre) & 230\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1082,7 +1289,13 @@ python scripts/generar_figuras.py     # docs/figuras/*.pdf, *.png y resumen.json
 cada fecha. La brecha en tiempo real elimina la información futura del filtro, pero no las revisiones del DANE.
 \item \textbf{La fase depende del método} (coincidencia de fase de 43\% entre HP en tiempo real y Hamilton).
 \item \textbf{La tasa neutral es externa} y tiene incertidumbre amplia.
-\item \textbf{Las implícitas contienen primas} variables en el tiempo.
+\item \textbf{Los aportes sectoriales son aproximados}: los volúmenes encadenados no son aditivos (pesos que
+suman $\approx100{,}6\%$).
+\item \textbf{La informalidad empieza en 2021}: la definición vigente no es comparable con la historia anterior.
+\item \textbf{Las implícitas contienen primas} variables en el tiempo: la trayectoria esperada a 10 años es una
+cota superior de la expectativa pura, y el rezago de indexación de la UVR afecta el tramo corto.
+\item \textbf{Las publicaciones no son titulares de prensa}: se generan con los datos descargados; algunas fechas
+son la del dato más reciente, no la de publicación.
 \item \textbf{COLCAP no mide retorno total} (sin dividendos); los índices equiponderado y de las 7 Magníficas
 tampoco.
 \item \textbf{Sesgo de supervivencia en la bolsa por dentro}: la canasta actual se aplica hacia atrás; las
@@ -1142,6 +1355,10 @@ Equiponderado & Equal-weighted & Índice en el que todas las acciones pesan igua
 7 Magníficas & Magnificent 7 & Las siete empresas de mayor peso en el COLCAP.\\
 Sesgo de supervivencia & Survivorship bias & Distorsión por usar solo las empresas que siguen en el índice.\\
 Vintage & Vintage & Versión de una serie según la fecha de publicación.\\
+Informalidad laboral & Labor informality & Ocupados sin seguridad social o en negocios no registrados.\\
+Aporte al crecimiento & Contribution to growth & Puntos del crecimiento total explicados por un sector.\\
+Trimestre móvil & Rolling quarter & Promedio de tres meses que avanza un mes cada vez.\\
+Trayectoria esperada & Expected path & Inflación promedio que descuentan los TES en cada tramo (1, 1–5, 5–10 años).\\
 \bottomrule
 \end{longtable}
 

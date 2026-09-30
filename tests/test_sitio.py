@@ -46,7 +46,8 @@ class TestSitio(unittest.TestCase):
         es = (self.out / "index.html").read_text(encoding="utf-8")
         en = (self.out / "en" / "index.html").read_text(encoding="utf-8")
         for html_ in (es, en):
-            for sid in ("crecimiento", "precios", "banco", "curva", "mercados", "empresas", "externo", "indicadores", "fuentes"):
+            for sid in ("crecimiento", "sectores", "informalidad", "precios", "banco", "curva", "mercados", "empresas",
+                        "externo", "indicadores", "fuentes"):
                 self.assertIn(f'id="{sid}"', html_)
             self.assertIn('id="curva-app"', html_)
             self.assertIn('id="ciclo-app"', html_)
@@ -54,6 +55,13 @@ class TestSitio(unittest.TestCase):
             self.assertIn('class="stats"', html_)
         self.assertIn('lang="es"', es)
         self.assertIn('lang="en"', en)
+
+    def test_secciones_numeradas_en_orden(self):
+        import re
+        es = (self.out / "index.html").read_text(encoding="utf-8")
+        nums = [int(n) for n in re.findall(r'<span class="sec-num">(\d+)</span>', es)]
+        self.assertEqual(nums, list(range(1, len(nums) + 1)))
+        self.assertGreaterEqual(len(nums), 11)
 
     def test_menu_no_usa_textos_de_metodo(self):
         es = (self.out / "index.html").read_text(encoding="utf-8")

@@ -113,3 +113,14 @@ h3.sub{font-family:var(--serif);font-size:20px;margin:0 0 10px}
 #ciclo-stats .stat{max-width:290px}
 
 @media (max-width:560px){.curve-grid,.cycle-app .curve-grid{grid-template-columns:minmax(0,1fr)}.chart{padding:12px 10px 10px}.stat{min-width:0}}
+.grid>.chart.wide{grid-column:1/-1}
+/* publicaciones oficiales */
+.news-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.news{display:flex;flex-direction:column;gap:4px;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;color:var(--ink)}
+.news:hover{text-decoration:none;border-color:#c9c7c0;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.news-meta{font-size:12px;color:var(--muted)}.news-meta b{color:var(--accent);font-weight:600}
+.news-t{font-weight:700;font-size:15px;line-height:1.35}
+.news-d{font-size:13.5px;color:var(--ink2);line-height:1.45}
+@media (max-width:980px){.news-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.news-grid{grid-template-columns:1fr}}
+.press{font-size:14px;color:var(--ink2);margin:14px 0 0}

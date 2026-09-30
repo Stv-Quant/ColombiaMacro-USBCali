@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -37,7 +38,7 @@ BAND = "rgba(27,175,122,0.12)"
 FONT = "Inter, 'Segoe UI', system-ui, -apple-system, sans-serif"
 MESES = {"es": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
          "en": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-DESCARGAS = ["pib_colombia.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
+DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "estado_fuentes.csv"]
 
 
@@ -344,6 +345,98 @@ class Graficos:
             fig.update_xaxes(range=rango_inicial(x.max()))
         return fig, {"franja": franja(L, [(t("g_" + ("cc" if freq == "q" else "deuda") + "_corto", L), x, y, "pp", "a", freq, 1, "%")])}
 
+    # --- sectores (PIB por actividad)
+    def sectores_barras(self):
+        L, sc = self.lang, self.d.sectores
+        if sc is None or sc.empty:
+            return None, {}
+        f = sc["fecha"].max()
+        u = sc[sc["fecha"] == f].set_index("codigo")
+        a = sc[sc["fecha"] == f - pd.DateOffset(years=1)].set_index("codigo")["yoy"]
+        u = u.assign(hace=a).sort_values("yoy")
+        fig = base(L, height=440, fecha_x=False)
+        fig.add_trace(go.Bar(y=list(u["sector"]), x=[round(v, 2) for v in u["yoy"]], orientation="h", showlegend=False,
+                             marker=dict(color=[C1 if v >= 0 else C2 for v in u["yoy"]], line=dict(width=0)),
+                             customdata=[[num(p_, 1, L, suf="%"), num(c_, 2, L, True, " pp"), num(h, 1, L, suf="%")]
+                                         for p_, c_, h in zip(u["peso"], u["contribucion"], u["hace"])],
+                             text=[num(v, 1, L, True, "%") for v in u["yoy"]], textposition="outside", cliponaxis=False,
+                             hovertemplate="<b>%{y}</b><br>" + t("sec_crec", L) + ": %{x:.1f}%<br>" + t("sec_hace", L)
+                             + ": %{customdata[2]}<br>" + t("sec_peso", L) + ": %{customdata[0]}<br>" + t("sec_aporte", L)
+                             + ": %{customdata[1]}<extra></extra>"))
+        fig.add_trace(go.Scatter(y=list(u["sector"]), x=[round(v, 2) for v in u["hace"]], mode="markers",
+                                 name=t("sec_raya", L).format(q=fecha(f - pd.DateOffset(years=1), "q", L)),
+                                 marker=dict(symbol="line-ns", size=16, line=dict(width=2.5, color=INK)), hoverinfo="skip"))
+        fig.add_vline(x=0, line=dict(color=INK2, width=1))
+        lo = min(0, float(u[["yoy", "hace"]].min().min())) - 2
+        hi = float(u[["yoy", "hace"]].max().max()) + 3
+        fig.update_layout(hovermode="closest", bargap=0.28, margin=dict(l=6, r=30, t=6, b=6))
+        fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID, range=[lo, hi], zeroline=False)
+        fig.update_yaxes(ticksuffix="", tickfont=dict(size=12, color=INK2))
+        return fig, {"notime": True}
+
+    def sectores_mapa(self):
+        """Mapa de calor: crecimiento anual de cada sector, trimestre a trimestre."""
+        L, sc = self.lang, self.d.sectores
+        if sc is None or sc.empty:
+            return None, {}
+        piv = sc.pivot_table(index="sector", columns="fecha", values="yoy")
+        orden = sc[sc["fecha"] == sc["fecha"].max()].sort_values("peso")["sector"]
+        piv = piv.reindex(orden)
+        x = list(qend(pd.Series(piv.columns)))
+        z = piv.values
+        fig = base(L, height=440)
+        fig.add_trace(go.Heatmap(
+            x=x, y=list(piv.index), z=[[None if pd.isna(v) else round(float(v), 2) for v in fila] for fila in z],
+            zmid=0, zmin=-12, zmax=12, colorscale=[[0, "#b04a17"], [0.35, "#f3c9b3"], [0.5, "#f7f6f2"], [0.65, "#bfd7f3"], [1, "#1f4f8f"]],
+            colorbar=dict(ticksuffix="%", thickness=10, len=0.9, outlinewidth=0, tickfont=dict(size=11, color=MUTED)),
+            xgap=1, ygap=1, customdata=[[fecha(f, "q", L) for f in piv.columns]] * len(piv.index),
+            hovertemplate="<b>%{y}</b> · %{customdata}<br>%{z:.1f}%<extra></extra>"))
+        fig.update_layout(hovermode="closest", showlegend=False, margin=dict(l=6, r=6, t=6, b=6))
+        fig.update_yaxes(ticksuffix="", tickfont=dict(size=11.5, color=INK2), gridcolor="rgba(0,0,0,0)")
+        fig.update_xaxes(range=rango_inicial(max(x), 5), showline=False)
+        return fig, {"noy": True}
+
+    # --- informalidad
+    def informalidad(self):
+        L, inf = self.lang, self.d.informalidad
+        if inf is None or inf.empty:
+            return None, {}
+        fig = base(L, delta=True)
+        x = inf["fecha"] + pd.offsets.MonthEnd(0)
+        self._l(fig, x, inf["nacional"], t("inf_nal", L), C1, width=2.6, cambio=("pp", "a"))
+        if "ciudades_13" in inf:
+            self._l(fig, x, inf["ciudades_13"], t("inf_13", L), C3, width=1.8, cambio=("pp", "a"))
+        panel_cambio(fig, x, inf["nacional"], "pp", "a", L, t("inf_nal", L))
+        fig.update_xaxes(range=rango_inicial(x.max(), 10))
+        return fig, {"franja": franja(L, [(t("inf_nal", L), x, inf["nacional"], "pp", "a", "m", 1, "%"),
+                                          (t("inf_13", L), x, inf["ciudades_13"], "pp", "a", "m", 1, "%")])}
+
+    def informalidad_ramas(self):
+        L, ir = self.lang, self.d.informalidad_ramas
+        if ir is None or ir.empty:
+            return None, {}
+        f = ir["fecha"].max()
+        u = ir[ir["fecha"] == f].set_index("rama")
+        a = ir[ir["fecha"] == f - pd.DateOffset(years=1)].set_index("rama")["tasa"]
+        u = u.assign(hace=a).sort_values("tasa")
+        fig = base(L, height=440, fecha_x=False)
+        fig.add_trace(go.Bar(y=list(u.index), x=[round(v, 2) for v in u["tasa"]], orientation="h", showlegend=False,
+                             marker=dict(color=C2, line=dict(width=0)),
+                             text=[num(v, 0, L, suf="%") for v in u["tasa"]], textposition="outside", cliponaxis=False,
+                             customdata=[[num(i_ / 1000, 2, L), num(o_ / 1000, 2, L), num(h, 1, L, suf="%"),
+                                          num(v - h, 1, L, True, " pp") if pd.notna(h) else "—"]
+                                         for i_, o_, h, v in zip(u["informales"], u["ocupados"], u["hace"], u["tasa"])],
+                             hovertemplate="<b>%{y}</b><br>" + t("inf_tasa", L) + ": %{x:.1f}% (%{customdata[3]} "
+                             + t("vs_ano", L) + ")<br>" + t("inf_personas", L)
+                             + ": %{customdata[0]} / %{customdata[1]} M<extra></extra>"))
+        fig.add_trace(go.Scatter(y=list(u.index), x=[round(v, 2) for v in u["hace"]], mode="markers",
+                                 name=t("sec_raya", L).format(q=fecha(f - pd.DateOffset(years=1), "m", L)),
+                                 marker=dict(symbol="line-ns", size=16, line=dict(width=2.5, color=INK)), hoverinfo="skip"))
+        fig.update_layout(hovermode="closest", bargap=0.28, margin=dict(l=6, r=30, t=6, b=6))
+        fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID, range=[0, 100])
+        fig.update_yaxes(ticksuffix="", tickfont=dict(size=12, color=INK2))
+        return fig, {"notime": True}
+
     # --- 5b. bolsa por dentro
     def bolsa_indices(self, b):
         """COLCAP oficial vs equiponderado vs 7 Magnificas, base 100 (el navegador re-basa al horizonte)."""
@@ -443,6 +536,53 @@ class Graficos:
         fig.update_xaxes(range=rango_inicial(w["fecha"].max()))
         return fig, {"franja": franja(L, [(t("tasa_real", L), w["fecha"], w["tpm_real_exante"], "pp", "a", "d", 1, "%")])}
 
+    def trayectoria_inflacion(self):
+        """Inflacion que el mercado descuenta para los proximos 10 anos (tramos implicitos en los TES),
+        junto a la inflacion observada: permite 'ver el futuro' que hoy pagan los bonos."""
+        L, d = self.lang, self.d
+        tt = d.tasas.dropna(subset=["bei_1y", "bei_5y", "bei_10y"])
+        if tt.empty:
+            return None, {}, None
+        hoy = tt.iloc[-1]
+        prev = tt[tt["fecha"] <= hoy["fecha"] - pd.DateOffset(years=1)]
+        fig = base(L, height=400)
+        meta_banda(fig, L)
+        inf = d.inflacion[d.inflacion["fecha"] >= hoy["fecha"] - pd.DateOffset(years=4)]
+        self._l(fig, inf["fecha"] + pd.offsets.MonthEnd(0), inf["inflacion_anual"], t("inf_observada", L), GRAY,
+                width=2, fmt=".2f")
+
+        def tramos(r):
+            b1, b5, b10 = (float(r[k]) / 100 for k in ("bei_1y", "bei_5y", "bei_10y"))
+            f15 = ((1 + b5) ** 5 / (1 + b1)) ** 0.25 - 1
+            f510 = ((1 + b10) ** 10 / (1 + b5) ** 5) ** 0.2 - 1
+            return [(0, 1, 100 * b1), (1, 5, 100 * f15), (5, 10, 100 * f510)]
+
+        def dibujar(r, nombre, color, dash, ancho, etiquetas):
+            f0 = pd.Timestamp(r["fecha"])
+            xs, ys, txt = [], [], []
+            for a, b, v in tramos(r):
+                xa, xb = f0 + pd.DateOffset(years=a), f0 + pd.DateOffset(years=b)
+                xs += [xa, xb, None]
+                ys += [round(v, 2), round(v, 2), None]
+                rango = f"{xa.year}–{xb.year}"
+                txt += [rango, rango, ""]
+                if etiquetas:
+                    fig.add_annotation(x=xa + (xb - xa) / 2, y=v, text=f"<b>{num(v, 1, L)}%</b>", showarrow=False,
+                                       yshift=13, font=dict(size=12.5, color=color))
+            fig.add_trace(go.Scatter(x=xs, y=ys, mode="lines", name=nombre, line=dict(color=color, width=ancho, dash=dash),
+                                     customdata=txt, connectgaps=False,
+                                     hovertemplate="%{customdata}: %{y:.1f}%<extra>" + nombre + "</extra>"))
+        if not prev.empty:
+            dibujar(prev.iloc[-1], t("tray_antes", L).format(f=fecha(prev.iloc[-1]["fecha"], "m", L)), GRAY, "dot", 2, False)
+        dibujar(hoy, t("tray_hoy", L).format(f=fecha(hoy["fecha"], "d", L)), C7, None, 4, True)
+        fig.add_vline(x=pd.Timestamp(hoy["fecha"]), line=dict(color=INK2, width=1, dash="dot"))
+        fig.add_annotation(x=pd.Timestamp(hoy["fecha"]), yref="paper", y=1, text=t("tray_hoy_corto", L), showarrow=False,
+                           xanchor="left", yanchor="top", xshift=4, font=dict(size=11.5, color=INK2))
+        fig.update_layout(hovermode="closest")
+        fig.update_xaxes(range=[(hoy["fecha"] - pd.DateOffset(years=4)).strftime("%Y-%m-%d"),
+                                (hoy["fecha"] + pd.DateOffset(years=10, months=3)).strftime("%Y-%m-%d")])
+        return fig, {"notime": True}, tramos(hoy)
+
     def anclaje(self):
         L, w = self.lang, semanal(self.d.tasas, ["bei_5y5y"])
         fig = base(L, delta=True)
@@ -494,6 +634,26 @@ def tabla_magnificas(b, L):
                     f"<td class='n'>{num(r.peso, 1, L, suf='%')}</td><td class='n'>${num(r.precio, 0, L)}</td>"
                     f"<td class='n'>{c(r.var_1m)}</td><td class='n'>{c(r.var_ano)}</td><td class='n'>{c(r.var_12m)}</td></tr>")
     return f"<div class='table-wrap'><table class='tbl'><thead><tr>{head}</tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
+
+
+# ------------------------------------------------------------------ publicaciones oficiales
+def bloque_noticias(d, s, L, n=12):
+    from colombiamacro import noticias as nt
+    items = nt.publicaciones(d, s, L)[:n]
+    if not items:
+        return ""
+    tarjetas = []
+    for it in items:
+        cuando = (t("nt_dato", L) if it["aprox"] else t("nt_fecha", L)).format(f=fecha(it["fecha"], "d", L))
+        tarjetas.append(
+            f'<a class="news" href="{esc(it["enlace"])}" target="_blank" rel="noopener">'
+            f'<span class="news-meta"><b>{esc(it["fuente"])}</b> · {cuando}</span>'
+            f'<span class="news-t">{esc(it["titular"])}</span><span class="news-d">{esc(it["detalle"])}</span></a>')
+    salas = " · ".join(f'<a href="{u}" target="_blank" rel="noopener">{esc(nombre)}</a>' for nombre, u in nt.SALAS)
+    return (f'<section id="noticias" class="cycle"><div class="sec-head"><span class="sec-num">◉</span>'
+            f'<h2>{t("q_noticias", L)}</h2></div><p class="answer">{t("resp_noticias", L)}</p>'
+            f'<div class="news-grid">{"".join(tarjetas)}</div>'
+            f'<p class="press"><b>{t("nt_salas", L)}:</b> {salas}</p></section>')
 
 
 # ------------------------------------------------------------------ reloj del ciclo interactivo
@@ -596,6 +756,7 @@ def fig_html(fig, meta, gid):
     data = pio.to_json(fig, validate=False, pretty=False, engine="json")
     attrs = ' data-notime="1"' if meta.get("notime") else ""
     attrs += ' data-rebase="1"' if meta.get("rebase") else ""
+    attrs += ' data-noy="1"' if meta.get("noy") else ""
     alto = int(fig.layout.height or 330)
     return (meta.get("franja", "") + f'<div class="plot" id="{gid}"{attrs} style="height:{alto}px"></div>'
             f'<script type="application/json" data-for="{gid}">{data}</script>')
@@ -608,10 +769,10 @@ def tarjeta(titulo, valor, detalle, estado, tono, pregunta_id):
             f'<div class="card-value">{esc(valor)}</div><div class="card-detail">{detalle}</div></a>')
 
 
-def bloque_grafico(titulo, fig_html_str, como_leer, nota=None):
+def bloque_grafico(titulo, fig_html_str, como_leer, nota=None, ancho=False):
     cuerpo = fig_html_str or '<div class="pending">—</div>'
     extra = f'<p class="note">{nota}</p>' if nota else ""
-    return (f'<figure class="chart"><figcaption>{esc(titulo)}</figcaption>{cuerpo}'
+    return (f'<figure class="chart{" wide" if ancho else ""}"><figcaption>{esc(titulo)}</figcaption>{cuerpo}'
             f'<p class="how"><span>?</span>{como_leer}</p>{extra}</figure>')
 
 
@@ -689,6 +850,50 @@ def pagina(d, s, lang, generado):
                   bloque_grafico(t("g_desempleo", L), fig_html(fd, md, "g-desempleo"), t("h_desempleo", L))],
                  s1_det, L)
 
+    # --- sectores
+    s_sec = ""
+    sc = d.sectores
+    if sc is not None and not sc.empty:
+        f = sc["fecha"].max()
+        u = sc[sc["fecha"] == f].sort_values("contribucion", ascending=False)
+        rap = u.sort_values("yoy", ascending=False)
+        neg = u[u["yoy"] < 0]["sector"].tolist()
+        resp_sec = t("resp_sectores", L).format(
+            q=fecha(f, "q", L), s1=rap.iloc[0]["sector"], v1=num(rap.iloc[0]["yoy"], 1, L),
+            s2=rap.iloc[1]["sector"], v2=num(rap.iloc[1]["yoy"], 1, L),
+            a=u.iloc[0]["sector"], ap=num(u.iloc[0]["contribucion"], 1, L), tot=num(u["contribucion"].sum(), 1, L))
+        resp_sec += " " + (t("resp_sec_neg", L).format(lista=", ".join(neg)) if neg else t("resp_sec_todos", L))
+        fsb, msb = g.sectores_barras()
+        fsm, msm = g.sectores_mapa()
+        s_sec = seccion("sectores", "0", t("q_sectores", L), resp_sec,
+                        [bloque_grafico(t("g_sec_barras", L).format(q=fecha(f, "q", L)), fig_html(fsb, msb, "g-sec-barras"), t("h_sec_barras", L)),
+                         bloque_grafico(t("g_sec_mapa", L), fig_html(fsm, msm, "g-sec-mapa"), t("h_sec_mapa", L))],
+                        f'<p class="method">{t("m_sectores", L)}</p>', L)
+
+    # --- informalidad
+    s_inf = ""
+    inf = d.informalidad
+    if inf is not None and not inf.empty:
+        ult = inf.iloc[-1]
+        ant = inf[inf["fecha"] <= ult["fecha"] - pd.DateOffset(years=1)]
+        ir = d.informalidad_ramas
+        millones = ""
+        if ir is not None and not ir.empty:
+            uu = ir[ir["fecha"] == ir["fecha"].max()]
+            millones = num(uu["informales"].sum() / 1000, 1, L)
+        ventana = t("mov_" + str(ult["fecha"].month), L)
+        resp_inf = t("resp_informal", L).format(
+            v=num(ult["nacional"], 1, L), p=ventana + " " + str(ult["fecha"].year), m=millones,
+            a=num(ant.iloc[-1]["nacional"], 1, L) if not ant.empty else "—",
+            c=num(ult["ciudades_13"], 1, L), i=num(inf.iloc[0]["nacional"], 1, L))
+        fin_, min_ = g.informalidad()
+        fir, mir = g.informalidad_ramas()
+        s_inf = seccion("informalidad", "0", t("q_informal", L), resp_inf,
+                        [bloque_grafico(t("g_informal", L), fig_html(fin_, min_, "g-informal"), t("h_informal", L)),
+                         bloque_grafico(t("g_inf_ramas", L).format(p=ventana + " " + str(ult["fecha"].year)),
+                                        fig_html(fir, mir, "g-inf-ramas"), t("h_inf_ramas", L))],
+                        f'<p class="method">{t("m_informal", L)}</p>', L)
+
     fi, mi = g.inflacion()
     fe, me = g.expectativas()
     s2_det = "".join(filter(None, [
@@ -698,12 +903,17 @@ def pagina(d, s, lang, generado):
     basica = ""
     if i.get("basica") is not None:
         basica = t("resp_basica", L).format(v=num(i["basica"], 1, L))
+    ftr, mtr, tramos_hoy = g.trayectoria_inflacion()
+    graf_tray = ""
+    if ftr is not None:
+        graf_tray = bloque_grafico(t("g_tray", L), fig_html(ftr, mtr, "g-tray"), t("h_tray", L).format(
+            a=num(tramos_hoy[0][2], 1, L), b=num(tramos_hoy[1][2], 1, L), c=num(tramos_hoy[2][2], 1, L)), ancho=True)
     s2 = seccion("precios", "2", t("q_precios", L),
                  t("resp_precios", L).format(v=num(i["total"], 2, L), m=fecha(i["fecha"], "m", L),
                                              a=num(i["hace_12m"], 1, L)) + " " + basica + " " +
                  t("resp_espera", L).format(v=num(tt["bei_1y"], 1, L)),
                  [bloque_grafico(t("g_inf", L), fig_html(fi, mi, "g-inf"), t("h_inf", L)),
-                  bloque_grafico(t("g_espera", L), fig_html(fe, me, "g-espera"), t("h_espera", L))],
+                  bloque_grafico(t("g_espera", L), fig_html(fe, me, "g-espera"), t("h_espera", L)), graf_tray],
                  s2_det, L)
 
     fp, mp = g.politica()
@@ -794,7 +1004,7 @@ def pagina(d, s, lang, generado):
 </head><body>
 <header class="top"><div class="wrap top-in">
   <a class="brand" href="#inicio"><img src="{raiz}assets/logo_usb.png" alt="USB Cali"><span><b>ColombiaMacro</b><small>{t("sub_marca", L)}</small></span></a>
-  <nav class="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a></nav>
+  <nav class="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a></nav>
   <a class="lang" href="{otro}">{t("otro_idioma", L)}</a>
 </div></header>
 <main id="inicio" class="wrap">
@@ -806,9 +1016,10 @@ def pagina(d, s, lang, generado):
   <p class="disclaimer">{t("aviso_estados", L)}</p>
 </section>
 {explorador_ciclo(d, L)}
+{bloque_noticias(d, s, L)}
 <div class="horizon" role="group" aria-label="{t('horizonte', L)}"><span>{t("horizonte", L)}:</span>
   <button data-years="3">{t("h3", L)}</button><button data-years="5">{t("h5", L)}</button><button data-years="10" class="on">{t("h10", L)}</button><button data-years="0">{t("htodo", L)}</button></div>
-{s1}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
+{s1}{s_sec}{s_inf}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
 <section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">8</span><h2>{t("q_todos", L)}</h2></div>
 <p class="answer">{t("resp_todos", L)}</p>{tabla}</section>
 <section id="fuentes" class="section"><div class="sec-head"><span class="sec-num">9</span><h2>{t("q_fuentes", L)}</h2></div>
@@ -820,6 +1031,12 @@ def pagina(d, s, lang, generado):
 </main>
 <footer class="wrap foot"><p>{t("aviso", L)}</p><p>DANE · Banco de la República · BVC/MSCI · Ministerio de Hacienda · {t("generado", L)} {fecha(generado, "d", L)}</p></footer>
 </body></html>"""
+
+
+def numerar_secciones(html_: str) -> str:
+    """Numera las secciones en el orden en que aparecen (1, 2, 3...)."""
+    contador = iter(range(1, 100))
+    return re.sub(r'<span class="sec-num">\d+</span>', lambda m: f'<span class="sec-num">{next(contador)}</span>', html_)
 
 
 def tabla_indicadores(d, s, L):
@@ -879,8 +1096,8 @@ def construir(salida: Path = SITE_DIR) -> Path:
         if (DATA_DIR / f).exists():
             shutil.copy(DATA_DIR / f, salida / "datos" / f)
     (salida / "assets" / "curva_tes.json").write_text(json.dumps(datos_curva(d), separators=(",", ":")), encoding="utf-8")
-    (salida / "index.html").write_text(pagina(d, s, "es", generado), encoding="utf-8")
-    (salida / "en" / "index.html").write_text(pagina(d, s, "en", generado), encoding="utf-8")
+    (salida / "index.html").write_text(numerar_secciones(pagina(d, s, "es", generado)), encoding="utf-8")
+    (salida / "en" / "index.html").write_text(numerar_secciones(pagina(d, s, "en", generado)), encoding="utf-8")
     (salida / ".nojekyll").write_text("")
     resumen = {"generado": str(generado.date()), "fase": s["ciclo"]["fase"],
                "resumen_es": mt.resumen_simple(s, "es"), "resumen_en": mt.resumen_simple(s, "en")}

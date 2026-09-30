@@ -70,6 +70,9 @@ class Datos:
     extra: dict = field(default_factory=dict)
     canasta: pd.DataFrame | None = None
     acciones: pd.DataFrame | None = None
+    sectores: pd.DataFrame | None = None
+    informalidad: pd.DataFrame | None = None
+    informalidad_ramas: pd.DataFrame | None = None
 
 
 def cargar() -> Datos:
@@ -104,7 +107,10 @@ def cargar() -> Datos:
                  mercado=am.tabla_mercado(colcap, trm, ipc),
                  ise=ise, laboral=laboral, extra=extra,
                  canasta=_read("colcap_canasta.csv"),
-                 acciones=_read("acciones_semanal.csv", parse_dates=["fecha"]))
+                 acciones=_read("acciones_semanal.csv", parse_dates=["fecha"]),
+                 sectores=_read("pib_sectores.csv", parse_dates=["fecha"]),
+                 informalidad=_read("informalidad.csv", parse_dates=["fecha"]),
+                 informalidad_ramas=_read("informalidad_ramas.csv", parse_dates=["fecha"]))
 
 
 # ---------------------------------------------------------------- bolsa por dentro

@@ -21,6 +21,7 @@ EXTRA_SOURCES = {
     # fechado el dia 1 tiene normalmente entre 60 y 95 dias al publicarse.
     "Actividad mensual – ISE (DANE)": ("ise_mensual.csv", "mensual", 110),
     "Desempleo – GEIH (DANE)": ("mercado_laboral.csv", "mensual", 100),
+    "Informalidad – GEIH (DANE)": ("informalidad.csv", "mensual", 110),
 }
 # serie en series_banrep.csv: (nombre visible, frecuencia, dias de tolerancia)
 BANREP_SERIES = {
@@ -122,6 +123,23 @@ def validate_acciones():
                        "ultima_observacion": latest.strftime("%Y-%m-%d"),
                        "ultima_publicacion_o_corte": latest.strftime("%Y-%m-%d"),
                        "estado": "rezagado" if age > stale else "vigente"})
+    path = BASE / "pib_sectores.csv"
+    if path.exists():
+        sec = pd.read_csv(path, parse_dates=["fecha"])
+        if sec.duplicated(["fecha", "codigo"]).any() or sec.groupby("fecha")["codigo"].nunique().ne(12).any():
+            errors.append("PIB por sectores: faltan agrupaciones o hay duplicados")
+        pib = pd.read_csv(BASE / "pib_colombia.csv", parse_dates=["fecha"])
+        if sec["fecha"].max() != pib["fecha"].max():
+            warnings.append("PIB por sectores: su ultimo trimestre no coincide con el PIB total")
+        states.append({"fuente": "PIB por sectores (DANE)", "archivo": "pib_sectores.csv", "frecuencia": "trimestral",
+                       "ultima_observacion": sec["fecha"].max().strftime("%Y-%m-%d"),
+                       "ultima_publicacion_o_corte": sec["fecha"].max().strftime("%Y-%m-%d"),
+                       "estado": "rezagado" if (TODAY - sec["fecha"].max()).days > 230 else "vigente"})
+    path = BASE / "informalidad_ramas.csv"
+    if path.exists():
+        ir = pd.read_csv(path)
+        if ir.duplicated(["fecha", "rama"]).any() or not ir["tasa"].between(0, 100).all():
+            errors.append("Informalidad por ramas: duplicados o tasas fuera de 0-100")
     return errors, warnings, states
 
 

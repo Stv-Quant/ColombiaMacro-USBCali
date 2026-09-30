@@ -18,6 +18,14 @@ from openpyxl import load_workbook
 from colombiamacro.config import data
 
 CSV_PIB = data("pib_colombia.csv")
+CSV_SECTORES = data("pib_sectores.csv")
+# Secciones CIIU (12 agrupaciones de cuentas nacionales) -> nombre corto para el tablero
+SECTORES = {
+    "A": "Agro y pesca", "B": "Minería", "C": "Industria", "D + E": "Electricidad, gas y agua",
+    "F": "Construcción", "G + H + I": "Comercio, transporte y turismo", "J": "Información y comunicaciones",
+    "K": "Finanzas y seguros", "L": "Inmobiliarias", "M + N": "Servicios profesionales",
+    "O + P + Q": "Gobierno, educación y salud", "R + S + T": "Arte, hogares y otros",
+}
 DANE_PAGE = (
     "https://www.dane.gov.co/index.php/estadisticas-por-tema/"
     "cuentas-nacionales/cuentas-nacionales-trimestrales/pib-informacion-tecnica"
@@ -94,6 +102,56 @@ def read_pib_levels(content, sheet_name):
         wb.close()
 
 
+def read_sector_levels(content, sheet_name="Cuadro 1"):
+    """Niveles reales (datos originales) de las 12 agrupaciones y del valor agregado."""
+    wb = load_workbook(io.BytesIO(content), read_only=True, data_only=True)
+    try:
+        rows = list(wb[sheet_name].values)
+        years, quarters = rows[11], rows[12]
+        cols, year = {}, None
+        for col in range(3, len(quarters)):
+            m = re.match(r"^(20\d{2}|19\d{2})(?:p|pr)?$", str(years[col]).strip())
+            if m:
+                year = int(m.group(1))
+            q = str(quarters[col]).strip()
+            if q in QUARTERS and year:
+                cols[col] = pd.Timestamp(year, QUARTERS[q], 1)
+        out = {}
+        for r in rows[13:40]:
+            code = re.sub(r"\s+", " ", str(r[1] or "")).strip()
+            key = code if code in SECTORES else ("VA" if str(r[2]).strip().lower() == "valor agregado bruto" else None)
+            if key is None or key in out:
+                continue
+            out[key] = pd.Series({f: float(r[c]) for c, f in cols.items() if isinstance(r[c], (int, float))})
+        faltan = [k for k in list(SECTORES) + ["VA"] if k not in out]
+        if faltan:
+            raise ValueError(f"Faltan agrupaciones en el anexo PIB: {faltan}")
+        return pd.DataFrame(out).sort_index()
+    finally:
+        wb.close()
+
+
+def build_sectores(niveles: pd.DataFrame) -> pd.DataFrame:
+    """Crecimiento anual, peso en el valor agregado y contribucion aproximada (pp) por sector.
+    Los volumenes encadenados no son aditivos: la suma de contribuciones difiere levemente del total."""
+    va = niveles["VA"]
+    filas = []
+    for code, nombre in SECTORES.items():
+        n = niveles[code]
+        yoy = n.pct_change(4, fill_method=None) * 100
+        contrib = (n - n.shift(4)) / va.shift(4) * 100
+        peso = n / va * 100
+        for f in n.index:
+            filas.append({"fecha": f, "codigo": code, "sector": nombre, "nivel": n[f], "yoy": yoy[f],
+                          "peso": peso[f], "contribucion": contrib[f]})
+    df = pd.DataFrame(filas)
+    df = df[df["fecha"] >= "2009-01-01"].dropna(subset=["yoy"])
+    if (df["yoy"].abs() > 80).any():
+        raise ValueError("Crecimiento sectorial fuera de rango de control")
+    df["fecha"] = df["fecha"].dt.strftime("%Y-%m-%d")
+    return df.sort_values(["fecha", "codigo"]).reset_index(drop=True)
+
+
 def build_table(real_original, real_adjusted, nominal, publication, source_url):
     if not real_original.index.equals(real_adjusted.index) or not real_original.index.equals(nominal.index):
         raise ValueError("Los anexos PIB no cubren los mismos trimestres")
@@ -135,6 +193,12 @@ def update(session=None):
     adjusted = read_pib_levels(content["real"], "Cuadro 4")
     nominal = read_pib_levels(content["nominal"], "Cuadro 1")
     table = build_table(real, adjusted, nominal, links["real"][1], links["real"][0])
+    try:  # los sectores no bloquean el PIB total
+        sectores = build_sectores(read_sector_levels(content["real"]))
+        sectores.to_csv(CSV_SECTORES, index=False, float_format="%.6f", lineterminator="\n")
+        print(f"PIB por sectores: {sectores['sector'].nunique()} agrupaciones hasta {sectores['fecha'].max()}")
+    except Exception as exc:
+        print(f"AVISO: PIB por sectores no actualizado: {exc}")
     name_match = re.search(r"-(I{1,3}|IV)trim(20\d{2})\.xlsx$", links["real"][0], re.I)
     if name_match:
         expected_last = pd.Timestamp(int(name_match.group(2)), QUARTERS[name_match.group(1).upper()], 1)

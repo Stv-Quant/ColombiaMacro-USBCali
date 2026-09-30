@@ -72,7 +72,7 @@ Una lectura: fase del ciclo, presión de precios, postura monetaria y lo que des
   arr/.style={-{Stealth[length=2.2mm]},color=cmmuted,thick}]
 \node[box,fill=cmsoft] (a) {DANE · BanRep\\20+ series oficiales};
 \node[box,right=4mm of a] (b) {Descarga diaria\\verificada};
-\node[box,right=4mm of b] (c) {Validación\\+ 47 pruebas};
+\node[box,right=4mm of b] (c) {Validación\\+ 57 pruebas};
 \node[box,right=4mm of c] (d) {Analítica\\explícita};
 \node[box,right=4mm of d,fill=cmsoft] (e) {Lectura\\ES / EN};
 \draw[arr] (a)--(b); \draw[arr] (b)--(c); \draw[arr] (c)--(d); \draw[arr] (d)--(e);
@@ -111,6 +111,22 @@ PIB real +3,5\% · potencial 2,4\%
 \fuente{DANE, PIB desestacionalizado ref. 2015. HP en tiempo real ($\lambda=1600$), HP dos colas y Hamilton (2018).}
 \end{frame}
 
+\begin{frame}{Sectores e informalidad}
+\begin{columns}[c]
+\column{0.44\textwidth}\centering
+\includegraphics[height=0.62\textheight,trim=0 401 1165 494,clip]{sec_sectores.png}
+\column{0.54\textwidth}
+\small
+\begin{itemize}
+\item Crecen más: \textbf{Gobierno, educación y salud} (10,0\%) y Arte, hogares y otros (9,5\%)
+\item Gobierno, educación y salud aporta \alert{1,8 de los 3,9 pp} de crecimiento del valor agregado
+\item Se contraen: Información y comunicaciones ($-0{,}1\%$) y Agro y pesca ($-2{,}1\%$)
+\item Informalidad: \textbf{54,6\%} de los ocupados (13,4 millones); 55,0\% hace un año, 60,7\% en 2021
+\end{itemize}
+\end{columns}
+\fuente{DANE: PIB por 12 agrupaciones CIIU, T2 2026; GEIH, empleo informal may–jul 2026.}
+\end{frame}
+
 \begin{frame}{El reloj del ciclo: entrando a expansión}
 \begin{columns}[c]
 \column{0.5\textwidth}\centering\includegraphics[height=0.72\textheight]{reloj_ciclo.pdf}
@@ -146,9 +162,10 @@ Presión \alert{generalizada}, no solo alimentos
 {\small inflación implícita 5y5y}\\[0.8em]
 \small A 1 año: \textbf{7,1\%}\\
 El techo del rango es 4\%\\
-Expectativas \alert{desancladas}
+Expectativas \alert{desancladas}\\[0.3em]
+Trayectoria a 10 años:\\ \textbf{7,1 $\rightarrow$ 5,8 $\rightarrow$ 6,0\%}
 \end{columns}
-\fuente{$\pi^{BE}_h=(1+i^{COP}_h)/(1+r^{UVR}_h)-1$ con curvas cero cupón TES (BanRep). Incluye primas de riesgo y liquidez.}
+\fuente{$\pi^{BE}_h=(1+i^{COP}_h)/(1+r^{UVR}_h)-1$ con curvas cero cupón TES (BanRep). Incluye primas de riesgo y liquidez. Trayectoria: año 1, años 1–5 y 5–10 (5y5y).}
 \end{frame}
 
 \begin{frame}{3 · Política: postura claramente restrictiva}
@@ -274,7 +291,7 @@ $\Rightarrow$ Por eso el tablero muestra la \alert{banda} entre métodos y cuán
 \centering
 {\Large El sitio en vivo}\\[1em]
 {\color{cmblue}\large stv-quant.github.io/ColombiaMacro-USBCali}\\[1.2em]
-\small Reloj del ciclo (hoy y T4 2020) $\rightarrow$ resumen $\rightarrow$ crecimiento $\rightarrow$ precios $\rightarrow$ \alert{curva TES: 2021 frente a 2022} $\rightarrow$ 7 Magníficas $\rightarrow$ todos los indicadores
+\small Reloj del ciclo (hoy y T4 2020) $\rightarrow$ resumen $\rightarrow$ crecimiento y sectores $\rightarrow$ precios $\rightarrow$ \alert{curva TES: 2021 frente a 2022} $\rightarrow$ 7 Magníficas $\rightarrow$ todos los indicadores
 \end{frame}
 
 \begin{frame}{Próximos pasos}
@@ -349,7 +366,7 @@ $g<0$ & \textcolor{cmblue}{Recuperación} & \textcolor{cmred}{Contracción}\\
 \begin{tabularx}{\textwidth}{@{}lXl@{}}
 \toprule
 \textbf{Bloque} & \textbf{Series} & \textbf{Fuente}\\\midrule
-Actividad & PIB real ref. 2015 (Cuadros 1 y 4), ISE, GEIH desestacionalizada & DANE\\
+Actividad & PIB ref. 2015 y 12 sectores, ISE, GEIH, informalidad & DANE\\
 Precios & IPC; básica 15388/15390/15392; regulados 15398; alimentos 15404; meta 853 & DANE, BanRep\\
 Tasas & TES cero cupón pesos y UVR 15272–15277; TPM 59; IBR 15324 & BanRep\\
 Mercados & COLCAP 6; TRM 1; ITCR 235 & BanRep (BVC/MSCI, SFC)\\
@@ -377,7 +394,7 @@ Externo y fiscal & Cuenta corriente 15290; IED 15133; reservas 15051; deuda GNC 
 \item Rangos, fechas, frecuencias
 \item Fórmulas recalculadas cada día
 \item Saltos aislados excluidos y registrados
-\item 47 pruebas automáticas
+\item 57 pruebas automáticas
 \end{itemize}
 \end{columns}
 \end{frame}

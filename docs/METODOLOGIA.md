@@ -113,6 +113,16 @@ positiva. Al T2 2026 los tres métodos dan brecha positiva (+0,3% a +2,3%).
 PIB; el ritmo de corto plazo es $100\,[(\bar{x}_{t,3}/\bar{x}_{t-3,3})^4-1]$ sobre la serie desestacionalizada
 (promedios móviles de tres meses), anualizado.
 
+### 3.6 Sectores y mercado laboral
+
+* **Sectores**: 12 agrupaciones CIIU Rev. 4 del PIB por el lado de la oferta (DANE, volúmenes
+  encadenados, datos originales). Crecimiento anual frente al mismo trimestre del año anterior;
+  aporte aproximado $c_{i,t} = (Y_{i,t} - Y_{i,t-4})/VA_{t-4}$. El mapa de calor recorta la escala en
+  ±12 % para que 2020 no oculte el resto de la historia (el recuadro flotante muestra el valor real).
+* **Informalidad**: proporción de ocupados informales de la GEIH (definición DANE 2023, alineada con
+  la OIT), trimestres móviles desde 2021; nacional y 13 ciudades. Por sector, informales / ocupados.
+  La suma por ramas reproduce la tasa nacional publicada (control automático).
+
 ## 4. Precios y expectativas
 
 * Inflación anual: $100\,(IPC_t/IPC_{t-12}-1)$; el último mes se reemplaza por la cifra publicada por el DANE
@@ -138,6 +148,28 @@ líquidos) y el rezago de indexación de la UVR; no es una expectativa pura (Gü
 
 Antes de 2020 la implícita pronostica mejor que la caminata aleatoria; el choque 2021-23 no fue anticipado
 por ningún método. La implícita se presenta como **lo que el mercado descuenta**, no como pronóstico.
+
+### 4.1 Trayectoria de inflación que descuenta el mercado
+
+Con los breakevens $b_1, b_5, b_{10}$ (inflación implícita promedio a 1, 5 y 10 años) se obtienen tres
+tramos que encadenan exactamente el breakeven a 10 años:
+
+* año 1: $b_1$;
+* años 1–5: $f_{1,5} = \left[(1+b_5)^5/(1+b_1)\right]^{1/4} - 1$;
+* años 5–10: $f_{5,10} = \left[(1+b_{10})^{10}/(1+b_5)^5\right]^{1/5} - 1$ (la 5y5y).
+
+El gráfico los dibuja hacia el futuro a partir de la última fecha, junto a la inflación observada y a la
+misma lectura de hace un año. **La 5y5y no es un pronóstico de su propia serie**: cada punto histórico
+es lo que el mercado esperaba, ese día, para la inflación promedio entre 5 y 10 años adelante. Incluye
+primas por riesgo inflacionario y liquidez, por lo que es una cota de la expectativa pura.
+
+### 4.2 Publicaciones oficiales
+
+La sección de noticias no copia titulares de prensa: resume el último dato publicado por cada
+entidad (DANE, Banco de la República, BVC) a partir de los datos descargados y enlaza a su página
+oficial. Cuando la fecha exacta de publicación no está en el archivo fuente se muestra "dato más
+reciente". Se descartó leer las páginas de prensa directamente: el sitio del Banco de la República
+bloquea lectores automáticos con un captcha y los agregadores comerciales no permiten republicar.
 
 ## 5. Postura monetaria y curva
 

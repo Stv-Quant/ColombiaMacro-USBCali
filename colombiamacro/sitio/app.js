@@ -58,9 +58,10 @@
       var ext = p.ext, x1 = ext[1] + 25 * 864e5, x0;
       if (years === 0) { x0 = ext[0] - 25 * 864e5; }
       else { var d = new Date(ext[1]); d.setFullYear(d.getFullYear() - years); x0 = d.getTime(); }
+      x0 = Math.max(x0, ext[0] - 25 * 864e5);   // no dejar espacio vacio antes del primer dato
       if (p.orig) rebase(p, x0);
       var upd = { 'xaxis.range': [new Date(x0).toISOString().slice(0, 10), new Date(x1).toISOString().slice(0, 10)] };
-      var yr = yRange(p.fig, x0, x1, 'y'); if (yr) upd['yaxis.range'] = yr;
+      var yr = p.noy ? null : yRange(p.fig, x0, x1, 'y'); if (yr) upd['yaxis.range'] = yr;
       if (p.fig.layout.yaxis2) { var y2 = yRange(p.fig, x0, x1, 'y2'); if (y2) upd['yaxis2.range'] = y2; }
       Plotly.relayout(p.el, upd);
     });
@@ -380,7 +381,7 @@
       var notime = el.dataset.notime === '1';
       // el.data contiene los arreglos ya decodificados por Plotly (incluye datos binarios).
       var live = { data: el.data, layout: el.layout };
-      var p = { el: el, fig: live, ext: notime ? null : extentX(live), notime: notime };
+      var p = { el: el, fig: live, ext: notime ? null : extentX(live), notime: notime, noy: el.dataset.noy === '1' };
       if (el.dataset.rebase === '1') {
         // copia de los niveles originales de las series del panel principal
         p.orig = live.data.map(function (tr) {

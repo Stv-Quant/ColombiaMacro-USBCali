@@ -30,7 +30,7 @@ Un `push` a `main` reconstruye y publica el sitio sin descargar datos.
 | Estado | Regla |
 |--------|-------|
 | Al día | Último dato dentro del rezago normal de publicación |
-| Retrasado | Supera el rezago: PIB 150 días, IPC 45, ISE 110, GEIH 100, diarias 7–10, canasta y acciones 10, deuda anual 800 |
+| Retrasado | Supera el rezago: PIB 150 días, IPC 45, ISE 110, GEIH 100, diarias 7–10, canasta y acciones 10, informalidad 110, PIB por sectores 230 (desde el inicio del trimestre), deuda anual 800 |
 | Pendiente | Aún no hay archivo (primera descarga pendiente) |
 
 ## En local

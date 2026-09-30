@@ -23,6 +23,7 @@ PASOS = [
     ("COLCAP — BanRep", "colombiamacro.fuentes.colcap", []),
     ("Politica, TRM, inflacion basica, externo — BanRep", "colombiamacro.fuentes.complementarias", ["--solo", "banrep"]),
     ("ISE y mercado laboral — DANE", "colombiamacro.fuentes.complementarias", ["--solo", "dane"]),
+    ("Informalidad laboral — DANE", "colombiamacro.fuentes.informalidad", []),
     ("Canasta COLCAP (iShares) y acciones (Yahoo Finance)", "colombiamacro.fuentes.acciones", []),
 ]
 LOG = data("registro_actualizacion.log")
