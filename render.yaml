@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: colombiamacro-usbcali
+    runtime: python
+    # "free" se duerme tras 15 min sin trafico (~1 min para despertar).
+    # Para presentaciones y uso institucional cambiar a "starter" (siempre activo).
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn dashboard_colombia:server --workers 2 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10

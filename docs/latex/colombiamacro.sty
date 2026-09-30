@@ -1,0 +1,82 @@
+% Estilo comun de los documentos de ColombiaMacro (compilar con XeLaTeX)
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{colombiamacro}[2026/09/30 ColombiaMacro docs]
+
+\RequirePackage[sc]{mathpazo}
+\RequirePackage[no-math]{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}[Scale=0.92]
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\RequirePackage{polyglossia}
+\setdefaultlanguage{spanish}
+\setotherlanguage{english}
+
+\RequirePackage[a4paper,top=26mm,bottom=26mm,left=27mm,right=27mm,headheight=14pt]{geometry}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{graphicx,xcolor,booktabs,tabularx,longtable,array,multirow}
+\RequirePackage{enumitem}
+\RequirePackage{titlesec}
+\RequirePackage{fancyhdr}
+\RequirePackage{microtype}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage{listings}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+\RequirePackage{caption}
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{bookmark}
+
+\definecolor{cmblue}{HTML}{2A78D6}
+\definecolor{cmink}{HTML}{1F1F1D}
+\definecolor{cmmuted}{HTML}{6B6A66}
+\definecolor{cmrule}{HTML}{DAD8D2}
+\definecolor{cmsoft}{HTML}{F4F7FC}
+\definecolor{cmgreen}{HTML}{1A7F4B}
+\definecolor{cmamber}{HTML}{B7791F}
+\definecolor{cmred}{HTML}{C0392B}
+\definecolor{cmviolet}{HTML}{4A3AA7}
+\definecolor{cmwarn}{HTML}{FDF6E7}
+
+\hypersetup{colorlinks=true,linkcolor=cmblue,urlcolor=cmblue,citecolor=cmblue}
+
+\titleformat{\section}{\sffamily\Large\bfseries\color{cmink}}{\color{cmblue}\thesection}{0.7em}{}
+\titleformat{\subsection}{\sffamily\large\bfseries\color{cmink}}{\color{cmblue}\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\sffamily\normalsize\bfseries\color{cmink}}{}{0em}{}
+\titlespacing*{\section}{0pt}{2.2ex plus .5ex}{1.2ex}
+\titlespacing*{\subsection}{0pt}{1.8ex plus .4ex}{0.8ex}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\linespread{1.08}
+\setlist{itemsep=0.25em,topsep=0.35em}
+
+\captionsetup{font={small,sf},labelfont={bf,color=cmblue},justification=raggedright,singlelinecheck=false}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\color{cmrule}\hrule height 0.4pt}
+\fancyhead[L]{\sffamily\footnotesize\color{cmmuted}ColombiaMacro · USB Cali}
+\fancyhead[R]{\sffamily\footnotesize\color{cmmuted}\nouppercase{\leftmark}}
+\fancyfoot[C]{\sffamily\footnotesize\color{cmmuted}\thepage}
+
+\lstset{basicstyle=\ttfamily\small,backgroundcolor=\color{cmsoft},frame=single,rulecolor=\color{cmrule},
+  framesep=6pt,xleftmargin=6pt,xrightmargin=6pt,breaklines=true,columns=fullflexible,
+  keywordstyle=\color{cmblue},commentstyle=\color{cmmuted}\itshape,showstringspaces=false,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Ó}{{\'O}}1 {→}{{$\rightarrow$}}1 {·}{{$\cdot$}}1}
+
+\newtcolorbox{leer}[1][Cómo leerlo]{enhanced,breakable,colback=cmsoft,colframe=cmblue,boxrule=0pt,leftrule=3pt,
+  arc=2pt,left=8pt,right=8pt,top=5pt,bottom=5pt,fonttitle=\sffamily\bfseries\small,coltitle=cmblue,
+  attach title to upper={\ },title={#1.}}
+\newtcolorbox{alerta}[1][Cuidado]{enhanced,breakable,colback=cmwarn,colframe=cmamber,boxrule=0pt,leftrule=3pt,
+  arc=2pt,left=8pt,right=8pt,top=5pt,bottom=5pt,fonttitle=\sffamily\bfseries\small,coltitle=cmamber,
+  attach title to upper={\ },title={#1.}}
+\newtcolorbox{dato}[1][Dato actual]{enhanced,breakable,colback=white,colframe=cmrule,boxrule=0.6pt,
+  arc=2pt,left=8pt,right=8pt,top=5pt,bottom=5pt,fonttitle=\sffamily\bfseries\small,coltitle=cmink,
+  attach title to upper={\ },title={#1.}}
+
+\newcommand{\archivo}[1]{\texttt{#1}}
+\newcommand{\pp}{\,\text{pp}}
+\newcommand{\captura}[3][0.95]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth]{#2}\caption{#3}\end{figure}}
+
+\endinput

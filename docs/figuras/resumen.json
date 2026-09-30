@@ -1,0 +1,38 @@
+{
+  "fase": "expansion",
+  "trimestre": "T2 2026",
+  "pib_yoy": 3.52,
+  "brecha": 0.29,
+  "brecha_min": 0.29,
+  "brecha_max": 2.26,
+  "potencial": 2.37,
+  "ipc": 6.24,
+  "ipc_mes": "2026-08",
+  "basica": 6.12,
+  "tpm": 12.0,
+  "real_exante": 4.6,
+  "bei_1y": 7.08,
+  "bei_5y5y": 6.01,
+  "tes10": 13.06,
+  "colcap_12m": 38.7,
+  "validacion_bei": {
+    "2006-2019": {
+      "n": 168,
+      "sesgo": 0.48,
+      "rmse_bei": 1.7,
+      "rmse_rw": 2.08
+    },
+    "2020-2025": {
+      "n": 68,
+      "sesgo": 2.32,
+      "rmse_bei": 4.13,
+      "rmse_rw": 4.07
+    },
+    "total": {
+      "n": 236,
+      "sesgo": 1.01,
+      "rmse_bei": 2.64,
+      "rmse_rw": 2.8
+    }
+  }
+}
