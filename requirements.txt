@@ -1,4 +1,7 @@
-dash==4.1.0
-plotly==6.7.0
+# Nucleo: descarga, validacion y construccion del sitio
 pandas==3.0.2
-gunicorn==23.0.0
+numpy==2.4.4
+plotly==6.7.0
+requests==2.33.1
+beautifulsoup4==4.14.3
+openpyxl==3.1.5

@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-import analitica_macro as am
+from colombiamacro import analitica as am
 
 
 class FisherBreakevenTests(unittest.TestCase):

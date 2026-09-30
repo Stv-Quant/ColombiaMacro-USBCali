@@ -6,10 +6,10 @@ from unittest.mock import Mock, patch
 
 import pandas as pd
 
-from actualizar_tes import INTERMEDIATE_CERT, banrep_ca_bundle, descargar_serie
-from actualizar_pib import build_table
-from construir_tablas_experimentales import calculate
-from validar_datos import isolated_tes_spikes
+from colombiamacro.fuentes.tes import INTERMEDIATE_CERT, banrep_ca_bundle, descargar_serie
+from colombiamacro.fuentes.pib import build_table
+from colombiamacro.validar import isolated_tes_spikes
+from colombiamacro.config import ROOT
 
 
 class DataPipelineTests(unittest.TestCase):
@@ -26,7 +26,7 @@ class DataPipelineTests(unittest.TestCase):
     def test_tes_request_uses_ca_bundle(self):
         response = Mock()
         response.json.return_value = [{"id": 15272, "data": [[1726617600000, 12.38]]}]
-        with patch("actualizar_tes.requests.get", return_value=response) as get:
+        with patch("colombiamacro.fuentes.tes.requests.get", return_value=response) as get:
             result = descargar_serie("tes_pesos_1y", 15272, "verified-bundle.pem")
         self.assertEqual(result.iloc[0]["tes_pesos_1y"], 12.38)
         self.assertEqual(get.call_args.kwargs["verify"], "verified-bundle.pem")
@@ -41,18 +41,6 @@ class DataPipelineTests(unittest.TestCase):
         self.assertAlmostEqual(table.iloc[-1]["pib_nominal_yoy"], 50)
         self.assertEqual(table.iloc[-1]["trimestre"], "T1 2025")
 
-    def test_incomplete_month_does_not_publish_return(self):
-        tickers = ["ECOPETROL", "PFBCOLOM", "GRUPOSURA", "GRUPOARGOS",
-                   "PFAVAL", "ISA", "NUTRESA"]
-        dates = pd.to_datetime(["2026-01-01", "2026-02-01", "2026-03-01"])
-        prices = pd.DataFrame([[100] * 7, [105] * 7, [110, 110] + [None] * 5],
-                              index=dates, columns=tickers)
-        baskets = {date: frozenset(tickers) for date in dates}
-        table = calculate(prices, baskets, today="2026-03-20")
-        self.assertAlmostEqual(table.iloc[0]["retorno_equiponderado_pct"], 5)
-        self.assertTrue(pd.isna(table.iloc[1]["retorno_equiponderado_pct"]))
-        self.assertEqual(table.iloc[1]["estado"], "sin_cobertura_o_atipicos")
-
     def test_isolated_tes_spike_is_flagged(self):
         flags = isolated_tes_spikes(pd.Series([10.0, 10.2, 0.5, 10.1, 10.2]))
         self.assertEqual(flags.tolist(), [False, False, True, False, False])
@@ -64,7 +52,7 @@ if __name__ == "__main__":
 
 class BanrepClientTests(unittest.TestCase):
     def test_payload_identity_and_accents(self):
-        from banrep_client import parse_payload
+        from colombiamacro.fuentes.banrep import parse_payload
         payload = [{"id": 59, "nombre": "Tasa de política monetaria",
                     "data": [[1790658000000, 12.0], [1790744400000, None]]}]
         df = parse_payload(payload, 59, "politica monetaria", "tpm")
@@ -75,16 +63,17 @@ class BanrepClientTests(unittest.TestCase):
             parse_payload(payload, 59, "Tasa Representativa", "tpm")
 
     def test_colcap_and_ipc_use_banrep_bundle(self):
-        import actualizar_colcap, actualizar_inflacion
-        self.assertTrue(hasattr(actualizar_colcap, "banrep_ca_bundle"))
-        self.assertTrue(hasattr(actualizar_inflacion, "banrep_ca_bundle"))
-        self.assertNotIn("truststore", Path("actualizar_colcap.py").read_text(encoding="utf-8"))
-        self.assertNotIn("truststore", Path("actualizar_inflacion.py").read_text(encoding="utf-8"))
+        from colombiamacro.fuentes import colcap, ipc
+        self.assertTrue(hasattr(colcap, "banrep_ca_bundle"))
+        self.assertTrue(hasattr(ipc, "banrep_ca_bundle"))
+        for name in ("colcap.py", "ipc.py"):
+            text = (ROOT / "colombiamacro" / "fuentes" / name).read_text(encoding="utf-8")
+            self.assertNotIn("truststore", text)
 
 
 class DaneAnnexTests(unittest.TestCase):
     def test_parse_dane_block_years_months(self):
-        from actualizar_macro_extra import parse_dane_block
+        from colombiamacro.fuentes.complementarias import parse_dane_block
         rows = [["titulo"], ["Concepto", 2025, None, 2026],
                 [None, "Enero", "Febrero", "Ene"],
                 ["Indicador de Seguimiento a la Economía", 100.0, 101.0, 102.5],
@@ -95,11 +84,23 @@ class DaneAnnexTests(unittest.TestCase):
         self.assertEqual(df["ise"].tolist(), [100.0, 101.0, 102.5])
 
     def test_long_table_drops_future_and_normalizes(self):
-        from actualizar_macro_extra import build_long, MIN_OBS
+        from colombiamacro.fuentes.complementarias import build_long
         dates = pd.date_range("2010-01-31", periods=200, freq="ME")
         frame = pd.DataFrame({"fecha": list(dates) + [pd.Timestamp("2099-12-31")],
                               "itcr_ipc": [100.0] * 201})
-        out = build_long({"itcr_ipc": frame})
+        out, errores = build_long({"itcr_ipc": frame})
+        self.assertEqual(errores, [])
         self.assertEqual(out["fecha"].min(), pd.Timestamp("2010-01-01"))
         self.assertLess(out["fecha"].max(), pd.Timestamp("2099-01-01"))
         self.assertTrue((out["id_banrep"] == 235).all())
+
+    def test_one_invalid_series_does_not_block_others(self):
+        # Caso real del 2026-09-30: reservas netas negativas en 1960 rompian toda la tabla.
+        from colombiamacro.fuentes.complementarias import build_long
+        dates = pd.date_range("1960-01-31", periods=200, freq="ME")
+        reservas = pd.DataFrame({"fecha": dates, "reservas_netas_musd": [-134.9] + [100.0] * 199})
+        itcr = pd.DataFrame({"fecha": dates, "itcr_ipc": [300.0] + [100.0] * 199})
+        out, errores = build_long({"reservas_netas_musd": reservas, "itcr_ipc": itcr})
+        self.assertEqual(set(out["serie"]), {"reservas_netas_musd"})
+        self.assertEqual(len(errores), 1)
+        self.assertIn("itcr_ipc", errores[0])

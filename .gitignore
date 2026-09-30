@@ -8,8 +8,8 @@ __pycache__/
 .venv/
 venv/
 
-# Herramientas locales
-.gstack/
+# Sitio generado (se publica desde GitHub Actions)
+site/
 
 # LaTeX
 *.aux
@@ -22,3 +22,5 @@ venv/
 *.nav
 *.snm
 *.vrb
+# ...excepto el registro de actualizacion, que se publica para diagnostico
+!data/registro_actualizacion.log

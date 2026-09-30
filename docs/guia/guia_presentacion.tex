@@ -1,6 +1,7 @@
 \documentclass[11pt]{article}
 \usepackage{../latex/colombiamacro}
 \graphicspath{{../figuras/}{../img/}{../presentacion/}}
+\setlength{\emergencystretch}{2.5em}
 \fancyhead[L]{\sffamily\footnotesize\color{cmmuted}ColombiaMacro · Guía de presentación}
 
 \newcommand{\slide}[3]{\subsection*{\color{cmblue}#1\ \ \color{cmink}#2 \hfill{\normalfont\small\color{cmmuted}#3}}}
@@ -292,22 +293,28 @@ las preguntas (no una diapositiva de “¿Preguntas?”).
 
 \subsection{Ruta de clics (3 minutos)}
 \begin{enumerate}
-\item \textbf{Veredicto} (30 s): leer la frase; señalar la fecha “Datos al…”.
-\item \textbf{Cambiar a EN} (10 s): \di{el mismo tablero en inglés para inversionistas extranjeros}. Volver a ES.
-\item \textbf{Sección 1} (40 s): pasar el cursor sobre la brecha para mostrar el tooltip; abrir
-\emph{Método y lectura} un segundo.
-\item \textbf{Sección 2} (30 s): expectativas; señalar la franja de la meta.
-\item \textbf{Sección 3} (30 s): tasa real frente a la banda neutral.
-\item \textbf{Tablero de señales} (30 s): \di{cada fila dice qué tan extremo es el dato frente a su historia.}
-\item \textbf{Descargas} (10 s): \di{todos los datos se descargan en CSV.}
+\item \textbf{Resumen y tarjetas} (25 s): leer el párrafo; señalar la fecha “datos al…” y las etiquetas de estado.
+\item \textbf{Cambiar a EN} (10 s): \di{el mismo sitio en inglés para inversionistas extranjeros}. Volver a ES.
+\item \textbf{Sección 1} (25 s): pasar el cursor sobre una barra del PIB para mostrar el valor y su cambio;
+abrir \emph{Detalle técnico (para economistas)} un segundo para mostrar la brecha y el reloj del ciclo.
+\item \textbf{Sección 2} (20 s): inflación frente a la franja de la meta; señalar la franja de cambios arriba del gráfico.
+\item \textbf{Sección 4, curva TES} (60 s) --- \emph{el momento fuerte de la demo}: mover la barra de fechas a
+finales de 2021 y luego de 2022, o marcar las fichas 2021 y 2022: \di{en un año la tasa a 1 año pasó de 5,4\%
+a 11,9\% y la de 10 años de 8,5\% a 13,2\%; la curva subió entera y se aplanó: es el ciclo de alzas del
+Banco}. Pasar el cursor por la historia para que la curva se mueva sola; clic para fijar una fecha;
+alternar TES en pesos / UVR. Cerrar con \emph{Volver al último dato}.
+\item \textbf{Todos los indicadores} (30 s): \di{cada fila dice si el dato está muy bajo, bajo, normal, alto o
+muy alto frente a su historia desde 2010.}
+\item \textbf{Fuentes} (10 s): \di{cada fuente dice si está al día y todos los datos se descargan en CSV.}
 \end{enumerate}
 
 \subsection{Tres niveles de respaldo}
 \begin{enumerate}
-\item \textbf{Principal}: versión desplegada en Render (plan \emph{starter} activo desde la víspera para evitar
-el arranque en frío). Abrirla 10 minutos antes y dejarla cargada.
-\item \textbf{Local}: \texttt{Iniciar ColombiaMacro.bat} en el portátil del expositor, ya abierto en otra pestaña
-(no depende de internet).
+\item \textbf{Principal}: el sitio publicado en GitHub Pages
+(\url{https://stv-quant.github.io/ColombiaMacro-USBCali/}). Es estático y siempre está activo: no hay arranque
+en frío. Abrirlo 10 minutos antes y dejarlo cargado.
+\item \textbf{Local}: \texttt{Iniciar ColombiaMacro.bat} (o \texttt{python scripts/lanzar\_local.py}) en el
+portátil del expositor, ya abierto en otra pestaña. Funciona sin internet con los últimos datos descargados.
 \item \textbf{Sin computador}: las capturas del manual en una carpeta y las diapositivas en PDF en una memoria USB.
 \end{enumerate}
 \begin{alerta}[Regla]
@@ -414,8 +421,8 @@ trabajo futuro.}
 \subsection{Actualizar cifras el día anterior}
 \label{sec:actualizar}
 \begin{lstlisting}
-python lanzar_local.py --actualizar      # descarga y valida datos oficiales
-python docs/generar_figuras.py           # figuras + docs/figuras/resumen.json
+python scripts/lanzar_local.py --actualizar  # descarga, valida y construye el sitio
+python scripts/generar_figuras.py           # figuras + docs/figuras/resumen.json
 cd docs/presentacion && latexmk -xelatex ColombiaMacro_Beamer.tex
 \end{lstlisting}
 Contrastar las cifras de las diapositivas con \texttt{resumen.json} y corregir los textos si cambiaron
@@ -430,7 +437,7 @@ Contrastar las cifras de las diapositivas con \texttt{resumen.json} y corregir l
 10 días antes & Primer ensayo completo cronometrado. Grabarse en video.\\
 7 días antes & Ensayo con un profesor economista como “abogado del diablo” usando la sección de preguntas.\\
 3 días antes & Ensayo en la sala o equivalente con el proyector real. Probar la demostración.\\
-1 día antes & Actualizar datos y figuras; activar Render starter; imprimir el resumen de una página.\\
+1 día antes & Actualizar datos y figuras; verificar que el último run del workflow esté en verde y el sitio publicado muestre la fecha del día; imprimir el resumen de una página.\\
 Día D, $-45$ min & Llegar, conectar, abrir tablero en línea y local, probar puntero y micrófono.\\
 \bottomrule
 \end{tabularx}

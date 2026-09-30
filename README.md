@@ -1,78 +1,104 @@
-# ColombiaMacro · Monitor del ciclo económico colombiano
+# ColombiaMacro · ¿Cómo va la economía colombiana?
 
-**Universidad de San Buenaventura Cali** · Finanzas y Negocios Internacionales
+Tablero abierto (español / inglés) sobre el ciclo económico colombiano, construido solo con
+datos oficiales del **DANE** y el **Banco de la República**. Se actualiza solo todos los días
+y se publica como sitio web estático en GitHub Pages.
 
-Tablero abierto y reproducible que responde, con datos oficiales actualizados cada día,
-**en qué fase del ciclo está Colombia y qué implica para precios, política monetaria y
-activos**. Bilingüe (ES/EN), pensado para inversionistas locales y extranjeros y para
-revisión académica.
-
-| | |
-| --- | --- |
-| Metodología | [`METODOLOGIA.md`](METODOLOGIA.md) |
-| Manual completo (PDF) | [`docs/Manual_ColombiaMacro.pdf`](docs/Manual_ColombiaMacro.pdf) |
-| Guía de presentación académica (PDF) | [`docs/Guia_Presentacion_Academica.pdf`](docs/Guia_Presentacion_Academica.pdf) |
-| Diapositivas (Beamer) | [`docs/presentacion/ColombiaMacro_Beamer.pdf`](docs/presentacion/ColombiaMacro_Beamer.pdf) |
-| Diccionario de datos | [`DATA_DICTIONARY.md`](DATA_DICTIONARY.md) |
-| Operación diaria | [`OPERACION_DATOS.md`](OPERACION_DATOS.md) |
+Proyecto académico · Universidad de San Buenaventura Cali.
 
 ## Qué muestra
 
-0. **Veredicto automático**: fase del ciclo y lectura con las cifras que la sustentan.
-1. **Actividad**: brecha del producto (HP en tiempo real, HP dos colas, Hamilton), reloj del ciclo, PIB, ISE y desempleo.
-2. **Precios**: inflación total y básica frente al rango meta; inflación implícita en TES (1 año y 5y5y).
-3. **Política monetaria y curva**: tasa de política, tasa real ex ante frente a la neutral, curva TES y pendientes.
-4. **Mercados y sector externo**: COLCAP en pesos y en dólares, TRM, tasa de cambio real, cuenta corriente y deuda del GNC.
-5. **Señales**: percentil histórico de cada indicador, laboratorio de canastas heredadas y descarga de datos.
+| # | Pregunta | Gráficos principales |
+|---|----------|----------------------|
+| 1 | ¿Está creciendo la economía? | PIB trimestral e ISE mensual, desempleo |
+| 2 | ¿Qué pasa con los precios? | Inflación vs. meta 2–4 %, inflación esperada |
+| 3 | ¿Qué hace el Banco de la República? | Tasa de política vs. inflación |
+| 4 | ¿Cuánto cobra el mercado por prestarle al Gobierno? | **Curva cero cupón TES** interactiva (cualquier día desde 2003, comparación por años) |
+| 5 | ¿Cómo están el dólar y la bolsa? | TRM, COLCAP |
+| 6 | ¿Cómo están las cuentas externas y fiscales? | Cuenta corriente, deuda del Gobierno |
+| 7 | Todos los indicadores | Último dato, cambio y nivel frente a su historia |
+| 8 | Fuentes | Estado de cada fuente, descargas CSV, metodología |
 
-## Verlo en local (Windows)
+Cada gráfico muestra arriba el **último dato y su cambio** (frente a hace un año, al trimestre
+o al mes anterior) y el recuadro flotante indica el cambio de cada punto. Los métodos técnicos
+(brecha del producto HP/Hamilton, reloj del ciclo, tasa real, 5y5y) están en los paneles
+"Detalle técnico", siempre explicados.
 
-1. Instalar [Python 3.10+](https://www.python.org/downloads/) marcando *Add python.exe to PATH*.
-2. Doble clic en **`Iniciar ColombiaMacro.bat`**.
+## Estructura
 
-El lanzador crea un entorno `.venv`, instala dependencias solo cuando cambian, busca un
-**puerto libre** (omite 8765 y 8766 y cualquier puerto ocupado) y abre el navegador.
-
-```bash
-python lanzar_local.py                    # puerto libre desde 8050
-python lanzar_local.py --evitar 8765 8766 3000
-python lanzar_local.py --actualizar       # descarga datos oficiales antes de abrir
-python lanzar_local.py --legacy           # tablero anterior (v8)
-./iniciar_colombiamacro.sh                # macOS / Linux
+```
+colombiamacro/            paquete de Python
+  config.py               rutas (data/, site/, docs/)
+  actualizar.py           descarga todas las fuentes (python -m colombiamacro.actualizar)
+  validar.py              controles de calidad y estado de fuentes
+  analitica.py            fórmulas: Fisher, breakevens, 5y5y, HP en tiempo real, Hamilton, reloj
+  modelo.py               instantánea, estados en lenguaje simple, tabla de indicadores
+  fuentes/                un módulo por fuente (banrep, pib, ipc, tes, colcap, complementarias)
+  sitio/                  generador del sitio estático (construir.py, textos.py, app.js, estilo.css)
+data/                     CSV oficiales versionados + registro_actualizacion.log
+docs/                     metodología, diccionario de datos, operación, manual, guía y presentación
+scripts/                  lanzar_local.py (abrir en su computador), generar_figuras.py (figuras PDF)
+tests/                    pruebas (fórmulas, datos, sitio)
+certs/                    certificado intermedio GeoTrust que el servidor de BanRep no envía
+.github/workflows/        actualización diaria + publicación en GitHub Pages
 ```
 
-## Datos y automatización
+## Verlo en su computador
 
-GitHub Actions ejecuta `actualizar_todo.py` todos los días a las 19:30 (hora Colombia):
-descarga DANE y BanRep, valida fórmulas y fechas (`validar_datos.py`), corre 43 pruebas y
-publica los CSV solo si todo pasa. El servidor web solo lee CSV versionados.
+Windows: doble clic en **`Iniciar ColombiaMacro.bat`**. macOS/Linux: `./iniciar_colombiamacro.sh`.
 
-| Módulo | Función |
-| --- | --- |
-| `banrep_client.py` | Descarga BanRep con cadena TLS completa y verificación de identidad de series |
-| `actualizar_*.py` | PIB, IPC, TES, COLCAP, series complementarias BanRep, ISE y GEIH |
-| `analitica_macro.py` | Fórmulas: Fisher, breakevens, 5y5y, HP en tiempo real, Hamilton, reloj del ciclo |
-| `modelo_tablero.py` | Instantánea, veredicto y tabla de señales |
-| `dashboard_colombia.py` | Presentación (Dash/Plotly) |
-| `docs/generar_figuras.py` | Figuras vectoriales para documentos y diapositivas |
+```bash
+python scripts/lanzar_local.py                 # busca un puerto libre desde 8050 (omite 8765 y 8766)
+python scripts/lanzar_local.py --actualizar    # descarga los datos oficiales antes de abrir
+python scripts/lanzar_local.py --evitar 8765 8766 3000
+```
+
+La primera vez crea `.venv` e instala dependencias (1–3 min). Requiere Python 3.10+.
+
+## Automatización
+
+`.github/workflows/actualizar-y-publicar.yml` corre todos los días a las 19:30 (Colombia):
+
+1. Pruebas → descarga DANE/BanRep (`python -m colombiamacro.actualizar`).
+2. Si una fuente falla, se conserva su último dato válido y se emite un aviso; **no detiene la publicación**.
+3. Validación → pruebas con los datos del día → commit de `data/` → construcción del sitio → GitHub Pages.
+
+El detalle de cada descarga queda en `data/registro_actualizacion.log`.
 
 ## Despliegue
 
-* **Render** (`render.yaml`): conectar el repositorio como *Blueprint*. El plan `free` se
-  suspende tras 15 minutos sin tráfico; para uso institucional usar `starter`.
-* **Docker** (`Dockerfile`): Google Cloud Run, Fly.io, Railway o un servidor de la universidad.
+**Recomendado: GitHub Pages** (gratis, siempre encendido, sin tiempos de arranque, se publica solo).
+
+1. *Settings → Pages → Build and deployment → Source:* **GitHub Actions**.
+2. *Settings → Actions → General → Workflow permissions:* **Read and write**.
+3. *Actions → Actualizar datos y publicar sitio → Run workflow*.
+4. Dirección: `https://stv-quant.github.io/ColombiaMacro-USBCali/`.
+
+Alternativas (el sitio es una carpeta de archivos estáticos, `site/`):
+
+| Opción | Costo | Cuándo usarla |
+|--------|-------|---------------|
+| Cloudflare Pages | Gratis | CDN global y dominio propio (p. ej. `macro.usbcali.edu.co`) |
+| Netlify | Gratis | Vista previa por cada cambio |
+| Render *Static Site* | Gratis | Si ya usa Render (a diferencia del servicio web, no se duerme) |
+| Servidor de la universidad | — | Copiar `site/` a cualquier servidor web (Apache, Nginx, IIS) |
+
+Para las alternativas: comando de construcción `pip install -r requirements.txt && python -m colombiamacro.sitio.construir`,
+carpeta de salida `site`.
+
+## Comandos útiles
 
 ```bash
-docker build -t colombiamacro . && docker run -p 8080:8080 colombiamacro
+pip install -r requirements.txt
+python -m colombiamacro.actualizar          # descargar fuentes
+python -m colombiamacro.validar             # controles de calidad
+python -m colombiamacro.sitio.construir     # generar site/
+python -m unittest discover -s tests        # pruebas
+pip install -r requirements-docs.txt && python scripts/generar_figuras.py   # figuras del manual
 ```
 
-## Pruebas
+Documentación: [Metodología](docs/METODOLOGIA.md) · [Diccionario de datos](docs/DICCIONARIO_DATOS.md) ·
+[Operación](docs/OPERACION.md) · [Manual (PDF)](docs/Manual_ColombiaMacro.pdf) ·
+[Guía de presentación (PDF)](docs/Guia_Presentacion_Academica.pdf)
 
-```bash
-python -m pip install -r requirements-update.txt
-python -m unittest discover -s tests
-```
-
----
-Tablero académico con datos oficiales (DANE, Banco de la República, BVC/MSCI, Ministerio de
-Hacienda). No constituye recomendación de inversión.
+> Tablero académico. No constituye recomendación de inversión.

@@ -1,6 +1,19 @@
 \documentclass[11pt]{article}
 \usepackage{../latex/colombiamacro}
 \graphicspath{{../img/}{../figuras/}}
+% Rutas largas: permitir cortes de línea después de "/", "_" y "."
+\ExplSyntaxOn
+\RenewDocumentCommand\archivo{m}{
+  \tl_set:Nn \l_tmpa_tl {#1}
+  \tl_replace_all:Nnn \l_tmpa_tl {/} {/\allowbreak}
+  \tl_replace_all:Nnn \l_tmpa_tl {\_} {\_\allowbreak}
+  \texttt{\l_tmpa_tl}
+}
+\ExplSyntaxOff
+\setlength{\emergencystretch}{2.5em}
+% Capturas en su lugar, junto al texto que las explica
+\usepackage{float}
+\renewcommand{\captura}[3][0.95]{\begin{figure}[H]\centering\includegraphics[width=#1\linewidth]{#2}\caption{#3}\end{figure}}
 
 \title{ColombiaMacro}
 \begin{document}
@@ -25,7 +38,7 @@
 \includegraphics[width=\linewidth]{hero_es.png}
 \vfill
 \begin{tabularx}{\linewidth}{@{}Xr@{}}
-{\sffamily\small Versión 9.0 · septiembre de 2026} & {\sffamily\small github.com/Stv-Quant/ColombiaMacro-USBCali}\\
+{\sffamily\small Versión 10.0 · septiembre de 2026} & {\sffamily\small github.com/Stv-Quant/ColombiaMacro-USBCali}\\
 \end{tabularx}
 \end{titlepage}
 
@@ -43,20 +56,25 @@ datos oficiales actualizados a diario:
 \sffamily\large ¿En qué fase del ciclo está la economía colombiana\\y qué implica para precios, política monetaria y activos?
 \end{center}
 
-La pregunta se descompone en cinco preguntas encadenadas, una por sección del tablero. El
+La pregunta se descompone en preguntas encadenadas, una por sección del sitio. El
 orden no es casual: sigue la secuencia causal con la que un banco central lee la economía
-(actividad $\rightarrow$ precios $\rightarrow$ reacción de política $\rightarrow$ precios de activos).
+(actividad $\rightarrow$ precios $\rightarrow$ reacción de política $\rightarrow$ curva y precios de activos).
+Cada sección responde primero en lenguaje sencillo y guarda el análisis técnico en un panel
+desplegable \emph{Detalle técnico (para economistas)}.
 
-\begin{center}
+\begin{center}\small
 \begin{tabularx}{\linewidth}{@{}lXX@{}}
 \toprule
-\textbf{Sección} & \textbf{Pregunta} & \textbf{Indicador principal}\\
+\textbf{Sección} & \textbf{Pregunta} & \textbf{Indicador principal (y detalle técnico)}\\
 \midrule
-1. Actividad & ¿Crece la economía por encima de su potencial? & Brecha del producto (HP en tiempo real)\\
-2. Precios & ¿Converge la inflación a la meta? & IPC total y básica; inflación implícita en TES\\
-3. Política y curva & ¿Cuál es la postura de BanRep y qué descuenta el mercado? & Tasa real ex ante frente a la neutral\\
-4. Mercados y externo & ¿Cómo lo reflejan la bolsa, el peso y las cuentas externas? & COLCAP (COP y USD), TRM, ITCR, cuenta corriente\\
-5. Señales & ¿Qué tan extremo es cada dato? & Percentil histórico desde 2010\\
+1. Crecimiento & ¿Está creciendo la economía? & PIB e ISE frente al ritmo habitual; desempleo (brecha del producto, reloj del ciclo)\\
+2. Precios & ¿Cómo están los precios? & Inflación total y de fondo frente a la meta; inflación esperada (5y5y)\\
+3. Banco de la República & ¿Qué está haciendo el Banco? & Tasa de política frente a inflación (tasa real frente a la neutral)\\
+4. Curva TES & ¿Cuánto cobra el mercado por prestarle al Gobierno? & Curva cero cupón TES pesos y UVR, explorable desde 2003\\
+5. Dólar y bolsa & ¿Cómo están el dólar y la bolsa? & TRM y COLCAP (ITCR)\\
+6. Externo y fiscal & Cuentas externas y fiscales & Cuenta corriente y deuda del Gobierno\\
+7. Indicadores & Todos los indicadores & Último dato, cambio y nivel frente a su historia desde 2010\\
+8. Fuentes & ¿De dónde salen los datos? & Estado de cada fuente, descargas CSV y glosario\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -90,32 +108,37 @@ expectativas implícitas son \emph{estimaciones} con incertidumbre documentada (
 \end{alerta}
 
 % ================================================================== 2
-\section{Recorrido rápido: el tablero en cinco minutos}
+\section{Recorrido rápido: el sitio en cinco minutos}
 \label{sec:recorrido}
 
-\captura[1]{topbar.png}{Barra superior: horizonte temporal (3, 5, 10 años o toda la historia) e idioma.}
+El sitio es un conjunto de páginas HTML estáticas con gráficos Plotly: la versión en español vive en
+\texttt{/} y la versión en inglés en \texttt{/en/}. No hay servidor de aplicación: todo lo que se ve se
+calculó al construir el sitio a partir de los CSV validados.
 
-\textbf{1. La barra superior.} El selector \emph{Horizonte} recorta todos los gráficos de series de tiempo
-a la misma ventana; \emph{ES/EN} cambia todos los textos, incluidos el veredicto y los rótulos.
+\textbf{1. La barra superior.} Los botones de \emph{horizonte} (3, 5, 10 años o \emph{Todo}) recortan todos
+los gráficos de series de tiempo a la misma ventana; el enlace ES/EN cambia de idioma.
 
-\textbf{2. El veredicto} (figura~\ref{fig:hero}). En una frase: la fase del ciclo (etiqueta de color),
-la posición frente al potencial y la dirección de la inflación. Debajo, qué descuenta el mercado. A la
-derecha, cuatro tarjetas con la cifra más importante de cada bloque y su fecha de referencia.
+\textbf{2. El resumen} (figura~\ref{fig:hero}). Un párrafo en lenguaje sencillo dice si la economía crece
+por encima o por debajo de su ritmo habitual, cómo va la inflación frente a la meta y qué hace el Banco de
+la República. Debajo, seis tarjetas —Crecimiento, Inflación, Tasa del Banco, Desempleo, Dólar y Bolsa— con
+la cifra, su fecha de referencia, el dato de hace un año y una \emph{etiqueta de estado} de color (por
+ejemplo \emph{Por encima de lo habitual}, \emph{Alta}, \emph{Mejorando}, \emph{Peso más fuerte}).
 
 \begin{figure}[htbp]\centering
 \includegraphics[width=\linewidth]{hero_es.png}
-\caption{Veredicto y tarjetas principales (vista en español).}\label{fig:hero}
+\caption{Resumen y seis tarjetas principales (vista en español).}\label{fig:hero}
 \end{figure}
 
-\textbf{3. El índice de secciones} permite saltar a cada pregunta.
+\textbf{3. Ocho secciones}, cada una con un número, una pregunta, un párrafo de respuesta generado a partir
+de los datos, los gráficos (cada uno con su \emph{franja de cambios}, sección~\ref{sec:franja}) y un panel
+desplegable \emph{Detalle técnico (para economistas)} con la brecha del producto, el reloj del ciclo, la tasa
+real, el anclaje 5y5y y la tasa de cambio real.
 
-\textbf{4. Cada sección} empieza con un número, la pregunta, un párrafo de lectura generado a partir de
-los datos, los gráficos y un desplegable \emph{Método y lectura} con las fórmulas.
+\textbf{4. Todos los indicadores}: una tabla con el último dato, su fecha, el cambio y el nivel frente a su
+propia historia desde 2010.
 
-\textbf{5. El tablero de señales} resume 16 indicadores con su último dato, cambio y percentil histórico.
-
-\textbf{6. Al final}: el laboratorio (canastas bursátiles heredadas), el estado de cada fuente y los enlaces
-para descargar todos los datos en CSV.
+\textbf{5. Al final}: el estado de cada fuente, los enlaces para descargar todos los datos en CSV, la
+documentación y el glosario.
 
 \begin{leer}[Regla de oro]
 Lea siempre la \emph{fecha de referencia} junto a la cifra. El PIB es trimestral y se publica unos 45 días
@@ -133,55 +156,81 @@ la bolsa son diarias. El tablero nunca rellena una frecuencia con otra.
   arr/.style={-{Stealth[length=2mm]},color=cmmuted,thick}]
 \node[src] (dane) at (0,0.9) {DANE\\PIB · IPC · ISE · GEIH};
 \node[src] (banrep) at (0,-0.9) {BanRep\\TES · COLCAP · TPM · TRM\\básica · sector externo};
-\node[box] (upd) at (3.9,0) {Actualizadores\\\texttt{actualizar\_*.py}\\\texttt{banrep\_client.py}};
-\node[box] (csv) at (7.8,0) {Tablas CSV\\versionadas en Git};
-\node[box] (val) at (7.8,-1.9) {\texttt{validar\_datos.py}\\+ 43 pruebas};
-\node[box] (app) at (11.7,0) {\texttt{analitica\_macro}\\\texttt{modelo\_tablero}\\\texttt{dashboard\_colombia}};
-\node[box] (web) at (11.7,-1.9) {Servidor web\\Render / Docker};
+\node[box] (upd) at (3.9,0) {Descarga\\\texttt{colombiamacro/}\\\texttt{fuentes/}};
+\node[box] (csv) at (7.8,0) {Tablas CSV en \texttt{data/}\\versionadas en Git};
+\node[box] (val) at (7.8,-1.9) {\texttt{python -m}\\\texttt{colombiamacro.validar}\\+ 32 pruebas};
+\node[box] (app) at (11.7,0) {\texttt{analitica} · \texttt{modelo}\\\texttt{sitio/construir}\\$\rightarrow$ \texttt{site/}};
+\node[box] (web) at (11.7,-1.9) {Sitio estático\\GitHub Pages};
 \node[src] (user) at (11.7,-3.6) {Navegador ES / EN};
 \draw[arr] (dane.east) -- (upd.west); \draw[arr] (banrep.east) -- (upd.west);
 \draw[arr] (upd) -- (csv); \draw[arr] (csv) -- (val);
 \draw[arr] (csv) -- (app); \draw[arr] (app) -- (web); \draw[arr] (web) -- (user);
 \node[font=\sffamily\scriptsize,color=cmmuted,below=1mm of upd] {GitHub Actions · 19:30 diario};
 \end{tikzpicture}
-\caption{Flujo de datos. El servidor web nunca consulta las fuentes: solo lee CSV validados.}
+\caption{Flujo de datos. El sitio publicado nunca consulta las fuentes: se construye a partir de CSV validados
+y se sirve como archivos estáticos.}
 \end{figure}
 
 \subsection{Capas}
 \begin{description}[style=nextline,leftmargin=0pt]
-\item[Captura] \archivo{actualizar\_pib.py}, \archivo{actualizar\_inflacion.py}, \archivo{actualizar\_tes.py},
-\archivo{actualizar\_colcap.py} y \archivo{actualizar\_macro\_extra.py} descargan cada fuente. Todas las
-series de BanRep pasan por \archivo{banrep\_client.py}.
-\item[Validación] \archivo{validar\_datos.py} recalcula fórmulas, revisa fechas, rangos y saltos, y escribe
-\archivo{estado\_fuentes.csv} y \archivo{alertas\_datos.csv}.
-\item[Analítica] \archivo{analitica\_macro.py} contiene funciones puras (entra una tabla, sale una tabla):
-Fisher, inflación implícita, filtro HP, Hamilton, reloj del ciclo, percentiles.
-\item[Modelo] \archivo{modelo\_tablero.py} carga todo, calcula la instantánea del último dato, redacta el
-veredicto y arma la tabla de señales. Es la única fuente de cada cifra que aparece en pantalla.
-\item[Presentación] \archivo{dashboard\_colombia.py} dibuja (Dash + Plotly). No calcula nada propio.
+\item[Captura] Los módulos de \archivo{colombiamacro/fuentes/} descargan cada fuente: \archivo{pib.py},
+\archivo{ipc.py}, \archivo{tes.py}, \archivo{colcap.py} y \archivo{complementarias.py} (16 series de BanRep,
+ISE y GEIH). Todas las series de BanRep pasan por \archivo{banrep.py}. El orquestador es
+\archivo{colombiamacro/actualizar.py}, que deja un registro en \archivo{data/registro\_actualizacion.log}.
+\item[Validación] \archivo{colombiamacro/validar.py} recalcula fórmulas, revisa fechas, rangos y saltos, y
+escribe \archivo{estado\_fuentes.csv} y \archivo{alertas\_datos.csv}.
+\item[Analítica] \archivo{colombiamacro/analitica.py} contiene funciones puras (entra una tabla, sale una
+tabla): Fisher, inflación implícita, filtro HP, Hamilton, reloj del ciclo, percentiles.
+\item[Modelo] \archivo{colombiamacro/modelo.py} carga todo, calcula la instantánea del último dato, redacta
+el resumen y el veredicto, asigna las etiquetas de estado y arma la tabla de indicadores. Es la única fuente
+de cada cifra que aparece en pantalla.
+\item[Presentación] \archivo{colombiamacro/sitio/construir.py} genera el sitio estático en \archivo{site/}
+(HTML + Plotly, ES y EN) con los textos de \archivo{textos.py}; \archivo{app.js} maneja la interacción en el
+navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apariencia. No calcula nada propio.
 \end{description}
 
 \subsection{Mapa de archivos}
-\begin{longtable}{@{}p{0.36\linewidth}p{0.58\linewidth}@{}}
+\begin{longtable}{@{}p{0.40\linewidth}p{0.54\linewidth}@{}}
 \toprule
 \textbf{Archivo} & \textbf{Función}\\\midrule\endhead
-\archivo{dashboard\_colombia.py} & Aplicación Dash v9; expone \texttt{server} para Gunicorn.\\
-\archivo{modelo\_tablero.py} & Carga, instantánea, veredicto, tabla de señales; parámetros \texttt{NEUTRAL\_REAL}, umbrales.\\
-\archivo{analitica\_macro.py} & Fórmulas y filtros.\\
-\archivo{banrep\_client.py} & Cliente BanRep con cadena TLS completa.\\
-\archivo{actualizar\_todo.py} & Orquestador de todas las fuentes.\\
-\archivo{actualizar\_macro\_extra.py} & 16 series BanRep + ISE + GEIH.\\
-\archivo{validar\_datos.py} & Controles de calidad y estado de fuentes.\\
-\archivo{lanzar\_local.py} & Lanzador local con búsqueda de puerto libre.\\
+\archivo{colombiamacro/config.py} & Rutas y constantes compartidas.\\
+\archivo{colombiamacro/actualizar.py} & Orquestador de todas las fuentes.\\
+\archivo{colombiamacro/validar.py} & Controles de calidad y estado de fuentes.\\
+\archivo{colombiamacro/analitica.py} & Fórmulas y filtros; parámetros HP, Hamilton y ventana COVID.\\
+\archivo{colombiamacro/modelo.py} & Carga, instantánea, resumen, veredicto, tabla de indicadores; parámetros \texttt{NEUTRAL\_REAL}, \texttt{UMBRAL\_*}.\\
+\archivo{colombiamacro/fuentes/banrep.py} & Cliente BanRep con cadena TLS completa.\\
+\archivo{colombiamacro/fuentes/pib.py}, \archivo{ipc.py}, \archivo{tes.py}, \archivo{colcap.py} & Descarga de PIB, IPC, curvas TES y COLCAP.\\
+\archivo{colombiamacro/fuentes/complementarias.py} & 16 series BanRep + ISE + GEIH.\\
+\archivo{colombiamacro/sitio/construir.py} & Generador del sitio estático (clase \texttt{Graficos}).\\
+\archivo{colombiamacro/sitio/textos.py} & Textos del sitio en español e inglés.\\
+\archivo{colombiamacro/sitio/app.js}, \archivo{estilo.css} & Interacción en el navegador y estilos.\\
+\archivo{data/} & CSV publicados y \archivo{registro\_actualizacion.log}.\\
+\archivo{scripts/lanzar\_local.py} & Lanzador local con búsqueda de puerto libre.\\
+\archivo{scripts/generar\_figuras.py} & Figuras vectoriales para documentos y diapositivas.\\
 \archivo{Iniciar ColombiaMacro.bat} & Doble clic en Windows.\\
-\archivo{dashboard\_legacy.py} & Tablero anterior (v8), conservado para comparación.\\
-\archivo{docs/generar\_figuras.py} & Figuras vectoriales para documentos y diapositivas.\\
-\archivo{METODOLOGIA.md} & Nota metodológica breve.\\
-\archivo{.github/workflows/actualizar-datos.yml} & Automatización diaria.\\
-\archivo{render.yaml}, \archivo{Dockerfile} & Despliegue.\\
-\archivo{tests/} & 43 pruebas unitarias e integradas.\\
+\archivo{certs/} & Certificado intermedio de BanRep.\\
+\archivo{docs/METODOLOGIA.md} & Nota metodológica breve.\\
+\archivo{.github/workflows/actualizar-y-publicar.yml} & Actualización diaria y publicación en GitHub Pages.\\
+\archivo{tests/} & 32 pruebas: fórmulas, datos y sitio.\\
 \bottomrule
 \end{longtable}
+
+\subsection{Comandos principales}
+\begin{lstlisting}
+python -m colombiamacro.actualizar        # descarga DANE y BanRep
+python -m colombiamacro.validar           # controles de calidad
+python -m colombiamacro.sitio.construir   # genera site/
+python -m unittest discover -s tests      # 32 pruebas
+python scripts/generar_figuras.py         # figuras de documentos
+python scripts/lanzar_local.py            # abre el sitio en local
+\end{lstlisting}
+
+\begin{alerta}[Tablero anterior]
+La aplicación Dash de versiones anteriores (\archivo{dashboard\_colombia.py}, \archivo{dashboard\_legacy.py}),
+\archivo{render.yaml}, el \archivo{Dockerfile} y el laboratorio de canastas bursátiles heredadas fueron
+retirados del proyecto; siguen disponibles en el historial del repositorio original
+\texttt{GRAFICO-ECONOMIA-COLOMBIANA}.
+\end{alerta}
 
 % ================================================================== 4
 \section{Ejecución local}
@@ -194,28 +243,23 @@ la primera vez (para instalar dependencias). No se requieren claves ni cuentas.
 Abra la carpeta del proyecto y haga doble clic en \archivo{Iniciar ColombiaMacro.bat}. El lanzador:
 \begin{enumerate}
 \item crea el entorno virtual \archivo{.venv} la primera vez (unos 1–3 minutos);
-\item instala o actualiza dependencias \emph{solo} si cambiaron los archivos \archivo{requirements};
+\item instala o actualiza dependencias \emph{solo} si cambió \archivo{requirements.txt};
+\item construye el sitio estático en \archivo{site/} con los últimos datos de \archivo{data/};
 \item busca un puerto libre empezando en 8050, \textbf{omitiendo 8765 y 8766} y cualquier puerto ocupado
 (comprueba IPv4 e IPv6 e intenta reservarlo);
-\item levanta el servidor \emph{waitress} en \texttt{127.0.0.1} (solo accesible desde su computador);
-\item abre el navegador cuando el tablero responde.
+\item sirve los archivos estáticos en \texttt{127.0.0.1} (solo accesible desde su computador);
+\item abre el navegador cuando el sitio responde.
 \end{enumerate}
-
-\begin{lstlisting}
-[ColombiaMacro] Puertos omitidos (ocupados o reservados): 8050
-[ColombiaMacro] Puerto elegido: 8051
-[ColombiaMacro] Servidor waitress en http://127.0.0.1:8051/
-[ColombiaMacro] Tablero listo en http://127.0.0.1:8051/  (Ctrl+C para detener)
-\end{lstlisting}
+Como el sitio es estático y los datos están en el repositorio, funciona sin internet con el último dato
+descargado; solo \texttt{--actualizar} necesita conexión.
 
 \subsection{Opciones}
 \begin{lstlisting}
-python lanzar_local.py --puerto 8090          # preferir un puerto
-python lanzar_local.py --evitar 8765 8766 3000 # puertos reservados adicionales
-python lanzar_local.py --actualizar           # descarga DANE/BanRep antes de abrir
-python lanzar_local.py --legacy               # tablero v8
-python lanzar_local.py --solo-puerto          # solo informa el puerto
-python lanzar_local.py --sin-navegador
+python scripts/lanzar_local.py --puerto 8090           # preferir un puerto
+python scripts/lanzar_local.py --evitar 8765 8766 3000 # puertos reservados adicionales
+python scripts/lanzar_local.py --actualizar            # descarga DANE/BanRep antes de abrir
+python scripts/lanzar_local.py --solo-puerto           # solo informa el puerto
+python scripts/lanzar_local.py --sin-navegador
 \end{lstlisting}
 En macOS o Linux: \texttt{./iniciar\_colombiamacro.sh} con las mismas opciones.
 
@@ -229,7 +273,7 @@ Un archivo \texttt{.bat} ya se ejecuta con doble clic. Si necesita un \texttt{.e
 un equipo sin Python, en Windows:
 \begin{lstlisting}
 py -m pip install pyinstaller
-py -m PyInstaller --onefile --name ColombiaMacro lanzar_local.py
+py -m PyInstaller --onefile --name ColombiaMacro scripts/lanzar_local.py
 \end{lstlisting}
 El ejecutable resultante sigue necesitando la carpeta del proyecto (datos y código) al lado.
 
@@ -323,22 +367,20 @@ Salario mínimo, variación & 15418 & \% anual & Contexto de precios\\
 \end{longtable}
 
 \subsection{ISE y mercado laboral (DANE)}
-\textbf{ISE} (\archivo{ise\_mensual.csv}): anexo \emph{ISE 9 actividades}; Cuadro~1 (original) y Cuadro~2
-(desestacionalizado), base 2015=100, total y grandes ramas (primarias, secundarias, terciarias).
+\textbf{ISE} (\archivo{ise\_mensual.csv}): anexo \emph{ISE 9 actividades}; Cuadro~1 (serie original) y Cuadro~2
+(serie desestacionalizada), base 2015=100, total y grandes ramas (primarias, secundarias, terciarias).
 \textbf{GEIH} (\archivo{mercado\_laboral.csv}): anexo desestacionalizado, total nacional: tasa global de
 participación (TGP), tasa de ocupación (TO) y tasa de desocupación (TD). El validador comprueba la identidad
 $TD = 100\,(1-TO/TGP)$.
 
-\subsection{Tablas heredadas}
-\archivo{indices\_colombia.csv}, \archivo{precios\_icolcap\_limpios.csv}, \archivo{Canasta\_Historica\_ICAP.xls}
-e \archivo{indices\_experimentales\_mensuales.csv} alimentan solo el laboratorio de canastas
-(sección~\ref{sec:lab}). No intervienen en ninguna cifra del tablero principal.
+Las tablas heredadas de las canastas bursátiles (ICOLCAP e índices experimentales) fueron retiradas del
+proyecto; todos los archivos de \archivo{data/} alimentan cifras del sitio.
 
 % ================================================================== 6
 \section{Transformaciones y fórmulas}
 \label{sec:formulas}
 
-Cada fórmula está en \archivo{analitica\_macro.py} y tiene una prueba en \archivo{tests/}. Los ejemplos
+Cada fórmula está en \archivo{colombiamacro/analitica.py} y tiene una prueba en \archivo{tests/}. Los ejemplos
 usan los datos al 25 de septiembre de 2026.
 
 \subsection{Identidad de Fisher exacta}
@@ -452,112 +494,174 @@ $(u,v)=(2,1)$~pp; para las series derivadas $(1;\,0{,}5)$~pp. Los valores origin
 solo se excluyen de los cálculos y se registran.
 
 % ================================================================== 7
-\section{Guía de lectura, gráfico por gráfico}
+\section{Guía de lectura, sección por sección}
 \label{sec:lectura}
 
-\subsection{Sección 1 · Actividad}
-\captura{lectura_1.png}{Párrafo de lectura de la sección de actividad.}
+El sitio sigue ocho secciones numeradas. Cada una responde su pregunta con un párrafo en lenguaje sencillo
+generado a partir de los datos; debajo de cada gráfico hay una nota \emph{?} que explica cómo leerlo. Los
+cálculos técnicos quedan en el panel desplegable \emph{Detalle técnico (para economistas)} al final de la
+sección.
 
-\subsubsection*{Brecha del producto}
-\captura[0.8]{chart_01_brecha_del_producto_del_pib_potencial.png}{Brecha del producto: estimación principal y rango entre métodos.}
+\subsection{Cómo leer la franja de cambios}
+\label{sec:franja}
+Encima de cada gráfico hay una \emph{franja} con el último valor de cada serie, su fecha de referencia y su
+cambio frente a un punto de comparación fijo (flecha azul si sube, naranja si baja):
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Serie} & \textbf{Comparación}\\\midrule
+La mayoría (inflación, desempleo, tasas, TES) & frente a hace 1 año\\
+PIB trimestral & frente al trimestre anterior\\
+ISE mensual & frente a hace 1 mes\\
+TRM y COLCAP & ambas: frente a hace 1 año y frente a hace 1 mes\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Las \textbf{tasas} (inflación, desempleo, tasas de interés, crecimiento) cambian en \textbf{puntos porcentuales}
+(pp): si la inflación pasa de 5,1\% a 6,24\%, el cambio es $+1{,}14$~pp. Los \textbf{niveles} (TRM, COLCAP)
+cambian en \textbf{porcentaje}: una TRM que pasa de 3.903 a 3.341 cae $-14{,}4\%$. Al pasar el cursor por
+cualquier punto de un gráfico, la caja emergente muestra el valor de ese punto \emph{y} su cambio con la
+misma regla, de modo que se puede leer el cambio en cualquier fecha histórica, no solo en el último dato.
+\begin{alerta}[Error frecuente]
+Confundir pp con \%. Una tasa que sube de 10\% a 12\% sube 2~pp, pero un 20\% en términos relativos. El sitio
+siempre usa pp para tasas.
+\end{alerta}
+
+\subsection{Resumen y tarjetas}
+La primera pantalla (figura~\ref{fig:hero}) resume el estado de la economía en tres o cuatro frases y seis
+tarjetas. La \emph{etiqueta de estado} de cada tarjeta sale de reglas explícitas de
+\archivo{colombiamacro/modelo.py}: el crecimiento se compara con el ritmo habitual (crecimiento potencial),
+la inflación con la meta de 3\% y su rango de 2\% a 4\%, la tasa del Banco con la neutral, el desempleo con su
+nivel de hace un año, y el dólar y la bolsa con su cambio en un año. Las etiquetas describen, no recomiendan.
+\captura[1]{hero_en.png}{La misma pantalla en inglés (\texttt{/en/}): todos los textos y rótulos se traducen.}
+
+\subsection{Sección 1 · ¿Está creciendo la economía?}
+\captura[1]{sec_crecimiento.png}{Sección 1: crecimiento del PIB e ISE frente al ritmo habitual, y desempleo.}
 \begin{leer}
-La línea azul es la estimación principal. La banda es el rango entre los tres métodos. Arriba de cero, la
-economía produce más que su potencial (presión sobre precios); abajo, hay holgura. Una banda angosta indica
-consenso entre métodos; una ancha, que la lectura depende del supuesto.
+Cada barra es un trimestre: cuánto creció el PIB real frente al mismo trimestre del año anterior. La línea
+naranja es el ISE mensual desestacionalizado, que adelanta el PIB del trimestre en curso. La línea punteada es
+el \emph{ritmo habitual} (crecimiento potencial): si las barras están por encima, la economía crece más rápido
+de lo normal. Los valores de 2020–2021 quedan fuera de escala para no aplastar la lectura reciente; la caja
+emergente los muestra. A la derecha, la tasa de desempleo desestacionalizada (mensual y promedio de 3 meses):
+un desempleo que cae mientras la economía crece por encima de lo habitual refuerza la lectura de presión de
+demanda.
 \end{leer}
 \begin{alerta}[Error frecuente]
 Confundir crecimiento con brecha. Una economía puede crecer 3,5\% y aun así estar \emph{cerca} del potencial si
-viene de una brecha negativa. Lo relevante para la inflación es el \emph{nivel} de la brecha.
+viene de una brecha negativa. Lo relevante para la inflación es el \emph{nivel} de la brecha, que está en el
+detalle técnico.
 \end{alerta}
 
-\subsubsection*{Reloj del ciclo}
-\captura[0.8]{chart_02_reloj_del_ciclo_nivel_y_direccion_de_la_.png}{Reloj del ciclo: últimos doce trimestres.}
+\subsubsection*{Detalle técnico: brecha del producto y reloj del ciclo}
+\captura[0.9]{detalle_tecnico.png}{Panel \emph{Detalle técnico} de la sección 1: brecha del producto con rango
+entre métodos y reloj del ciclo.}
 \begin{leer}
-Cada punto es un trimestre; el grande es el último. El eje horizontal es el nivel de la brecha; el vertical,
-su cambio en dos trimestres. El recorrido típico gira en sentido horario: recuperación $\rightarrow$
-expansión $\rightarrow$ desaceleración $\rightarrow$ contracción.
+En la brecha, la línea azul es la estimación principal (HP en tiempo real) y la banda es el rango entre los
+tres métodos (HP en tiempo real, HP de dos colas y Hamilton). Arriba de cero, la economía produce más que su
+potencial; abajo, hay holgura. Una banda angosta indica consenso; una ancha, que la lectura depende del
+supuesto. En el reloj, cada punto es un trimestre (el grande es el último): el eje horizontal es el nivel de
+la brecha y el vertical su cambio en dos trimestres. El recorrido típico gira en sentido horario:
+recuperación $\rightarrow$ expansión $\rightarrow$ desaceleración $\rightarrow$ contracción.
 \end{leer}
 
-\subsubsection*{Crecimiento real anual}
-\captura[0.8]{chart_03_crecimiento_real_anual_pib_trimestral_is.png}{PIB trimestral, ISE mensual y crecimiento potencial.}
+\subsection{Sección 2 · ¿Cómo están los precios?}
+\captura[1]{sec_precios.png}{Sección 2: inflación total y de fondo frente a la meta, e inflación esperada a 1 año.}
 \begin{leer}
-El ISE adelanta el PIB del trimestre en curso. Cuando el crecimiento supera al potencial (línea punteada),
-la brecha tiende a cerrarse o a volverse positiva. Los valores de 2020–2022 quedan fuera de escala para no
-aplastar la lectura reciente; el tooltip los muestra.
+La franja verde es el rango meta de BanRep (3\% $\pm$ 1~pp). La \emph{inflación de fondo} (sin alimentos ni
+regulados) mide la presión persistente: si la total sube pero la de fondo no, el choque es probablemente
+transitorio. A la derecha, la inflación que el mercado espera para el próximo año (implícita en los TES a
+1 año) frente a la observada: si la línea morada está sobre la franja, el mercado cree que la inflación
+seguirá alta. En el detalle técnico está la 5y5y: si se mantiene dentro del rango, las expectativas de largo
+plazo están \emph{ancladas}; por encima de 4\%, \emph{desancladas}.
 \end{leer}
 
-\subsubsection*{Desempleo}
-Tasa de desocupación desestacionalizada (mensual y promedio de 3 meses). Un desempleo que cae mientras la
-brecha es positiva refuerza la lectura de presión de demanda.
-
-\subsection{Sección 2 · Precios}
-\captura[0.8]{chart_05_inflacion_total_y_basica_frente_al_rango.png}{Inflación total y básica frente al rango meta.}
+\subsection{Sección 3 · ¿Qué está haciendo el Banco de la República?}
+\captura[1]{sec_banco.png}{Sección 3: tasa de política frente a la inflación.}
 \begin{leer}
-La franja verde es el rango meta de BanRep (3\% $\pm$ 1~pp). La básica (sin alimentos ni regulados) mide la
-presión persistente; si la total sube pero la básica no, el choque es probablemente transitorio (alimentos,
-tarifas). Hoy ambas están por encima de 6\%: la presión es generalizada.
+La distancia entre la tasa de política y la inflación es, en esencia, la tasa real. La postura depende de la
+tasa \emph{real}, no de la nominal: en el detalle técnico, la tasa real ex ante (con la inflación que descuenta
+el mercado) se compara con la neutral estimada de 2,7–3,0\%. Por encima, la política frena la demanda; por
+debajo, la estimula.
 \end{leer}
 
-\captura[0.8]{chart_06_expectativas_de_mercado_inflacion_implic.png}{Inflación implícita en TES a 1 año y 5y5y.}
+\subsection{Sección 4 · ¿Cuánto cobra el mercado por prestarle al Gobierno?}
+\label{sec:curva}
+\captura[1]{sec_curva.png}{Sección 4: explorador interactivo de la curva cero cupón de los TES.}
+Esta sección es un explorador interactivo de la curva cero cupón que estima BanRep. Todos los datos (cada
+día hábil desde 2003) viajan con la página, así que la interacción es inmediata y funciona sin conexión.
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[TES en pesos / TES en UVR] El interruptor cambia entre la curva \emph{nominal} (TES en pesos) y la curva
+\emph{real} (TES en UVR, cuyo principal se ajusta por inflación). La diferencia entre ambas, plazo a plazo, es
+la inflación implícita.
+\item[Barra de fechas] Recorre todos los días hábiles desde 2003. La curva gruesa azul es la del día elegido;
+el botón \emph{Volver al último dato} regresa al corte más reciente.
+\item[Años para comparar] Las fichas \emph{Comparar con el cierre de:} superponen la curva del último día hábil
+de cada año marcado (por ejemplo 2021 y 2022), con colores distintos, para ver cómo se desplazó la curva.
+\item[Historia de 1, 5 y 10 años] A la derecha, las tres tasas desde 2003. Al pasar el cursor, la curva de la
+izquierda se mueve a ese día; al hacer clic, la fecha queda fija. La línea vertical punteada marca la fecha
+elegida.
+\item[Cifras] Encima de los gráficos: tasas a 1, 5 y 10 años y la \emph{pendiente 10a $-$ 1a}, cada una con su
+cambio frente a un año antes de la fecha elegida. La pendiente se rotula \emph{normal} (positiva),
+\emph{plana} (cercana a cero) o \emph{invertida} (negativa).
+\end{description}
 \begin{leer}
-Si la 5y5y (morada) se mantiene dentro del rango, el mercado confía en que la inflación volverá a la meta
-aunque hoy esté alta. Una 5y5y persistentemente por encima de 4\% indica expectativas desancladas: el
-mercado duda de la convergencia y exige más prima en los bonos largos.
+La curva muestra cuánto rinde prestarle al Gobierno a 1, 5 y 10 años. Una curva que sube de izquierda a
+derecha es lo normal: el mercado exige más por prestar a más plazo. Un desplazamiento hacia arriba de toda la
+curva refleja una tasa de política más alta y mayores primas. Una curva plana o invertida suele anticipar
+recortes de tasas o menor crecimiento.
+\end{leer}
+\begin{dato}[Ejemplo: el ciclo de alzas 2021–2022]
+Al marcar 2021 y 2022, la tasa a 1 año pasa de 5,44\% a 11,90\% y la de 10 años de 8,46\% a 13,23\%: toda la
+curva sube, pero la parte corta sube más (reacción a la tasa de política) y la pendiente 10a $-$ 1a se reduce
+de $+3{,}0$ a $+1{,}3$~pp. Al cierre de 2023, con el mercado anticipando recortes, la tasa a 1 año (10,06\%)
+queda por encima de la de 5 años (9,59\%).
+\end{dato}
+
+\subsection{Sección 5 · ¿Cómo están el dólar y la bolsa?}
+\captura[1]{sec_mercados.png}{Sección 5: TRM (pesos por dólar) y COLCAP.}
+\begin{leer}
+Una TRM que baja significa un peso más fuerte. La franja de ambos gráficos muestra el cambio en un año y en un
+mes. Para un inversionista extranjero el retorno relevante combina el precio de las acciones y la tasa de
+cambio: si el peso se aprecia, el retorno en dólares supera al de pesos. COLCAP es un índice de precios: no
+incluye dividendos. El 28 de mayo de 2021 pasó a la metodología MSCI. En el detalle técnico, el ITCR compara
+precios de Colombia con los de sus socios comerciales: por debajo de 100 el peso está más fuerte en términos
+reales que en 2010.
 \end{leer}
 
-\subsection{Sección 3 · Política monetaria y curva}
-\captura[0.8]{chart_08_tasa_de_politica_frente_a_inflacion.png}{Tasa de política frente a inflación observada e implícita.}
-\captura[0.8]{chart_09_tasa_de_politica_real_ex_ante_frente_a_l.png}{Tasa real ex ante y ex post frente a la neutral.}
+\subsection{Sección 6 · Cuentas externas y fiscales}
+\captura[1]{sec_externo.png}{Sección 6: cuenta corriente y deuda bruta del Gobierno Nacional Central.}
 \begin{leer}
-La postura depende de la tasa \emph{real}, no de la nominal. Por encima de la banda gris (neutral estimada
-2,7–3,0\%) la política frena la demanda; por debajo, la estimula. La ex ante (con la inflación que descuenta
-el mercado) es la relevante para decisiones de inversión y consumo.
-\end{leer}
-\captura[0.7]{chart_10_curva_cero_cupon_tes_pesos.png}{Curva cero cupón TES pesos: hoy, hace 3 y hace 12 meses.}
-\begin{leer}
-La curva muestra cuánto rinde prestarle al Gobierno a 1, 5 y 10 años. Un desplazamiento hacia arriba de toda
-la curva (como entre septiembre de 2025 y hoy) refleja una tasa de política más alta y mayores primas; una
-curva plana o invertida suele anticipar recortes o menor crecimiento.
-\end{leer}
-\captura[0.8]{chart_11_pendiente_de_la_curva.png}{Pendientes 10A–1A y 10A–tasa de política.}
-
-\subsection{Sección 4 · Mercados y sector externo}
-\captura[0.8]{chart_12_colcap_en_pesos_y_en_dolares_base_100_al.png}{COLCAP en pesos y en dólares, base 100 al inicio del horizonte.}
-\begin{leer}
-Para un inversionista extranjero el retorno relevante es en dólares: combina el precio de las acciones y la
-tasa de cambio. Si la línea en dólares supera a la de pesos, el peso se apreció en el período.
-COLCAP es un índice de precios: no incluye dividendos.
-\end{leer}
-\captura[0.8]{chart_13_tasa_de_cambio_nominal_pesos_por_dolar_t.png}{TRM: pesos por dólar.}
-\captura[0.8]{chart_14_tasa_de_cambio_real_multilateral_itcr_ip.png}{Tasa de cambio real multilateral.}
-\begin{leer}
-El ITCR compara precios de Colombia con los de sus socios comerciales, en una misma moneda. Por debajo de
-100 el peso está más fuerte en términos reales que en 2010: las importaciones se abaratan y la
-competitividad de las exportaciones no tradicionales se reduce.
-\end{leer}
-\captura[0.8]{chart_15_cuenta_corriente_del_pib_trimestral.png}{Cuenta corriente, porcentaje del PIB.}
-\captura[0.8]{chart_16_deuda_bruta_del_gobierno_nacional_centra.png}{Deuda bruta del Gobierno Nacional Central.}
-
-\subsection{Sección 5 · Tablero de señales}
-\captura{senales.png}{Tablero de señales.}
-\begin{leer}
-Cada fila tiene el último dato, su fecha, el cambio (en pp para tasas y en \% para niveles como COLCAP o TRM)
-y el percentil desde 2010. Las barras oscuras marcan valores extremos (percentil $\le 10$ o $\ge 90$): son
-los datos que más se alejan de su normalidad histórica y merecen atención.
+Un déficit de cuenta corriente significa que el país gasta más de lo que produce y lo financia con capital
+externo; tiene rezago largo, así que conviene leer la tendencia. La deuda del Gobierno, como porcentaje del
+PIB, da el contexto fiscal de las primas en los TES largos.
 \end{leer}
 
-\subsection{Laboratorio de canastas}
-\label{sec:lab}
-\captura[0.85]{chart_lab.png}{Laboratorio: COLCAP oficial frente a reconstrucciones heredadas.}
-Las curvas “equiponderada” y “7 Magníficas” son reconstrucciones del proyecto original: retornos mensuales de
-canastas locales distribuidos a días, sin ajuste por dividendos ni eventos corporativos y con composición
-posterior a 2021 aproximada. Se conservan para revisión metodológica; no son índices oficiales.
+\subsection{Sección 7 · Todos los indicadores}
+\captura[1]{sec_indicadores.png}{Sección 7: tabla de todos los indicadores con su nivel frente a la historia.}
+\begin{leer}
+Cada fila tiene el último dato, su período, el cambio (en pp para tasas y en \% para niveles como COLCAP o TRM)
+y una barra con su posición frente a su propia historia desde 2010 (percentil), traducida a palabras:
+\emph{muy bajo}, \emph{bajo}, \emph{normal}, \emph{alto} o \emph{muy alto}. Los extremos son los datos que más se
+alejan de su normalidad histórica y merecen atención.
+\end{leer}
+
+\subsection{Sección 8 · Fuentes}
+\captura[1]{sec_fuentes.png}{Sección 8: estado de cada fuente, descargas CSV, documentación y glosario.}
+\begin{leer}
+Cada fuente aparece con su último período y un estado: \emph{Al día}, \emph{Retrasado} (supera el umbral de
+días esperado para su frecuencia) o \emph{Pendiente} (aún no descargada). Desde aquí se descargan todos los
+CSV, la documentación y el glosario ES/EN.
+\end{leer}
+
+\subsection{Vista en el teléfono}
+\captura[0.38]{movil.png}{El sitio en un teléfono: tarjetas y gráficos se apilan en una columna.}
 
 % ================================================================== 8
 \section{El veredicto automático}
 \label{sec:veredicto}
 
-Todas las frases salen de \archivo{modelo\_tablero.veredicto()} con estas reglas:
+Todas las frases (el resumen sencillo de la portada y el veredicto técnico) salen de las funciones
+\texttt{resumen\_simple()} y \texttt{veredicto()} de \archivo{colombiamacro/modelo.py} con estas reglas:
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
 \toprule
@@ -578,7 +682,7 @@ rango meta.”} Brecha $+0{,}3\%$ (rango $+0{,}3$ a $+2{,}3$); IPC $+0{,}40$~pp 
 4,6\% (restrictiva); 5y5y 6,0\% (desancladas).
 \end{dato}
 
-Los parámetros están al inicio de \archivo{modelo\_tablero.py}. Cambiarlos modifica la redacción
+Los parámetros están al inicio de \archivo{colombiamacro/modelo.py}. Cambiarlos modifica la redacción
 automáticamente; las pruebas verifican que las frases citen las cifras correctas.
 
 % ================================================================== 9
@@ -591,9 +695,12 @@ automáticamente; las pruebas verifican que las frases citen las cifras correcta
 \item Fechas sin duplicados, sin futuros, sin meses o trimestres faltantes.
 \item Recalculo de fórmulas en cada corrida: PIB (tres tasas), IPC, ISE, identidad de la GEIH, COLCAP base 100.
 \item Saltos aislados listados en \archivo{alertas\_datos.csv}.
-\item 43 pruebas: fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de información futura en el
-HP en tiempo real, Hamilton en una caminata con deriva), cliente BanRep, lectores DANE, tablero completo
-en ambos idiomas y tres horizontes, lista blanca de descargas.
+\item Cada serie de BanRep se valida por separado: si una no pasa (identidad, rango o historia), se excluye y
+se conserva su versión anterior, sin bloquear las demás.
+\item 32 pruebas en tres grupos: fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de
+información futura en el HP en tiempo real, Hamilton en una caminata con deriva), datos (cliente BanRep,
+lectores DANE, rangos y fechas) y sitio (construcción completa en ambos idiomas, franjas de cambios, datos de
+la curva TES, enlaces de descarga).
 \end{itemize}
 
 \subsection{Robustez de la brecha del producto}
@@ -630,70 +737,105 @@ pronostica mejor que suponer que la inflación no cambia; el choque 2021–23 no
 \section{Automatización y operación}
 
 \subsection{Flujo diario}
-El workflow \archivo{.github/workflows/actualizar-datos.yml} corre todos los días a las 00:30 UTC (19:30
-Colombia) y también a demanda (\emph{Run workflow}):
+El workflow \archivo{.github/workflows/actualizar-y-publicar.yml} (\emph{Actualizar datos y publicar sitio})
+corre todos los días a las 00:30 UTC (19:30 Colombia) y también a demanda (\emph{Run workflow}):
 \begin{enumerate}
 \item instala dependencias y corre las pruebas;
-\item ejecuta \archivo{actualizar\_todo.py} (si una fuente falla, las demás continúan);
-\item valida las tablas y corre de nuevo las pruebas con los datos nuevos;
-\item publica un commit solo si los CSV cambiaron;
-\item marca el run como fallido si alguna fuente falló, para que llegue una alerta por correo.
+\item descarga las fuentes con \archivo{python -m colombiamacro.actualizar}. Como el paso usa
+\texttt{continue-on-error}, si una fuente falla las demás continúan y el sitio se publica igual;
+\item emite un aviso (\emph{warning}) visible en el resumen del run por cada fuente con falla, tomado de
+\archivo{data/registro\_actualizacion.log}; los avisos \textbf{no} detienen la publicación;
+\item valida las tablas (\archivo{python -m colombiamacro.validar}) y corre de nuevo las pruebas con los datos
+del día;
+\item guarda un commit con \archivo{data/} solo si los CSV cambiaron;
+\item construye el sitio (\archivo{python -m colombiamacro.sitio.construir}) y lo publica en GitHub Pages.
 \end{enumerate}
-El servidor web se redespliega al recibir el commit (auto-deploy).
+Un \emph{push} a \texttt{main} (por ejemplo, un cambio de código o de textos) reconstruye y publica el sitio
+sin descargar datos.
+
+\subsection{Validación serie por serie}
+Cada serie de BanRep se descarga con hasta 3 intentos y espera creciente entre ellos, y se valida
+individualmente: una serie inválida se excluye y se conserva su versión anterior, sin afectar a las demás.
+\begin{alerta}[Causa de la primera corrida fallida]
+Las reservas internacionales netas traen un valor de $-134{,}9$ millones de USD en los años sesenta, fuera del
+rango anterior $(0,\ 500000)$; como la validación era por tabla, ese dato bloqueaba toda la tabla de series
+complementarias. Hoy el rango es $(-1000,\ 500000)$ y una serie inválida ya no bloquea a las demás.
+\end{alerta}
 
 \subsection{Estado de las fuentes}
-\archivo{estado\_fuentes.csv} lista cada fuente con su último período y uno de tres estados:
-\emph{vigente}, \emph{rezagado} (supera el umbral de días esperado) o \emph{pendiente} (aún no descargada).
-Se ve en el desplegable \emph{Fuentes, vigencia y descargas}.
-
-\subsection{Primera carga tras publicar el repositorio}
-\begin{enumerate}
-\item En GitHub: \emph{Settings $\rightarrow$ Actions $\rightarrow$ General $\rightarrow$ Workflow permissions}: \emph{Read and write}.
-\item \emph{Actions $\rightarrow$ Actualizar indicadores Colombia $\rightarrow$ Run workflow}.
-\item Verificar que aparezca un commit “Actualizar indicadores publicados” con \archivo{series\_banrep.csv},
-\archivo{ise\_mensual.csv} y \archivo{mercado\_laboral.csv}.
-\end{enumerate}
+\archivo{estado\_fuentes.csv} lista cada fuente con su último período y uno de tres estados, que el sitio
+muestra en la sección~8: \emph{Al día}, \emph{Retrasado} (supera el umbral de días esperado) o
+\emph{Pendiente} (aún no descargada). Umbrales de rezago:
+\begin{center}\small
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Fuente} & \textbf{Días sin dato nuevo}\\\midrule
+PIB (trimestral) & 150\\
+IPC (mensual) & 45\\
+ISE (mensual) & 110\\
+GEIH (mensual) & 100\\
+Series diarias (TES, COLCAP, TRM, TPM) & 7\\
+Deuda del Gobierno (anual) & 800\\
+\bottomrule
+\end{tabular}
+\end{center}
 
 \subsection{El caso del certificado de BanRep}
 El servidor \texttt{suameca.banrep.gov.co} envía su certificado sin el intermedio \emph{GeoTrust EV RSA CA G2}.
-Los navegadores lo completan solos; Python en Linux no. \archivo{banrep\_client.py} agrega ese intermedio
-(versionado en \archivo{certs/}) a las raíces de confianza, sin desactivar la verificación TLS. Antes de la v9
-solo el actualizador de TES lo hacía, y por eso el COLCAP dejó de actualizarse el 24 de septiembre de 2026.
+Los navegadores lo completan solos; Python en Linux no. \archivo{colombiamacro/fuentes/banrep.py} agrega ese
+intermedio (versionado en \archivo{certs/}) a las raíces de confianza, sin desactivar la verificación TLS.
+Antes de la v9 solo el actualizador de TES lo hacía, y por eso el COLCAP dejó de actualizarse el 24 de
+septiembre de 2026.
 
 % ================================================================== 11
 \section{Despliegue}
 \label{sec:deploy}
 
+Como el sitio es estático (HTML, JavaScript, CSS y datos), puede alojarse en cualquier servicio de archivos
+estáticos: no hay servidor de aplicación que mantener ni arranques en frío.
+
+\textbf{Recomendación}: GitHub Pages. Es gratuito, siempre está activo, no tiene arranque en frío y el mismo
+workflow que actualiza los datos publica el sitio. Llevar siempre la versión local como respaldo
+(sección~\ref{sec:respaldo}).
+
+\subsection{GitHub Pages paso a paso}
+\begin{enumerate}
+\item En el repositorio: \emph{Settings $\rightarrow$ Pages $\rightarrow$ Build and deployment $\rightarrow$
+Source}: \emph{GitHub Actions}.
+\item \emph{Settings $\rightarrow$ Actions $\rightarrow$ General $\rightarrow$ Workflow permissions}:
+\emph{Read and write permissions} (para que el workflow pueda guardar los datos nuevos).
+\item \emph{Actions $\rightarrow$ Actualizar datos y publicar sitio $\rightarrow$ Run workflow}.
+\item Al terminar, el sitio queda en \url{https://stv-quant.github.io/ColombiaMacro-USBCali/} (inglés en
+\texttt{/en/}). El resumen del run muestra el enlace y los avisos de fuentes con falla, si los hay.
+\item Verificar que aparezca un commit “Actualizar datos oficiales AAAA-MM-DD” con los CSV de \archivo{data/}.
+\end{enumerate}
+
+\subsection{Alternativas}
+Todas usan el mismo comando de construcción y la misma carpeta de salida:
+\begin{lstlisting}
+# Build command
+pip install -r requirements.txt && python -m colombiamacro.sitio.construir
+# Output directory
+site
+\end{lstlisting}
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}lXX@{}}
 \toprule
 \textbf{Opción} & \textbf{Ventajas} & \textbf{Limitaciones}\\\midrule
-Render (plan free) & Ya configurado (\archivo{render.yaml}); auto-deploy desde GitHub & Se suspende tras 15 min sin tráfico; tarda cerca de un minuto en despertar\\
-Render (plan starter) & Siempre activo, mismo flujo; recomendado para presentaciones & Costo mensual (del orden de 7 USD)\\
-Google Cloud Run (Docker) & Escala a cero, HTTPS, dominio propio; instancia mínima para evitar arranques en frío & Requiere cuenta GCP y facturación\\
-Servidor de la universidad (Docker) & Dominio institucional (p. ej. \texttt{colombiamacro.usbcali.edu.co}), control de TI & Depende de la oficina de TI; actualizar con \texttt{git pull} programado\\
-Hugging Face Spaces (Docker) & Gratuito, visibilidad académica & Se suspende por inactividad; no institucional\\
+GitHub Pages (recomendada) & Gratuito, siempre activo, sin arranque en frío; integrado al workflow diario & Dominio \texttt{github.io} salvo configurar uno propio\\
+Cloudflare Pages & Gratuito, CDN global, dominio propio (p. ej. \texttt{macro.usbcali.edu.co}) & Requiere cuenta y conectar el repositorio\\
+Netlify & Gratuito, vistas previas por rama & Límites de minutos de construcción en el plan gratuito\\
+Render (Static Site) & Gratuito; a diferencia de un \emph{web service}, el sitio estático no se suspende & Otra cuenta que mantener\\
+Servidor de la universidad & Dominio institucional, control de TI & Copiar \archivo{site/} a Apache, Nginx o IIS; programar la copia tras cada actualización\\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-\textbf{Recomendación}: Render con el repositorio nuevo, plan \emph{starter} durante el período de
-presentaciones (sin arranques en frío), y el \archivo{Dockerfile} como ruta para migrar a un servidor
-institucional de la universidad. Siempre llevar la versión local como respaldo.
-
-\subsection{Render paso a paso}
-\begin{enumerate}
-\item En Render: \emph{New $\rightarrow$ Blueprint} y elegir el repositorio \texttt{ColombiaMacro-USBCali}.
-\item Render lee \archivo{render.yaml}: servicio \texttt{colombiamacro-usbcali}, Python 3.12, Gunicorn.
-\item Cambiar el plan a \emph{Starter} si se requiere disponibilidad permanente.
-\item Verificar \emph{Auto-Deploy: Yes} para que cada commit de datos redepliegue.
-\end{enumerate}
-
-\subsection{Docker}
-\begin{lstlisting}
-docker build -t colombiamacro .
-docker run -p 8080:8080 colombiamacro     # http://localhost:8080
-\end{lstlisting}
+\subsection{Respaldo local para presentaciones}
+\label{sec:respaldo}
+En el portátil: doble clic en \archivo{Iniciar ColombiaMacro.bat} (o \texttt{python scripts/lanzar\_local.py}).
+El sitio se construye con los últimos datos del repositorio y se sirve en \texttt{127.0.0.1}, sin necesidad de
+internet.
 
 % ================================================================== 12
 \section{Mantenimiento y extensión}
@@ -703,24 +845,34 @@ docker run -p 8080:8080 colombiamacro     # http://localhost:8080
 \item Encontrar el número en el graficador de BanRep
 (\url{https://suameca.banrep.gov.co/graficador-series/}); la URL de consulta es
 \texttt{.../consultaSerieParaGraficar?idSerie=N}.
-\item Agregar una entrada en \texttt{SERIES} de \archivo{actualizar\_macro\_extra.py}:
+\item Agregar una entrada en \texttt{SERIES} de \archivo{colombiamacro/fuentes/complementarias.py}, con su
+rango plausible:
 \begin{lstlisting}[language=Python]
 "embi_colombia": (NNNN, "texto del nombre", "diaria", "pb", (0, 2000)),
 \end{lstlisting}
-\item Agregarla a la lista de \texttt{extra} en \archivo{modelo\_tablero.cargar()} y, si debe vigilarse, a
-\texttt{BANREP\_SERIES} en \archivo{validar\_datos.py}.
-\item Crear su gráfico en \archivo{dashboard\_colombia.py} con \texttt{base\_fig} y \texttt{line}.
-\item Correr \texttt{python -m unittest discover -s tests}.
+\item Agregarla a \texttt{BANREP\_SERIES} en \archivo{colombiamacro/validar.py} (etiqueta, frecuencia y días
+de rezago tolerados).
+\item Crear su método de gráfico en la clase \texttt{Graficos} de \archivo{colombiamacro/sitio/construir.py}
+y sus textos (español e inglés) en \archivo{colombiamacro/sitio/textos.py}.
+\item Correr las pruebas y reconstruir el sitio:
+\begin{lstlisting}
+python -m unittest discover -s tests
+python -m colombiamacro.sitio.construir
+\end{lstlisting}
 \end{enumerate}
 
 \subsection{Cambiar parámetros metodológicos}
-\texttt{NEUTRAL\_REAL}, \texttt{UMBRAL\_BRECHA}, \texttt{UMBRAL\_POSTURA} y \texttt{ANCLA\_EXPECTATIVAS} en
-\archivo{modelo\_tablero.py}; \texttt{HP\_LAMBDA\_TRIMESTRAL}, \texttt{HAMILTON\_H}, \texttt{HAMILTON\_P} y la ventana
-COVID en \archivo{analitica\_macro.py}. Documentar todo cambio en \archivo{METODOLOGIA.md}.
+\begin{itemize}
+\item \archivo{colombiamacro/modelo.py}: \archivo{NEUTRAL\_REAL}, \archivo{UMBRAL\_BRECHA}, \archivo{UMBRAL\_POSTURA}
+y \archivo{ANCLA\_EXPECTATIVAS}.
+\item \archivo{colombiamacro/analitica.py}: \archivo{HP\_LAMBDA\_TRIMESTRAL}, \archivo{HAMILTON\_H},
+\archivo{HAMILTON\_P} y la ventana COVID (\archivo{COVID\_DESDE}, \archivo{COVID\_HASTA}).
+\end{itemize}
+Documentar todo cambio en \archivo{docs/METODOLOGIA.md}.
 
 \subsection{Regenerar figuras de documentos}
 \begin{lstlisting}
-python docs/generar_figuras.py     # docs/figuras/*.pdf, *.png y resumen.json
+python scripts/generar_figuras.py     # docs/figuras/*.pdf, *.png y resumen.json
 \end{lstlisting}
 
 % ================================================================== 13
@@ -733,7 +885,6 @@ cada fecha. La brecha en tiempo real elimina la información futura del filtro, 
 \item \textbf{La tasa neutral es externa} y tiene incertidumbre amplia.
 \item \textbf{Las implícitas contienen primas} variables en el tiempo.
 \item \textbf{COLCAP no mide retorno total} (sin dividendos).
-\item \textbf{Canastas heredadas}: sin ajuste por eventos corporativos ni composición histórica completa.
 \end{enumerate}
 
 \subsection*{Trabajo futuro}
@@ -747,12 +898,17 @@ de la curva; riesgo país (CDS/EMBI) si se obtiene una fuente con derechos de re
 \item[“No se encontró Python”] Instalar Python 3.10+ desde python.org marcando \emph{Add python.exe to PATH}.
 \item[El navegador no abre] Copiar la URL que muestra la consola (\texttt{http://127.0.0.1:PUERTO/}).
 \item[Otro programa usa el puerto] El lanzador lo detecta y elige otro; para reservar más: \texttt{--evitar}.
-\item[Sección “pendiente de primera descarga”] Ejecutar el workflow manualmente o \texttt{--actualizar} en local.
-\item[Fuente “rezagada”] Revisar el run de GitHub Actions; si la fuente cambió de formato, el mensaje de error
-indica la serie y la causa.
+\item[Una fuente aparece “Pendiente” o “Retrasado”] Leer \archivo{data/registro\_actualizacion.log} (o los
+avisos del run en GitHub Actions): indica la serie y la causa. En local, \texttt{--actualizar} fuerza la
+descarga. Si la fuente cambió de formato, la serie se excluye y se conserva su versión anterior.
 \item[\texttt{CERTIFICATE\_VERIFY\_FAILED} con BanRep] Verificar que \archivo{certs/GeoTrustEVRSACAG2.pem} exista
-y que el código use \archivo{banrep\_client.py}.
-\item[Render tarda en abrir] Plan free suspendido; esperar un minuto o cambiar a starter.
+y que el código use \archivo{colombiamacro/fuentes/banrep.py}.
+\item[El sitio no aparece publicado] Revisar \emph{Settings $\rightarrow$ Pages $\rightarrow$ Source}: debe
+decir \emph{GitHub Actions}. Luego volver a correr el workflow.
+\item[El workflow no puede guardar los datos (error al hacer push)] \emph{Settings $\rightarrow$ Actions
+$\rightarrow$ General $\rightarrow$ Workflow permissions}: \emph{Read and write permissions}.
+\item[El sitio muestra datos viejos] Verificar que el último run haya terminado en verde y forzar la recarga
+del navegador (Ctrl+F5).
 \end{description}
 
 % ================================================================== A

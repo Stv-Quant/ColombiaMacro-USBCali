@@ -1,0 +1,3 @@
+# Solo para regenerar figuras de documentos (scripts/generar_figuras.py)
+-r requirements.txt
+matplotlib==3.10.9

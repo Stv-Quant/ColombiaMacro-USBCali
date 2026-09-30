@@ -1,0 +1,61 @@
+name: Actualizar datos y publicar sitio
+on:
+  schedule:
+    - cron: "30 0 * * *"      # 19:30 hora de Colombia
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: ["docs/**/*.tex", "docs/**/*.pdf", "**/*.md"]
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: colombiamacro
+  cancel-in-progress: false
+jobs:
+  datos-y-sitio:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12", cache: pip, cache-dependency-path: requirements.txt}
+      - name: Dependencias
+        run: python -m pip install -r requirements.txt
+      - name: Pruebas
+        run: python -m unittest discover -s tests
+      - name: Descargar fuentes oficiales
+        id: fuentes
+        if: github.event_name != 'push'
+        continue-on-error: true
+        run: python -m colombiamacro.actualizar
+      - name: Avisar fuentes con falla (no detiene la publicacion)
+        if: github.event_name != 'push'
+        run: |
+          grep -E "FALLO|ERROR" data/registro_actualizacion.log | while read -r linea; do
+            echo "::warning title=Fuente con falla::$linea"
+          done || true
+          cat data/registro_actualizacion.log || true
+      - name: Validar tablas
+        run: python -m colombiamacro.validar
+      - name: Pruebas con los datos del dia
+        run: python -m unittest discover -s tests
+      - name: Guardar datos nuevos en el repositorio
+        if: github.event_name != 'push'
+        run: |
+          git add data/
+          if git diff --cached --quiet; then echo "Sin cambios de datos"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Actualizar datos oficiales $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main && git push
+      - name: Construir sitio
+        run: python -m colombiamacro.sitio.construir
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with: {path: site}
+      - id: deploy
+        uses: actions/deploy-pages@v4

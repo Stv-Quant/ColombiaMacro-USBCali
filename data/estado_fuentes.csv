@@ -1,0 +1,13 @@
+fuente,archivo,frecuencia,ultima_observacion,ultima_publicacion_o_corte,estado
+PIB real (DANE),pib_colombia.csv,trimestral,2026-04-01,2026-08-18,vigente
+Inflación – IPC (DANE),inflacion_clean.csv,mensual,2026-08-01,2026-09-07,vigente
+Tasas de los TES (BanRep),tasas_interes_clean.csv,diaria_mercado,2026-09-25,2026-09-25,vigente
+Bolsa – COLCAP (BanRep),colcap_oficial.csv,diaria_mercado,2026-09-29,2026-09-29,vigente
+Actividad mensual – ISE (DANE),ise_mensual.csv,mensual,2026-07-01,2026-07-01,vigente
+Desempleo – GEIH (DANE),mercado_laboral.csv,mensual,2026-07-01,2026-07-01,vigente
+Tasa de política (BanRep),series_banrep.csv,diaria,,,pendiente
+Dólar – TRM (BanRep),series_banrep.csv,diaria,,,pendiente
+Inflación básica (BanRep),series_banrep.csv,mensual,,,pendiente
+Tasa de cambio real (BanRep),series_banrep.csv,mensual,,,pendiente
+Cuenta corriente (BanRep),series_banrep.csv,trimestral,,,pendiente
+Deuda del Gobierno (MinHacienda),series_banrep.csv,anual,,,pendiente
