@@ -1,0 +1,109 @@
+Actualizacion ColombiaMacro — 2026-09-30 13:10 UTC
+
+============================================================
+  IPC — DANE y BanRep
+============================================================
+=======================================================
+  Actualizador Inflacion Colombia - BanRep
+=======================================================
+CSV actual: 248 meses, ultimo: 2026-08-01
+Descargando IPC de BanRep...
+OK - 866 meses descargados (1954-07-01 -> 2026-08-01)
+Sin cambios de IPC
+
+=======================================================
+  Estado actual Inflacion Colombia
+=======================================================
+  Total meses    : 248
+  Primer dato    : 2006-01-01
+  Ultimo dato    : 2026-08-01
+  Inf. mensual   : 0.39%
+  Inf. anual     : 6.24%
+=======================================================
+
+Ultimos 6 meses:
+     fecha  inflacion_mensual  inflacion_anual
+2026-03-01               0.78             5.56
+2026-04-01               0.78             5.69
+2026-05-01               0.47             5.84
+2026-06-01               0.39             6.14
+2026-07-01               0.17             6.02
+2026-08-01               0.39             6.24
+
+============================================================
+  Curvas TES — BanRep
+============================================================
+=======================================================
+  Actualizador TES Colombia - BanRep
+=======================================================
+CSV actual: 5773 filas, ultimo dia: 2026-09-25
+
+Descargando series de BanRep...
+  tes_pesos_1y (ID 15272)... OK (5773 puntos hasta 2026-09-25)
+  tes_pesos_5y (ID 15273)... OK (5773 puntos hasta 2026-09-25)
+  tes_pesos_10y (ID 15274)... OK (5773 puntos hasta 2026-09-25)
+  tes_uvr_1y (ID 15275)... OK (5225 puntos hasta 2026-09-25)
+  tes_uvr_5y (ID 15276)... OK (5225 puntos hasta 2026-09-25)
+  tes_uvr_10y (ID 15277)... OK (5223 puntos hasta 2026-09-25)
+Sin cambios de TES
+
+=======================================================
+  Estado actual TES Colombia
+=======================================================
+  Total filas    : 5773
+  Primer dato    : 2003-01-02
+  Ultimo dato    : 2026-09-25
+=======================================================
+
+Ultimos 5 dias:
+     fecha  tes_pesos_1y  tes_pesos_5y  tes_pesos_10y  tes_uvr_1y  tes_uvr_5y  tes_uvr_10y
+2026-09-21         12.38         12.78          12.89        5.04        6.46         6.57
+2026-09-22         12.34         12.72          12.83        5.12        6.29         6.46
+2026-09-23         12.41         12.77          12.88        5.00        6.36         6.52
+2026-09-24         12.39         12.80          12.94        5.07        6.39         6.54
+2026-09-25         12.42         12.90          13.06        4.99        6.48         6.64
+
+============================================================
+  PIB real y nominal — DANE
+============================================================
+PIB: sin cambios
+
+============================================================
+  COLCAP — BanRep
+============================================================
+COLCAP: sin cambios
+
+============================================================
+  Politica, TRM, inflacion basica, externo — BanRep
+============================================================
+tpm                        id 59      10456 obs hasta 2026-09-30
+  ibr_overnight              id 15324    4570 obs hasta 2026-09-29
+  trm                        id 1       12727 obs hasta 2026-09-30
+  inflacion_sin_alimentos    id 15388     522 obs hasta 2026-08-31
+  inflacion_basica_sar       id 15390     522 obs hasta 2026-08-31
+  inflacion_nucleo15         id 15392     522 obs hasta 2026-08-31
+  inflacion_regulados        id 15398     522 obs hasta 2026-08-31
+  inflacion_alimentos        id 15404      81 obs hasta 2026-08-31
+  meta_inflacion             id 853       432 obs hasta 2026-12-31
+  itcr_ipc                   id 235       477 obs hasta 2026-08-31
+  terminos_intercambio       id 15360     378 obs hasta 2026-06-30
+  reservas_netas_musd        id 15051     800 obs hasta 2026-08-31
+  cuenta_corriente_pct_pib   id 15290     122 obs hasta 2026-06-30
+  ied_musd                   id 15133     106 obs hasta 2026-06-30
+  deuda_bruta_gnc_pct_pib    id 15328      31 obs hasta 2025-12-01
+  salario_minimo_var         id 15418      42 obs hasta 2026-12-31
+series_banrep.csv: actualizado (16 de 16 series)
+
+============================================================
+  ISE y mercado laboral — DANE
+============================================================
+ISE: 259 meses hasta 2026-07-01 (sin cambios)
+Mercado laboral: 307 meses hasta 2026-07-01 (sin cambios)
+
+RESUMEN
+  [OK] IPC — DANE y BanRep
+  [OK] Curvas TES — BanRep
+  [OK] PIB real y nominal — DANE
+  [OK] COLCAP — BanRep
+  [OK] Politica, TRM, inflacion basica, externo — BanRep
+  [OK] ISE y mercado laboral — DANE
