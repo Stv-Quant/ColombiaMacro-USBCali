@@ -2,7 +2,11 @@
 
 ## Rutina diaria (automática)
 
-GitHub Actions (`.github/workflows/actualizar-y-publicar.yml`) corre a las 00:30 UTC (19:30 Colombia):
+GitHub Actions (`.github/workflows/actualizar-y-publicar.yml`) tiene dos horarios:
+
+* **Cada hora en días hábiles** (7:07–18:07 Colombia): `python -m colombiamacro.actualizar --rapido`
+  (TES, COLCAP y series diarias de BanRep). Solo guarda y publica si llegó un dato nuevo.
+* **Completa** a las 00:30 UTC (19:30 Colombia) y al ejecutarla a mano:
 
 1. `python -m unittest discover -s tests`
 2. `python -m colombiamacro.actualizar` — cada fuente corre en su propio proceso; si una falla, las demás continúan.
@@ -41,3 +45,9 @@ Busca un puerto libre desde 8050 y omite 8765 y 8766.
 ## Publicar cambios de código
 
 Todo cambio se sube a `main`; el flujo reconstruye el sitio. No hay servidor que mantener.
+
+## Decisiones de política monetaria anunciadas
+
+La serie oficial de la tasa de política registra una decisión el día en que empieza a regir. Para
+reflejar el anuncio el mismo día, agregar una fila en `data/decisiones_banrep.csv` (editable desde
+GitHub). Cuando la serie oficial muestra la nueva tasa, la fila deja de tener efecto.

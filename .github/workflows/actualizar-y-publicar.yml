@@ -1,8 +1,14 @@
 name: Actualizar datos y publicar sitio
 on:
   schedule:
-    - cron: "30 0 * * *"      # 19:30 hora de Colombia
+    - cron: "30 0 * * *"        # 19:30 Colombia: actualizacion completa (DANE, BanRep, acciones)
+    - cron: "7 12-23 * * 1-5"   # 7:07 a 18:07 Colombia, cada hora en dias habiles: series diarias de BanRep
   workflow_dispatch:
+    inputs:
+      completa:
+        description: "Actualizacion completa (todas las fuentes)"
+        type: boolean
+        default: true
   push:
     branches: [main]
     paths-ignore: ["docs/**/*.tex", "docs/**/*.pdf", "**/*.md"]
@@ -19,6 +25,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      # rapida = corrida horaria; completa = nocturna o manual
+      MODO: ${{ (github.event_name == 'schedule' && github.event.schedule != '30 0 * * *') && 'rapida' || ((github.event_name == 'workflow_dispatch' && !inputs.completa) && 'rapida' || 'completa') }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -27,11 +36,12 @@ jobs:
         run: python -m pip install -r requirements.txt
       - name: Pruebas
         run: python -m unittest discover -s tests
-      - name: Descargar fuentes oficiales
+      - name: Descargar fuentes oficiales (${{ env.MODO }})
         id: fuentes
         if: github.event_name != 'push'
         continue-on-error: true
-        run: python -m colombiamacro.actualizar
+        run: |
+          if [ "$MODO" = "rapida" ]; then python -m colombiamacro.actualizar --rapido; else python -m colombiamacro.actualizar; fi
       - name: Avisar fuentes con falla (no detiene la publicacion)
         if: github.event_name != 'push'
         run: |
@@ -44,18 +54,39 @@ jobs:
       - name: Pruebas con los datos del dia
         run: python -m unittest discover -s tests
       - name: Guardar datos nuevos en el repositorio
+        id: guardar
         if: github.event_name != 'push'
         run: |
+          # Solo cuenta como cambio un dato nuevo (el registro y el estado cambian en cada corrida).
+          if [ -z "$(git status --porcelain -- data ':!data/registro_actualizacion.log' ':!data/estado_fuentes.csv')" ]; then
+            echo "Sin datos nuevos"
+            echo "cambios=false" >> "$GITHUB_OUTPUT"
+            if [ "$MODO" = "rapida" ]; then git checkout -- data; fi
+            exit 0
+          fi
+          echo "cambios=true" >> "$GITHUB_OUTPUT"
           git add data/
-          if git diff --cached --quiet; then echo "Sin cambios de datos"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Actualizar datos oficiales $(date -u +%Y-%m-%d)"
+          git commit -m "Actualizar datos oficiales $(TZ=America/Bogota date +'%Y-%m-%d %H:%M') ($MODO)"
           git pull --rebase origin main && git push
+      - name: Decidir si se publica
+        id: publicar
+        run: |
+          # La corrida horaria solo publica si llego un dato nuevo; las demas publican siempre.
+          if [ "${{ github.event_name }}" = "push" ] || [ "$MODO" = "completa" ] || [ "${{ steps.guardar.outputs.cambios }}" = "true" ]; then
+            echo "si=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "si=false" >> "$GITHUB_OUTPUT"; echo "Sin datos nuevos: no se vuelve a publicar"
+          fi
       - name: Construir sitio
+        if: steps.publicar.outputs.si == 'true'
         run: python -m colombiamacro.sitio.construir
       - uses: actions/configure-pages@v5
+        if: steps.publicar.outputs.si == 'true'
       - uses: actions/upload-pages-artifact@v4
+        if: steps.publicar.outputs.si == 'true'
         with: {path: site}
       - id: deploy
+        if: steps.publicar.outputs.si == 'true'
         uses: actions/deploy-pages@v4

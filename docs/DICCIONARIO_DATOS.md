@@ -12,6 +12,7 @@ dato se conocio. Cada archivo mantiene su frecuencia propia.
 | `colcap_oficial.csv` | Dia de mercado | [BanRep/BVC, indice COLCAP](https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/2500/indice_mercado_accionario_colcap), serie 6 | Mercado accionario oficial |
 | `pib_sectores.csv` | Sector × trimestre (largo) | DANE, anexo PIB producción a precios constantes (Cuadro 1) | Crecimiento, peso y aporte de las 12 agrupaciones |
 | `informalidad.csv` | Trimestre móvil, fechado al último mes | [DANE, empleo informal y seguridad social](https://www.dane.gov.co/index.php/estadisticas-por-tema/mercado-laboral/empleo-informal-y-seguridad-social) | Proporción de informales: nacional, 13 y 23 ciudades |
+| `informalidad_ciudades.csv` | Ciudad × trimestre móvil (largo) | DANE, mismo anexo (hoja Prop informalidad) | Tasa de informalidad de las 23 ciudades; `grupo` = 13 (principales) o 23 |
 | `informalidad_ramas.csv` | Rama × trimestre móvil (largo) | DANE, mismo anexo (hoja Ramas de actividad) | Ocupados, informales y tasa por sector |
 | `colcap_canasta.csv` | Una accion de la canasta vigente | [iShares MSCI COLCAP (BlackRock)](https://www.blackrock.com/co/productos/251708/ishares-colcap-fund), composicion diaria | Pesos del COLCAP y 7 Magnificas |
 | `acciones_semanal.csv` | Accion × semana (largo), fechada al viernes | Yahoo Finance, simbolos `<TICKER>.CL` | Equiponderado y 7 Magnificas |

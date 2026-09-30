@@ -11,11 +11,10 @@ Proyecto académico · Universidad de San Buenaventura Cali.
 
 | # | Pregunta | Gráficos principales |
 |---|----------|----------------------|
-| ◉ | Últimas publicaciones oficiales | Tarjetas con el último dato de DANE, BanRep y BVC, con enlace a la fuente oficial |
 | ◷ | ¿En qué parte del ciclo está la economía? | **Reloj del ciclo interactivo** (fase, nivel y dirección; recorrido por trimestre desde 2014) |
-| 1 | ¿Está creciendo la economía? | PIB trimestral e ISE mensual, desempleo |
-| 2 | ¿Qué sectores impulsan la economía? | Crecimiento de los 12 sectores del PIB (último trimestre vs. hace un año) y mapa de calor trimestre a trimestre |
-| 3 | ¿Cuánto del empleo es informal? | Informalidad nacional y 13 ciudades (trimestre móvil desde 2021), informalidad por sector |
+| 1 | ¿Está creciendo la economía? | PIB trimestral e ISE mensual, desempleo, **producción frente a su capacidad** (frontera de producción) y **tamaño de la economía en pesos y dólares** |
+| 2 | ¿Qué sectores impulsan la economía? | Crecimiento de los 12 sectores del PIB (cualquier trimestre desde 2010 vs. un año antes) y mapa de calor |
+| 3 | ¿Cuánto del empleo es informal? | Informalidad nacional y 13 ciudades, por sector y por cada una de las 23 ciudades (selector de ciudad) |
 | 4 | ¿Qué pasa con los precios? | Inflación vs. meta 2–4 %, inflación esperada y **trayectoria que descuenta el mercado para los próximos 10 años** (1 año, años 1–5 y 5y5y) |
 | 5 | ¿Qué hace el Banco de la República? | Tasa de política vs. inflación |
 | 6 | ¿Cuánto cobra el mercado por prestarle al Gobierno? | **Curva cero cupón TES** interactiva (cualquier día desde 2003, comparación por años) |
@@ -23,9 +22,10 @@ Proyecto académico · Universidad de San Buenaventura Cali.
 | 8 | ¿Qué empresas mueven la bolsa? | COLCAP vs. equiponderado vs. **7 Magníficas** (base 100), pesos de la canasta, tabla de las 7 |
 | 9 | ¿Cómo están las cuentas externas y fiscales? | Cuenta corriente, deuda del Gobierno |
 | 10 | Todos los indicadores | Último dato, cambio y nivel frente a su historia |
+| — | Nota: últimas publicaciones oficiales | Último dato de DANE, BanRep y BVC en una línea, con enlace oficial (discreta, al final) |
 | 11 | Fuentes | Estado de cada fuente, descargas CSV, metodología |
 
-Cada gráfico muestra arriba el **último dato y su cambio** (frente a hace un año, al trimestre
+Cada gráfico lleva al pie su **fuente** y un **?** que muestra la metodología. Muestra arriba el **último dato y su cambio** (frente a hace un año, al trimestre
 o al mes anterior), abajo un **panel de barras con ese cambio a lo largo del tiempo**, y el
 recuadro flotante indica el cambio de cada punto. Las escalas se ajustan al periodo visible
 (2020 incluido). Los métodos técnicos
@@ -65,13 +65,21 @@ La primera vez crea `.venv` e instala dependencias (1–3 min). Requiere Python 
 
 ## Automatización
 
-`.github/workflows/actualizar-y-publicar.yml` corre todos los días a las 19:30 (Colombia):
+`.github/workflows/actualizar-y-publicar.yml` corre **cada hora en días hábiles** (7:07 a 18:07, hora de
+Colombia) con las series diarias del Banco de la República (tasa de política, TRM, TES, COLCAP) y publica
+solo si llegó un dato nuevo; a las 19:30 hace la actualización completa (DANE, acciones, informalidad):
 
 1. Pruebas → descarga DANE/BanRep (`python -m colombiamacro.actualizar`).
 2. Si una fuente falla, se conserva su último dato válido y se emite un aviso; **no detiene la publicación**.
 3. Validación → pruebas con los datos del día → commit de `data/` → construcción del sitio → GitHub Pages.
 
-El detalle de cada descarga queda en `data/registro_actualizacion.log`.
+El detalle de cada descarga queda en `data/registro_actualizacion.log`. Para forzar una actualización:
+*Actions → Actualizar datos y publicar sitio → Run workflow*.
+
+**Decisiones de la Junta del Banco de la República.** La nueva tasa entra a la serie oficial el día en que
+empieza a regir (normalmente el día hábil siguiente al anuncio). Para mostrarla desde el mismo día del
+anuncio se agrega una fila a `data/decisiones_banrep.csv` (`fecha_anuncio,vigente_desde,tasa,nota,enlace`);
+el tablero la marca como "Anunciada" y deja de usarla sola cuando la serie oficial la registra.
 
 ## Despliegue
 

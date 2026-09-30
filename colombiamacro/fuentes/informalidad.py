@@ -34,6 +34,11 @@ from colombiamacro.config import data
 
 OUT = data("informalidad.csv")
 OUT_RAMAS = data("informalidad_ramas.csv")
+OUT_CIUDADES = data("informalidad_ciudades.csv")
+# Las 13 ciudades y areas metropolitanas (A.M.) de la medicion tradicional del DANE
+CIUDADES_13 = ["Bogotá D.C.", "Medellín A.M.", "Cali A.M.", "Barranquilla A.M.", "Bucaramanga A.M.",
+               "Manizales A.M.", "Pasto", "Pereira A.M.", "Cúcuta A.M.", "Ibagué", "Montería",
+               "Cartagena", "Villavicencio"]
 PAGINA = ("https://www.dane.gov.co/index.php/estadisticas-por-tema/mercado-laboral/"
           "empleo-informal-y-seguridad-social")
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0 Safari/537.36"}
@@ -86,6 +91,32 @@ def fechas_columnas(anos: tuple, rotulos: tuple) -> dict[int, pd.Timestamp]:
 
 def _filas(ws) -> list[tuple]:
     return list(ws.values)
+
+
+def leer_ciudades(wb) -> pd.DataFrame:
+    """Proporcion de informales por ciudad (23 ciudades y areas metropolitanas)."""
+    hoja = next(n for n in wb.sheetnames if _norm(n).startswith("prop informalidad"))
+    filas = _filas(wb[hoja])
+    i_enc = next(i for i, r in enumerate(filas) if r[0] and _norm(r[0]).startswith("proporcion de informal") and r[1])
+    fechas = fechas_columnas(filas[i_enc], filas[i_enc + 1])
+    trece = {_norm(c) for c in CIUDADES_13}
+    out = []
+    for r in filas[i_enc + 2:]:
+        nombre = str(r[0] or "").strip()
+        if not nombre or _norm(nombre).startswith(("fuente", "nota")):
+            if out:
+                break
+            continue
+        if _norm(nombre) in DOMINIOS:
+            continue
+        for c, f in fechas.items():
+            if isinstance(r[c], (int, float)):
+                out.append({"fecha": f, "ciudad": nombre, "tasa": round(float(r[c]), 4),
+                            "grupo": "13" if _norm(nombre) in trece else "23"})
+    df = pd.DataFrame(out)
+    if df["ciudad"].nunique() < 20 or (df.drop_duplicates("ciudad")["grupo"] == "13").sum() != 13:
+        raise ValueError("No se encontraron las 23 ciudades (o las 13 principales) en el anexo")
+    return df.sort_values(["ciudad", "fecha"]).reset_index(drop=True)
 
 
 def leer_proporcion(wb) -> pd.DataFrame:
@@ -144,10 +175,10 @@ def leer_ramas(wb) -> pd.DataFrame:
     return pd.DataFrame(filas_out).sort_values(["rama", "fecha"]).reset_index(drop=True)
 
 
-def leer_anexo(contenido: bytes) -> tuple[pd.DataFrame, pd.DataFrame]:
+def leer_anexo(contenido: bytes) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     wb = load_workbook(io.BytesIO(contenido), read_only=True, data_only=True)
     try:
-        return leer_proporcion(wb), leer_ramas(wb)
+        return leer_proporcion(wb), leer_ramas(wb), leer_ciudades(wb)
     finally:
         wb.close()
 
@@ -179,9 +210,10 @@ def main() -> int:
     url = enlace_anexo(r.text)
     r = s.get(url, timeout=120)
     r.raise_for_status()
-    prop, ramas = leer_anexo(r.content)
+    prop, ramas, ciudades = leer_anexo(r.content)
     escribir(prop, OUT)
     escribir(ramas, OUT_RAMAS)
+    escribir(ciudades, OUT_CIUDADES)
     ult = prop.iloc[-1]
     print(f"  informalidad: {len(prop)} trimestres moviles hasta {ult['periodo']} "
           f"(nacional {ult['nacional']:.1f}%); {ramas['rama'].nunique()} ramas — {url}")

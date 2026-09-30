@@ -38,7 +38,7 @@ BAND = "rgba(27,175,122,0.12)"
 FONT = "Inter, 'Segoe UI', system-ui, -apple-system, sans-serif"
 MESES = {"es": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
          "en": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
-DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
+DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "estado_fuentes.csv"]
 
 
@@ -176,7 +176,10 @@ def franja(lang, items):
         s = s.dropna()
         if s.empty:
             continue
-        valor = (("$" if suf == "$" else "") + num(s.iloc[-1], dec, lang) + ("" if suf == "$" else suf))
+        if suf.startswith("$"):
+            valor = "$" + num(s.iloc[-1], dec, lang) + suf[1:]
+        else:
+            valor = num(s.iloc[-1], dec, lang) + suf
         cambios = []
         for per in (periodo if isinstance(periodo, (list, tuple)) else [periodo]):
             ch = serie_cambio(s.index, s.values, modo, per).iloc[-1]
@@ -228,8 +231,12 @@ class Graficos:
         yq = [round(float(v), 2) for v in c["pib_real_yoy"]]
         ch = serie_cambio(xq, yq, "pp", "t")
         fig.add_trace(go.Bar(x=list(xq), y=yq, name=t("pib_trim", L), marker=dict(color=C1, line=dict(width=0)),
-                             customdata=[f"{txt_cambio(v, 'pp', L)} {t('vs_trim', L)}" if pd.notna(v) else "" for v in ch],
-                             hovertemplate=f"%{{y:.1f}}%  <span style='color:{MUTED}'>%{{customdata}}</span>"))
+                             customdata=[[f"{txt_cambio(v, 'pp', L)} {t('vs_trim', L)}" if pd.notna(v) else "",
+                                          "$" + num(n_ / 1000, 0, L) if pd.notna(n_) else "—"]
+                                         for v, n_ in zip(ch, d.pib.set_index("fecha")["pib_real_miles_millones_ref2015"]
+                                                          .reindex(pd.to_datetime(c["fecha"])).values)],
+                             hovertemplate=f"%{{y:.1f}}%  <span style='color:{MUTED}'>%{{customdata[0]}}</span><br>"
+                             + t("crec_nivel", L) + ": %{customdata[1]} bill."))
         items = [(t("pib_trim", L), xq, yq, "pp", "t", "q", 1, "%")]
         if d.ise is not None:
             i = d.ise.dropna(subset=["ise_sa_yoy"])
@@ -297,7 +304,13 @@ class Graficos:
         xi = d.inflacion["fecha"] + pd.offsets.MonthEnd(0)
         self._l(fig, xi, d.inflacion["inflacion_anual"], t("inf_total", L), C2, fmt=".2f", cambio=("pp", "a"))
         fig.add_hline(y=3, line=dict(color=C3, width=1, dash="dot"))
-        fig.update_xaxes(range=rango_inicial(w["fecha"].max()))
+        an = (self.s.get("tasas") or {}).get("tpm_anunciada")
+        if an:
+            fig.add_trace(go.Scatter(x=[an["vigente"]], y=[an["tasa"]], mode="markers+text", name=t("an_marca", L),
+                                     marker=dict(symbol="star", size=14, color=C1, line=dict(color="#fff", width=1)),
+                                     text=[num(an["tasa"], 2, L, suf="%")], textposition="top left",
+                                     hovertemplate=t("an_hover", L).format(a=fecha(an["anuncio"], "d", L)) + ": %{y:.2f}%<extra></extra>"))
+        fig.update_xaxes(range=rango_inicial(max(w["fecha"].max(), an["vigente"]) if an else w["fecha"].max()))
         tp = d.extra["tpm"]
         return fig, {"franja": franja(L, [(t("tpm_linea", L), tp["fecha"], tp["tpm"], "pp", "a", "d", 2, "%"),
                                           (t("inf_total", L), xi, d.inflacion["inflacion_anual"], "pp", "a", "m", 2, "%")])}
@@ -344,6 +357,81 @@ class Graficos:
         if horizonte:
             fig.update_xaxes(range=rango_inicial(x.max()))
         return fig, {"franja": franja(L, [(t("g_" + ("cc" if freq == "q" else "deuda") + "_corto", L), x, y, "pp", "a", freq, 1, "%")])}
+
+    # --- produccion y capacidad (frontera de produccion)
+    def capacidad(self):
+        """PIB real desestacionalizado frente a su capacidad (PIB potencial): la 'frontera' de lo que la
+        economia puede producir sin presionar precios. Area verde = por encima; naranja = por debajo."""
+        L, d = self.lang, self.d
+        p = d.pib.set_index("fecha")["pib_real_ajustado_miles_millones_ref2015"].astype(float) / 1000
+        c = d.ciclo.set_index("fecha")["brecha_hp_tiempo_real"]
+        df = pd.DataFrame({"y": p, "gap": c}).dropna()
+        df["pot"] = df["y"] * np.exp(-df["gap"] / 100)
+        x = list(qend(pd.Series(df.index)))
+        y, pot = [round(v, 2) for v in df["y"]], [round(v, 2) for v in df["pot"]]
+        arriba = [max(a, b) for a, b in zip(y, pot)]
+        abajo = [min(a, b) for a, b in zip(y, pot)]
+        fig = base(L, suffix="", delta=True)
+        for borde, relleno, color in ((arriba, "rgba(26,127,75,0.22)", None), (abajo, "rgba(235,104,52,0.25)", None)):
+            fig.add_trace(go.Scatter(x=x, y=pot, mode="lines", line=dict(width=0), hoverinfo="skip", showlegend=False))
+            fig.add_trace(go.Scatter(x=x, y=borde, mode="lines", line=dict(width=0), fill="tonexty", fillcolor=relleno,
+                                     hoverinfo="skip", showlegend=False))
+        fig.add_trace(go.Scatter(x=x, y=pot, mode="lines", name=t("cap_pot", L), line=dict(color=INK2, width=2, dash="dash"),
+                                 hovertemplate="$%{y:,.0f} bill.<extra>" + t("cap_pot", L) + "</extra>"))
+        fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name=t("cap_real", L), line=dict(color=C1, width=2.6),
+                                 customdata=[num(g, 1, L, True, "%") for g in df["gap"]],
+                                 hovertemplate="$%{y:,.0f} bill. · " + t("cap_dif", L) + " %{customdata}<extra>" + t("cap_real", L) + "</extra>"))
+        fig.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=11, color="rgba(26,127,75,0.45)", symbol="square"),
+                                 name=t("cap_sobre", L)))
+        fig.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=11, color="rgba(235,104,52,0.5)", symbol="square"),
+                                 name=t("cap_holgura", L)))
+        gaps = [round(float(v), 2) for v in df["gap"]]
+        fig.add_trace(go.Bar(x=x, y=gaps, yaxis="y2", showlegend=False, name=t("cap_dif", L),
+                             marker=dict(color=["rgba(26,127,75,0.7)" if v >= 0 else "rgba(235,104,52,0.75)" for v in gaps], line=dict(width=0)),
+                             customdata=[num(v, 1, L, True, "%") for v in gaps], hovertemplate="%{customdata}"))
+        fig.add_shape(type="line", xref="x domain", x0=0, x1=1, yref="y2", y0=0, y1=0, line=dict(color=INK2, width=0.8))
+        fig.update_layout(yaxis2=dict(ticksuffix="%", nticks=4, gridcolor=GRID, zeroline=False, fixedrange=True,
+                                      tickfont=dict(size=11, color=MUTED), automargin=True), bargap=0.15)
+        fig.add_annotation(xref="paper", x=0, yref="y2 domain", y=1.03, yanchor="bottom", xanchor="left", showarrow=False,
+                           text=f"<b>{t('cap_panel', L)}</b>", font=dict(size=11.5, color=MUTED))
+        fig.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", ticksuffix="",
+                                     title=dict(text=t("cap_eje", L), font=dict(size=11.5))))
+        fig.update_xaxes(range=rango_inicial(max(x)))
+        u = df.iloc[-1]
+        return fig, {"franja": franja(L, [(t("cap_dif", L), x, df["gap"], "pp", "a", "q", 1, "%")])}, u
+
+    def pib_pesos(self):
+        """Tamano de la economia: PIB de los ultimos 4 trimestres en billones de pesos (corrientes y de 2015) y en dolares."""
+        L, d = self.lang, self.d
+        p = d.pib.set_index("fecha").sort_index()
+        nom = p["pib_nominal_billones_cop"].astype(float).rolling(4).sum()
+        real = (p["pib_real_miles_millones_ref2015"].astype(float) / 1000).rolling(4).sum()
+        x = list(qend(pd.Series(p.index)))
+        fig = base(L, suffix="", height=360)
+        fig.add_trace(go.Bar(x=x, y=[None if pd.isna(v) else round(v, 1) for v in nom], name=t("pp_nom", L),
+                             marker=dict(color=C1, line=dict(width=0)),
+                             customdata=[num(v, 1, L, True, "%") if pd.notna(v) else "" for v in (nom / nom.shift(4) - 1) * 100],
+                             hovertemplate="$%{y:,.0f} bill.  <span style='color:" + MUTED + "'>%{customdata} " + t("vs_ano", L) + "</span>"))
+        fig.add_trace(go.Scatter(x=x, y=[None if pd.isna(v) else round(v, 1) for v in real], name=t("pp_real", L), mode="lines",
+                                 line=dict(color=C2, width=2.2), hovertemplate="$%{y:,.0f} bill."))
+        usd = None
+        trm = d.extra.get("trm")
+        if trm is not None and not trm.empty:
+            tq = trm.set_index("fecha")["trm"].resample("QS").mean()
+            tq4 = tq.rolling(4).mean().reindex(p.index)
+            usd = nom * 1e12 / tq4 / 1e9  # miles de millones de dolares
+            fig.add_trace(go.Scatter(x=x, y=[None if pd.isna(v) else round(v, 1) for v in usd], name=t("pp_usd", L),
+                                     mode="lines", yaxis="y3", line=dict(color=C3, width=2, dash="dot"),
+                                     hovertemplate="US$%{y:,.0f} mil M"))
+            fig.update_layout(yaxis3=dict(overlaying="y", side="right", tickprefix="US$", tickformat=",.0f", showgrid=False,
+                                          fixedrange=True, tickfont=dict(size=11, color=C3), automargin=True))
+        fig.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", ticksuffix=""))
+        fig.update_layout(bargap=0.25)
+        fig.update_xaxes(range=rango_inicial(max(x)))
+        u = {"nom": nom.dropna().iloc[-1], "real": real.dropna().iloc[-1], "q": p.index[-1],
+             "usd": None if usd is None or usd.dropna().empty else usd.dropna().iloc[-1]}
+        items = [(t("pp_nom", L), x, nom, "pct", "a", "q", 0, "$ bill.")]
+        return fig, {"franja": franja(L, items), "noy": True}, u
 
     # --- sectores (PIB por actividad)
     def sectores_barras(self):
@@ -435,6 +523,34 @@ class Graficos:
         fig.update_layout(hovermode="closest", bargap=0.28, margin=dict(l=6, r=30, t=6, b=6))
         fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID, range=[0, 100])
         fig.update_yaxes(ticksuffix="", tickfont=dict(size=12, color=INK2))
+        return fig, {"notime": True}
+
+    def informalidad_ciudades(self):
+        """Ranking de informalidad por ciudad (23 ciudades y A.M.; las 13 principales resaltadas)."""
+        L, ic = self.lang, self.d.informalidad_ciudades
+        if ic is None or ic.empty:
+            return None, {}
+        f = ic["fecha"].max()
+        u = ic[ic["fecha"] == f].set_index("ciudad")
+        a = ic[ic["fecha"] == f - pd.DateOffset(years=1)].set_index("ciudad")["tasa"]
+        u = u.assign(hace=a).sort_values("tasa")
+        fig = base(L, height=560, fecha_x=False)
+        fig.add_trace(go.Bar(y=list(u.index), x=[round(v, 2) for v in u["tasa"]], orientation="h", showlegend=False,
+                             marker=dict(color=[C1 if g_ == "13" else "#c9c7c0" for g_ in u["grupo"]], line=dict(width=0)),
+                             text=[num(v, 0, L, suf="%") for v in u["tasa"]], textposition="outside", cliponaxis=False,
+                             customdata=[[num(h, 1, L, suf="%"), num(v - h, 1, L, True, " pp") if pd.notna(h) else "—",
+                                          t("inf_13c", L) if g_ == "13" else t("inf_23c", L)]
+                                         for h, v, g_ in zip(u["hace"], u["tasa"], u["grupo"])],
+                             hovertemplate="<b>%{y}</b> · %{customdata[2]}<br>" + t("inf_tasa", L) + ": %{x:.1f}%<br>"
+                             + t("hace_ano", L) + ": %{customdata[0]} (%{customdata[1]})<extra></extra>"))
+        fig.add_trace(go.Scatter(y=list(u.index), x=[round(v, 2) for v in u["hace"]], mode="markers",
+                                 name=t("sec_raya", L).format(q=fecha(f - pd.DateOffset(years=1), "m", L)),
+                                 marker=dict(symbol="line-ns", size=12, line=dict(width=2.2, color=INK)), hoverinfo="skip"))
+        fig.add_trace(go.Bar(y=[None], x=[None], orientation="h", name=t("inf_13c", L), marker=dict(color=C1)))
+        fig.add_trace(go.Bar(y=[None], x=[None], orientation="h", name=t("inf_23c", L), marker=dict(color="#c9c7c0")))
+        fig.update_layout(hovermode="closest", bargap=0.22, margin=dict(l=6, r=30, t=6, b=6))
+        fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID, range=[0, 80])
+        fig.update_yaxes(ticksuffix="", tickfont=dict(size=11.5, color=INK2))
         return fig, {"notime": True}
 
     # --- 5b. bolsa por dentro
@@ -636,24 +752,70 @@ def tabla_magnificas(b, L):
     return f"<div class='table-wrap'><table class='tbl'><thead><tr>{head}</tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
 
 
+# ------------------------------------------------------------------ selectores (sectores por trimestre, ciudad)
+def selector_sectores(d, L):
+    sc = d.sectores
+    if sc is None or sc.empty:
+        return ""
+    trimestres = []
+    for f in sorted(sc["fecha"].unique()):
+        f = pd.Timestamp(f)
+        u = sc[sc["fecha"] == f]
+        a = sc[sc["fecha"] == f - pd.DateOffset(years=1)].set_index("codigo")["yoy"]
+        trimestres.append({"q": fecha(f, "q", L), "qa": fecha(f - pd.DateOffset(years=1), "q", L),
+                           "s": [[r.sector, round(r.yoy, 2), None if pd.isna(a.get(r.codigo)) else round(float(a.get(r.codigo)), 2),
+                                  round(r.peso, 2), round(r.contribucion, 3)] for r in u.itertuples()]})
+    datos = json.dumps(trimestres, ensure_ascii=False, separators=(",", ":"))
+    opciones = "".join(f'<option value="{k}"{" selected" if k == len(trimestres) - 1 else ""}>{esc(q["q"])}</option>'
+                       for k, q in enumerate(trimestres))
+    txt = json.dumps({k: t(k, L) for k in ("sec_crec", "sec_hace", "sec_peso", "sec_aporte", "sec_raya")}, ensure_ascii=False)
+    return (f'<div class="picker"><label>{t("sec_ver", L)} <select id="sec-q">{opciones}</select></label>'
+            f'<button class="linkbtn" id="sec-ultimo">{t("tes_volver", L)}</button></div>'
+            f'<script type="application/json" id="sec-datos">{datos}</script>'
+            f'<script type="application/json" id="sec-textos">{txt}</script>')
+
+
+def selector_ciudad(d, L):
+    ic, inf = d.informalidad_ciudades, d.informalidad
+    if ic is None or ic.empty or inf is None:
+        return ""
+    ciudades = {}
+    for c_, g_ in ic.groupby("ciudad"):
+        g_ = g_.sort_values("fecha")
+        ciudades[c_] = {"g": g_["grupo"].iloc[0], "y": [round(v, 2) for v in g_["tasa"]]}
+    fechas = sorted(ic["fecha"].dt.strftime("%Y-%m-%d").unique())
+    nal = inf.set_index(inf["fecha"].dt.strftime("%Y-%m-%d"))
+    datos = {"f": fechas, "c": ciudades, "nal": [round(float(nal["nacional"].get(f_, float("nan"))), 2) for f_ in fechas],
+             "c13": [round(float(nal["ciudades_13"].get(f_, float("nan"))), 2) for f_ in fechas]}
+    trece = [c_ for c_ in ciudades if ciudades[c_]["g"] == "13"]
+    otras = [c_ for c_ in ciudades if ciudades[c_]["g"] != "13"]
+    ops = (f'<optgroup label="{t("inf_13c", L)}">' + "".join(f'<option{" selected" if c_.startswith("Cali") else ""}>{esc(c_)}</option>' for c_ in sorted(trece))
+           + f'</optgroup><optgroup label="{t("inf_23c", L)}">' + "".join(f"<option>{esc(c_)}</option>" for c_ in sorted(otras)) + "</optgroup>")
+    txt = json.dumps({k: t(k, L) for k in ("inf_nal", "inf_13", "vs_ano")}, ensure_ascii=False)
+    return (f'<div class="picker"><label>{t("inf_ver_ciudad", L)} <select id="inf-ciudad">{ops}</select></label></div>'
+            f'<div class="stats" id="inf-ciudad-stats"></div>'
+            f'<div class="plot" id="g-inf-ciudad" style="height:360px"></div>'
+            f'<script type="application/json" id="inf-ciudad-datos">{json.dumps(datos, ensure_ascii=False, separators=(",", ":")).replace("NaN", "null")}</script>'
+            f'<script type="application/json" id="inf-ciudad-textos">{txt}</script>')
+
+
 # ------------------------------------------------------------------ publicaciones oficiales
 def bloque_noticias(d, s, L, n=12):
+    """Nota lateral discreta al final: ultimos datos oficiales con enlace a la fuente."""
     from colombiamacro import noticias as nt
     items = nt.publicaciones(d, s, L)[:n]
     if not items:
         return ""
-    tarjetas = []
+    filas = []
     for it in items:
-        cuando = (t("nt_dato", L) if it["aprox"] else t("nt_fecha", L)).format(f=fecha(it["fecha"], "d", L))
-        tarjetas.append(
-            f'<a class="news" href="{esc(it["enlace"])}" target="_blank" rel="noopener">'
-            f'<span class="news-meta"><b>{esc(it["fuente"])}</b> · {cuando}</span>'
-            f'<span class="news-t">{esc(it["titular"])}</span><span class="news-d">{esc(it["detalle"])}</span></a>')
+        cuando = t("nt_dato", L) if it["aprox"] else fecha(it["fecha"], "d", L)
+        filas.append(
+            f'<li><a href="{esc(it["enlace"])}" target="_blank" rel="noopener">'
+            f'<span class="nm">{esc(it["fuente"])} · {cuando}</span>'
+            f'<span class="nt">{esc(it["titular"])}</span><span class="nd">{esc(it["detalle"])}</span></a></li>')
     salas = " · ".join(f'<a href="{u}" target="_blank" rel="noopener">{esc(nombre)}</a>' for nombre, u in nt.SALAS)
-    return (f'<section id="noticias" class="cycle"><div class="sec-head"><span class="sec-num">◉</span>'
-            f'<h2>{t("q_noticias", L)}</h2></div><p class="answer">{t("resp_noticias", L)}</p>'
-            f'<div class="news-grid">{"".join(tarjetas)}</div>'
-            f'<p class="press"><b>{t("nt_salas", L)}:</b> {salas}</p></section>')
+    return (f'<aside id="noticias" class="notes"><h3>{t("q_noticias", L)}</h3><p class="note">{t("resp_noticias", L)}</p>'
+            f'<ul>{"".join(filas)}</ul><p class="note">{t("nt_salas", L)}: {salas}</p></aside>')
 
 
 # ------------------------------------------------------------------ reloj del ciclo interactivo
@@ -673,7 +835,7 @@ def explorador_ciclo(d: mt.Datos, lang: str) -> str:
     datos = json.dumps(datos_ciclo(d, L), ensure_ascii=False, separators=(",", ":"))
     textos = json.dumps({k: t(k, L) for k in (
         "ck_fase", "ck_brecha", "ck_dir", "ck_racha", "ck_encima", "ck_debajo", "ck_mejora", "ck_empeora",
-        "ck_trim", "ck_trim1", "ck_eje_x", "ck_eje_y", "ck_hover", "vs_2t")}, ensure_ascii=False)
+        "ck_trim", "ck_trim1", "ck_hist_x", "ck_hist_y", "ck_eje_x", "ck_eje_y", "ck_hover", "vs_2t")}, ensure_ascii=False)
     tr = datos_ciclo(d, L)["trimestres"]
     ult = tr[-1]
     racha = 1
@@ -701,10 +863,10 @@ def explorador_ciclo(d: mt.Datos, lang: str) -> str:
     <div class="stats" id="ciclo-stats"></div>
     <div class="curve-grid">
       <figure class="chart"><figcaption>{t("g_reloj_main", L)}</figcaption><div class="plot" id="g-ciclo-reloj" style="height:420px"></div>
-        <p class="how"><span>?</span>{t("h_reloj_main", L)}</p></figure>
+        <p class="how"><span>?</span>{t("h_reloj_main", L)}</p>{pie_ficha("g-ciclo-reloj", L)}</figure>
       <figure class="chart"><figcaption>{t("g_ciclo_hist", L)}</figcaption><div class="phases">{leyenda}</div>
         <div class="plot" id="g-ciclo-hist" style="height:380px"></div>
-        <p class="how"><span>?</span>{t("h_ciclo_hist", L)}</p></figure>
+        <p class="how"><span>?</span>{t("h_ciclo_hist", L)}</p>{pie_ficha("g-ciclo-hist", L)}</figure>
     </div>
   </div>
   <script type="application/json" id="ciclo-datos">{datos}</script>
@@ -742,9 +904,9 @@ def explorador_curva(lang):
   <div class="stats" id="curva-stats"></div>
   <div class="curve-grid">
     <figure class="chart"><figcaption>{t('tes_g_curva', L)}</figcaption><div class="plot" id="g-curva-tes"></div>
-      <p class="how"><span>?</span>{t('tes_h_curva', L)}</p></figure>
+      <p class="how"><span>?</span>{t('tes_h_curva', L)}</p>{pie_ficha("g-curva-tes", L)}</figure>
     <figure class="chart"><figcaption>{t('tes_g_hist', L)}</figcaption><div class="plot" id="g-curva-hist"></div>
-      <p class="how"><span>?</span>{t('tes_h_hist', L)}</p></figure>
+      <p class="how"><span>?</span>{t('tes_h_hist', L)}</p>{pie_ficha("g-curva-hist", L)}</figure>
   </div>
 </div>"""
 
@@ -758,7 +920,7 @@ def fig_html(fig, meta, gid):
     attrs += ' data-rebase="1"' if meta.get("rebase") else ""
     attrs += ' data-noy="1"' if meta.get("noy") else ""
     alto = int(fig.layout.height or 330)
-    return (meta.get("franja", "") + f'<div class="plot" id="{gid}"{attrs} style="height:{alto}px"></div>'
+    return (meta.get("antes", "") + meta.get("franja", "") + f'<div class="plot" id="{gid}"{attrs} style="height:{alto}px"></div>'
             f'<script type="application/json" data-for="{gid}">{data}</script>')
 
 
@@ -769,11 +931,43 @@ def tarjeta(titulo, valor, detalle, estado, tono, pregunta_id):
             f'<div class="card-value">{esc(valor)}</div><div class="card-detail">{detalle}</div></a>')
 
 
+def pie_ficha(gid, L):
+    """Pie del grafico: fuente + '?' con la metodologia (tooltip accesible)."""
+    from colombiamacro.sitio.fichas import ficha
+    f = ficha(gid, L)
+    if not f:
+        return ""
+    fuente, metodo = f
+    return (f'<div class="ficha"><span class="src"><b>{t("fuente_pie", L)}:</b> {esc(fuente)}</span>'
+            f'<span class="info" tabindex="0" role="button" aria-label="{t("metodo_pie", L)}">?'
+            f'<span class="tip" role="tooltip"><b>{t("metodo_pie", L)}.</b> {esc(metodo)}</span></span></div>')
+
+
 def bloque_grafico(titulo, fig_html_str, como_leer, nota=None, ancho=False):
     cuerpo = fig_html_str or '<div class="pending">—</div>'
     extra = f'<p class="note">{nota}</p>' if nota else ""
+    m = re.search(r'class="plot" id="([^"]+)"', cuerpo)
+    pie = pie_ficha(m.group(1), LANG_ACTUAL[0]) if m else ""
     return (f'<figure class="chart{" wide" if ancho else ""}"><figcaption>{esc(titulo)}</figcaption>{cuerpo}'
-            f'<p class="how"><span>?</span>{como_leer}</p>{extra}</figure>')
+            f'<p class="how"><span>?</span>{como_leer}</p>{extra}{pie}</figure>')
+
+
+LANG_ACTUAL = ["es"]
+
+
+def bloque_grafico_html(titulo, cuerpo, como_leer, gid_ficha):
+    """Bloque para graficos dibujados en el navegador (selectores)."""
+    if not cuerpo:
+        return ""
+    return (f'<figure class="chart"><figcaption>{esc(titulo)}</figcaption>{cuerpo}'
+            f'<p class="how"><span>?</span>{como_leer}</p>{pie_ficha(gid_ficha, LANG_ACTUAL[0])}</figure>')
+
+
+def inf_13_lista(d):
+    ic = d.informalidad_ciudades
+    if ic is None or ic.empty:
+        return []
+    return sorted(ic[ic["grupo"] == "13"]["ciudad"].unique())
 
 
 def seccion(sid, num_, titulo, respuesta, graficos, detalle_html, lang, abierto=False):
@@ -792,6 +986,9 @@ def seccion(sid, num_, titulo, respuesta, graficos, detalle_html, lang, abierto=
 # ------------------------------------------------------------------ pagina
 def pagina(d, s, lang, generado):
     L = lang
+    ahora = pd.Timestamp.now(tz="America/Bogota")
+    construido = f"{fecha(ahora, 'd', L)}, {ahora:%H:%M}"
+    LANG_ACTUAL[0] = L
     g = Graficos(d, s, L)
     c, i, tt, m = s["ciclo"], s["inflacion"], s["tasas"], s["mercado"]
     ec = mt.estado_crecimiento(c["pib_real_yoy"], c["crecimiento_potencial_hp"])
@@ -811,9 +1008,17 @@ def pagina(d, s, lang, generado):
     if tt.get("tpm") is not None:
         tono_p = {"restrictiva": "warn", "neutral": "ok", "expansiva": "warn"}.get(post, "neutral")
         cambio = tt.get("tpm_hace_12m")
-        cards.append(tarjeta(t("c_tasa", L), num(tt["tpm"], 2, L, suf="%"),
-                             f'{t("tasa_detalle", L)}<br>{t("hace_ano", L)}: {num(cambio, 2, L, suf="%")}',
-                             t(f"ep_{post}", L), tono_p, "banco"))
+        an = tt.get("tpm_anunciada")
+        if an:
+            verbo = t("an_sube" if an["tasa"] > an["anterior"] else "an_baja", L)
+            cards.append(tarjeta(t("c_tasa", L), num(an["tasa"], 2, L, suf="%"),
+                                 t("an_detalle", L).format(a=fecha(an["anuncio"], "d", L), v=fecha(an["vigente"], "d", L),
+                                                           p=num(an["anterior"], 2, L)),
+                                 verbo, "warn", "banco"))
+        else:
+            cards.append(tarjeta(t("c_tasa", L), num(tt["tpm"], 2, L, suf="%"),
+                                 f'{t("tasa_detalle", L)}<br>{t("hace_ano", L)}: {num(cambio, 2, L, suf="%")}',
+                                 t(f"ep_{post}", L), tono_p, "banco"))
     if s.get("laboral"):
         lb = s["laboral"]
         el = mt.estado_desempleo(lb["td"], lb["td_hace_12m"])
@@ -836,18 +1041,22 @@ def pagina(d, s, lang, generado):
     # --- secciones
     fc, mc = g.crecimiento()
     fd, md = g.desempleo()
-    s1_det = "".join(filter(None, [
-        f'<p>{tecnico["actividad"]}</p>',
-        bloque_grafico(t("g_brecha", L), fig_html(*g.brecha(), "g-brecha"), t("h_brecha", L)),
-        f'<p class="method">{t("m_brecha", L)}</p>']))
+    fcap, mcap, ucap = g.capacidad()
+    fpp, mpp, upp = g.pib_pesos()
+    usd_txt = t("pp_resp_usd", L).format(u=num(upp["usd"], 0, L)) if upp.get("usd") else ""
+    s1_det = (f'<p>{t("x_crec", L).format(g=num(ucap["gap"], 1, L, True), pot=num(ucap["pot"], 0, L), y=num(ucap["y"], 0, L))}</p>'
+              f'<p>{t("x_crec2", L)}</p>')
     ise_txt = ""
     if s.get("ise"):
         ise_txt = t("resp_ise", L).format(v=num(s["ise"]["yoy"], 1, L), f=fecha(s["ise"]["fecha"], "m", L))
+    tam_txt = t("pp_resp", L).format(n=num(upp["nom"], 0, L), q=fecha(upp["q"], "q", L)) + usd_txt
     s1 = seccion("crecimiento", "1", t("q_crec", L),
                  t("resp_crec", L).format(v=num(c["pib_real_yoy"], 1, L), q=fecha(c["fecha"], "q", L),
-                                          p=num(c["crecimiento_potencial_hp"], 1, L)) + " " + ise_txt,
+                                          p=num(c["crecimiento_potencial_hp"], 1, L)) + " " + ise_txt + " " + tam_txt,
                  [bloque_grafico(t("g_crec", L), fig_html(fc, mc, "g-crec"), t("h_crec", L)),
-                  bloque_grafico(t("g_desempleo", L), fig_html(fd, md, "g-desempleo"), t("h_desempleo", L))],
+                  bloque_grafico(t("g_desempleo", L), fig_html(fd, md, "g-desempleo"), t("h_desempleo", L)),
+                  bloque_grafico(t("g_cap", L), fig_html(fcap, mcap, "g-capacidad"), t("h_cap", L)),
+                  bloque_grafico(t("g_pp", L), fig_html(fpp, mpp, "g-pib-pesos"), t("h_pp", L))],
                  s1_det, L)
 
     # --- sectores
@@ -864,11 +1073,12 @@ def pagina(d, s, lang, generado):
             a=u.iloc[0]["sector"], ap=num(u.iloc[0]["contribucion"], 1, L), tot=num(u["contribucion"].sum(), 1, L))
         resp_sec += " " + (t("resp_sec_neg", L).format(lista=", ".join(neg)) if neg else t("resp_sec_todos", L))
         fsb, msb = g.sectores_barras()
+        msb = dict(msb, antes=selector_sectores(d, L))
         fsm, msm = g.sectores_mapa()
         s_sec = seccion("sectores", "0", t("q_sectores", L), resp_sec,
                         [bloque_grafico(t("g_sec_barras", L).format(q=fecha(f, "q", L)), fig_html(fsb, msb, "g-sec-barras"), t("h_sec_barras", L)),
                          bloque_grafico(t("g_sec_mapa", L), fig_html(fsm, msm, "g-sec-mapa"), t("h_sec_mapa", L))],
-                        f'<p class="method">{t("m_sectores", L)}</p>', L)
+                        f'<p>{t("x_sectores", L)}</p>', L)
 
     # --- informalidad
     s_inf = ""
@@ -888,18 +1098,22 @@ def pagina(d, s, lang, generado):
             c=num(ult["ciudades_13"], 1, L), i=num(inf.iloc[0]["nacional"], 1, L))
         fin_, min_ = g.informalidad()
         fir, mir = g.informalidad_ramas()
+        fic, mic = g.informalidad_ciudades()
+        trece_txt = ", ".join(inf_13_lista(d))
         s_inf = seccion("informalidad", "0", t("q_informal", L), resp_inf,
                         [bloque_grafico(t("g_informal", L), fig_html(fin_, min_, "g-informal"), t("h_informal", L)),
                          bloque_grafico(t("g_inf_ramas", L).format(p=ventana + " " + str(ult["fecha"].year)),
-                                        fig_html(fir, mir, "g-inf-ramas"), t("h_inf_ramas", L))],
-                        f'<p class="method">{t("m_informal", L)}</p>', L)
+                                        fig_html(fir, mir, "g-inf-ramas"), t("h_inf_ramas", L)),
+                         bloque_grafico(t("g_inf_ciudades", L).format(p=ventana + " " + str(ult["fecha"].year)),
+                                        fig_html(fic, mic, "g-inf-ciudades"), t("h_inf_ciudades", L)),
+                         bloque_grafico_html(t("g_inf_ciudad", L), selector_ciudad(d, L), t("h_inf_ciudad", L), "g-inf-ciudades")],
+                        f'<p>{t("x_informal", L).format(lista=trece_txt)}</p>', L)
 
     fi, mi = g.inflacion()
     fe, me = g.expectativas()
     s2_det = "".join(filter(None, [
-        f'<p>{tecnico["expectativas"]}</p>',
-        bloque_grafico(t("g_anclaje", L), fig_html(*g.anclaje(), "g-anclaje"), t("h_anclaje", L)),
-        f'<p class="method">{t("m_expect", L)}</p>']))
+        f'<p>{t("x_precios", L)}</p>',
+        bloque_grafico(t("g_anclaje", L), fig_html(*g.anclaje(), "g-anclaje"), t("h_anclaje", L))]))
     basica = ""
     if i.get("basica") is not None:
         basica = t("resp_basica", L).format(v=num(i["basica"], 1, L))
@@ -918,13 +1132,17 @@ def pagina(d, s, lang, generado):
 
     fp, mp = g.politica()
     s3_det = "".join(filter(None, [
-        f'<p>{tecnico["politica"]}</p>',
-        bloque_grafico(t("g_real", L), fig_html(*g.tasa_real(), "g-real"), t("h_real", L)),
-        f'<p class="method">{t("m_politica", L)}</p>']))
+        f'<p>{t("x_real", L).format(v=num(tt.get("tpm") or 0, 2, L), e=num(tt["bei_1y"], 1, L), r=num(tt.get("tpm_real_exante") or 0, 1, L))}</p>',
+        f'<p>{t("x_real2", L)}</p>',
+        bloque_grafico(t("g_real", L), fig_html(*g.tasa_real(), "g-real"), t("h_real", L))]))
     resp3 = t("resp_banco_na", L)
     if tt.get("tpm") is not None:
         resp3 = t("resp_banco", L).format(v=num(tt["tpm"], 2, L), r=num(tt.get("tpm_real_exante"), 1, L),
                                           e=t(f"ep2_{post}", L))
+        an = tt.get("tpm_anunciada")
+        if an:
+            resp3 = t("an_resp", L).format(a=fecha(an["anuncio"], "d", L), n=num(an["tasa"], 2, L),
+                                           p=num(an["anterior"], 2, L), v=fecha(an["vigente"], "d", L)) + " " + resp3
     s3 = seccion("banco", "3", t("q_banco", L), resp3,
                  [bloque_grafico(t("g_politica", L), fig_html(fp, mp, "g-politica"), t("h_politica", L))],
                  s3_det, L)
@@ -941,13 +1159,13 @@ def pagina(d, s, lang, generado):
     s_curva = (f'<section id="curva" class="section"><div class="sec-head"><span class="sec-num">4</span>'
                f'<h2>{t("q_curva", L)}</h2></div><p class="answer">{resp_curva}</p>{explorador_curva(L)}'
                f'<details class="tech"><summary>{t("detalle_tecnico", L)}</summary><div class="tech-body">'
-               f'<p class="method">{t("m_curva", L)}</p></div></details></section>')
+               f'<p>{t("x_curva", L)}</p></div></details></section>')
 
     fdol, mdol = g.dolar()
     fb, mb = g.bolsa()
     s4_det = "".join(filter(None, [
-        bloque_grafico(t("g_itcr", L), fig_html(*g.itcr(), "g-itcr"), t("h_itcr", L)),
-        f'<p class="method">{t("m_mercados", L)}</p>']))
+        f'<p>{t("x_mercados", L)}</p>',
+        bloque_grafico(t("g_itcr", L), fig_html(*g.itcr(), "g-itcr"), t("h_itcr", L))]))
     resp4 = t("resp_bolsa", L).format(v=num(m["colcap_12m"], 1, L, True))
     if m.get("trm") is not None:
         resp4 = t("resp_dolar", L).format(v=num(m["trm"], 0, L), c=num(m["trm_12m"], 1, L, True)) + " " + resp4
@@ -1004,24 +1222,25 @@ def pagina(d, s, lang, generado):
 </head><body>
 <header class="top"><div class="wrap top-in">
   <a class="brand" href="#inicio"><img src="{raiz}assets/logo_usb.png" alt="USB Cali"><span><b>ColombiaMacro</b><small>{t("sub_marca", L)}</small></span></a>
-  <nav class="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a></nav>
+  <nav class="menu" id="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a></nav>
+  <button class="menu-toggle" id="menu-toggle" aria-controls="menu" aria-expanded="true" title="{t("menu_ocultar", L)}">☰</button>
   <a class="lang" href="{otro}">{t("otro_idioma", L)}</a>
 </div></header>
 <main id="inicio" class="wrap">
 <section class="hero">
-  <p class="kicker">{t("kicker", L)} · {t("datos_al", L)} {fecha(generado, "d", L)}</p>
+  <p class="kicker">{t("kicker", L)} · {t("datos_al", L)} {fecha(generado, "d", L)} · {t("construido", L)} {construido}</p>
   <h1>{t("h1", L)}</h1>
   <p class="summary">{esc(mt.resumen_simple(s, L))}</p>
   <div class="cards">{"".join(cards)}</div>
   <p class="disclaimer">{t("aviso_estados", L)}</p>
 </section>
 {explorador_ciclo(d, L)}
-{bloque_noticias(d, s, L)}
 <div class="horizon" role="group" aria-label="{t('horizonte', L)}"><span>{t("horizonte", L)}:</span>
   <button data-years="3">{t("h3", L)}</button><button data-years="5">{t("h5", L)}</button><button data-years="10" class="on">{t("h10", L)}</button><button data-years="0">{t("htodo", L)}</button></div>
 {s1}{s_sec}{s_inf}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
 <section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">8</span><h2>{t("q_todos", L)}</h2></div>
 <p class="answer">{t("resp_todos", L)}</p>{tabla}</section>
+{bloque_noticias(d, s, L)}
 <section id="fuentes" class="section"><div class="sec-head"><span class="sec-num">9</span><h2>{t("q_fuentes", L)}</h2></div>
 <p class="answer">{t("resp_fuentes", L)}</p>{fuentes}
 <p class="downloads"><b>{t("descargar", L)}:</b> {descargas}</p>

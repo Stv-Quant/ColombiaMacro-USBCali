@@ -110,3 +110,74 @@ class TestTrayectoria(unittest.TestCase):
         ult = d.tasas.dropna(subset=["bei_10y"]).iloc[-1]
         self.assertAlmostEqual(prod ** 0.1 - 1, ult["bei_10y"] / 100, places=8)
         self.assertAlmostEqual(f510, ult["bei_5y5y"], places=6)
+
+
+class TestV112(unittest.TestCase):
+    def test_trece_ciudades(self):
+        from colombiamacro.fuentes import informalidad as inf
+        d = mt.cargar()
+        if d.informalidad_ciudades is None:
+            self.skipTest("sin informalidad_ciudades.csv")
+        ic = d.informalidad_ciudades
+        trece = sorted(ic[ic["grupo"] == "13"]["ciudad"].unique())
+        self.assertEqual(trece, sorted(inf.CIUDADES_13))
+        self.assertGreaterEqual(ic["ciudad"].nunique(), 23)
+
+    def test_enlaces_banrep_verificados(self):
+        from colombiamacro import noticias as nt
+        for k, u in nt.ENLACES.items():
+            self.assertNotIn("banrep.gov.co/es/estadisticas", u, k)   # esas rutas no existen
+
+    def test_capacidad_reproduce_la_brecha(self):
+        import numpy as np
+        from colombiamacro.sitio import construir as cs
+        d = mt.cargar()
+        fig, meta, u = cs.Graficos(d, mt.instantanea(d), "es").capacidad()
+        self.assertAlmostEqual(100 * np.log(u["y"] / u["pot"]), u["gap"], places=8)
+
+
+class TestFichas(unittest.TestCase):
+    def test_cada_grafico_tiene_fuente_y_metodologia(self):
+        import re
+        import tempfile
+        from pathlib import Path
+        from colombiamacro.sitio import construir as cs
+        from colombiamacro.sitio.fichas import FICHAS
+        with tempfile.TemporaryDirectory() as tmp:
+            out = cs.construir(Path(tmp) / "site")
+            for pag in (out / "index.html", out / "en" / "index.html"):
+                html_ = pag.read_text(encoding="utf-8")
+                ids = set(re.findall(r'class="plot" id="(g-[^"]+)"', html_))
+                faltan = [i for i in ids if i not in FICHAS and i != "g-inf-ciudad"]
+                self.assertEqual(faltan, [])
+                self.assertGreaterEqual(html_.count('class="ficha"'), len(ids) - 1)
+                self.assertIn('id="menu-toggle"', html_)
+                self.assertLess(html_.index('id="noticias"'), html_.index('id="fuentes"'))
+                self.assertGreater(html_.index('id="noticias"'), html_.index('id="indicadores"'))
+
+
+class TestDecisionAnunciada(unittest.TestCase):
+    def serie(self, valores, fin="2026-09-30"):
+        f = pd.date_range(end=fin, periods=len(valores), freq="D")
+        return pd.DataFrame({"fecha": f, "tpm": valores})
+
+    def test_pendiente_hasta_que_la_serie_la_registra(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, "decisiones_banrep.csv").write_text(
+                "fecha_anuncio,vigente_desde,tasa,nota,enlace\n2026-09-30,2026-10-01,12.25,x,\n", encoding="utf-8")
+            with mock.patch.object(mt, "DATA_DIR", Path(tmp)):
+                an = mt.decision_pendiente(None, self.serie([12.0] * 5))
+                self.assertEqual(an["tasa"], 12.25)
+                self.assertEqual(an["anterior"], 12.0)
+                ya = mt.decision_pendiente(None, self.serie([12.0] * 5 + [12.25], fin="2026-10-01"))
+                self.assertIsNone(ya)
+
+    def test_modo_rapido_solo_series_diarias(self):
+        from colombiamacro import actualizar as ac
+        rapidos = [m for _, m, _ in ac.pasos(True)]
+        self.assertIn("colombiamacro.fuentes.complementarias", rapidos)
+        self.assertNotIn("colombiamacro.fuentes.pib", rapidos)
+        self.assertEqual(len(ac.pasos(False)), len(ac.PASOS))

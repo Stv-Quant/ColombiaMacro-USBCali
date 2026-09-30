@@ -327,8 +327,10 @@
         hovermode: 'closest', bargap: 0.15, shapes: marcaHist(), showlegend: true,
         legend: { orientation: 'h', x: 0, y: 1, yanchor: 'bottom', font: { size: 12 } },
         separators: lang === 'es' ? ',.' : '.,',
-        xaxis: { type: 'date', showgrid: false, showline: true, linecolor: '#dcdad4', fixedrange: true, automargin: true, tickfont: { color: '#7a7974' } },
-        yaxis: { ticksuffix: '%', gridcolor: '#eeede8', zeroline: false, fixedrange: true, automargin: true, tickfont: { color: '#7a7974' } }
+        xaxis: { type: 'date', showgrid: false, showline: true, linecolor: '#dcdad4', fixedrange: true, automargin: true, tickfont: { color: '#7a7974' },
+                 title: { text: X.ck_hist_x, font: { size: 12 } } },
+        yaxis: { ticksuffix: '%', gridcolor: '#eeede8', zeroline: false, fixedrange: true, automargin: true, tickfont: { color: '#7a7974' },
+                 title: { text: X.ck_hist_y, font: { size: 12 } } }
       };
       Plotly.react(gH, datos, lay, CFG);
     }
@@ -372,6 +374,119 @@
     gH.on('plotly_hover', function (ev) { var i = porFecha(ev); if (i !== null && i !== idx) ir(i); });
   }
 
+  // ---------------------------------------------------------------- menu: ocultar al bajar, mostrar al subir
+  function cabecera() {
+    var top = document.querySelector('.top'), btn = document.getElementById('menu-toggle');
+    if (!top) return;
+    var ultimo = window.scrollY, movil = function () { return window.matchMedia('(max-width:980px)').matches; };
+    window.addEventListener('scroll', function () {
+      var y = window.scrollY, bajando = y > ultimo + 4, subiendo = y < ultimo - 4;
+      if (bajando && y > 120) { top.classList.add('oculta'); document.body.classList.add('top-oculta'); document.body.classList.remove('menu-abierto'); }
+      else if (subiendo || y < 60) { top.classList.remove('oculta'); document.body.classList.remove('top-oculta'); }
+      if (bajando || subiendo) ultimo = y;
+    }, { passive: true });
+    if (!btn) return;
+    var guardado = null;
+    try { guardado = localStorage.getItem('cm-sin-menu'); } catch (e) {}
+    if (guardado === '1') { document.body.classList.add('sin-menu'); btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function () {
+      if (movil()) { document.body.classList.toggle('menu-abierto'); return; }
+      var oculto = document.body.classList.toggle('sin-menu');
+      btn.setAttribute('aria-expanded', oculto ? 'false' : 'true');
+      try { localStorage.setItem('cm-sin-menu', oculto ? '1' : '0'); } catch (e) {}
+    });
+    document.querySelectorAll('.menu a').forEach(function (a) {
+      a.addEventListener('click', function () { document.body.classList.remove('menu-abierto'); });
+    });
+  }
+
+  // ---------------------------------------------------------------- utilidades comunes
+  var BASE_LAYOUT = function (lang) {
+    return {
+      paper_bgcolor: '#fff', plot_bgcolor: '#fff', margin: { l: 6, r: 30, t: 6, b: 6 },
+      font: { family: "Inter, 'Segoe UI', system-ui, sans-serif", size: 12.5, color: '#52514e' },
+      separators: lang === 'es' ? ',.' : '.,',
+      hoverlabel: { bgcolor: '#fff', bordercolor: '#dcdad4', font: { size: 12.5, color: '#0b0b0b' } },
+      legend: { orientation: 'h', x: 0, y: 1, yanchor: 'bottom', font: { size: 12 } }
+    };
+  };
+  function numTxt(v, dec, lang, signo) {
+    if (v === null || v === undefined || isNaN(v)) return '—';
+    var s = Math.abs(v).toFixed(dec); if (lang === 'es') s = s.replace('.', ',');
+    return (v < 0 ? '-' : (signo ? '+' : '')) + s;
+  }
+
+  // ---------------------------------------------------------------- sectores: elegir trimestre
+  function sectoresSelector() {
+    var sel = document.getElementById('sec-q'), el = document.getElementById('g-sec-barras');
+    if (!sel || !el) return;
+    var D = JSON.parse(document.getElementById('sec-datos').textContent);
+    var X = JSON.parse(document.getElementById('sec-textos').textContent);
+    var lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+    var cap = el.closest('figure').querySelector('figcaption');
+    var base = cap.textContent.replace(/\s*\([^)]*\)\s*$/, '');
+    function dibujar(k) {
+      var q = D[k], filas = q.s.slice().sort(function (a, b) { return a[1] - b[1]; });
+      var ys = filas.map(function (r) { return r[0]; });
+      var lo = 0, hi = 0;
+      filas.forEach(function (r) { [r[1], r[2]].forEach(function (v) { if (v !== null) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }); });
+      var trazos = [{
+        type: 'bar', orientation: 'h', y: ys, x: filas.map(function (r) { return r[1]; }), showlegend: false,
+        marker: { color: filas.map(function (r) { return r[1] >= 0 ? '#2a78d6' : '#eb6834'; }) },
+        text: filas.map(function (r) { return numTxt(r[1], 1, lang, true) + '%'; }), textposition: 'outside', cliponaxis: false,
+        customdata: filas.map(function (r) { return [numTxt(r[3], 1, lang) + '%', numTxt(r[4], 2, lang, true) + ' pp', r[2] === null ? '—' : numTxt(r[2], 1, lang) + '%']; }),
+        hovertemplate: '<b>%{y}</b><br>' + X.sec_crec + ': %{x:.1f}%<br>' + X.sec_hace + ': %{customdata[2]}<br>' + X.sec_peso + ': %{customdata[0]}<br>' + X.sec_aporte + ': %{customdata[1]}<extra></extra>'
+      }, {
+        type: 'scatter', mode: 'markers', y: ys, x: filas.map(function (r) { return r[2]; }), hoverinfo: 'skip',
+        name: X.sec_raya.replace('{q}', q.qa), marker: { symbol: 'line-ns', size: 16, line: { width: 2.5, color: '#0b0b0b' } }
+      }];
+      var lay = Object.assign(BASE_LAYOUT(lang), {
+        height: 440, hovermode: 'closest', bargap: 0.28, showlegend: true,
+        xaxis: { ticksuffix: '%', gridcolor: '#eeede8', zeroline: false, fixedrange: true, range: [lo - 2, hi + 3], automargin: true, tickfont: { color: '#7a7974' } },
+        yaxis: { fixedrange: true, automargin: true, tickfont: { size: 12, color: '#52514e' } },
+        shapes: [{ type: 'line', xref: 'x', x0: 0, x1: 0, yref: 'paper', y0: 0, y1: 1, line: { color: '#52514e', width: 1 } }]
+      });
+      Plotly.react(el, trazos, lay, { displayModeBar: false, responsive: true });
+      cap.textContent = base + ' (' + q.q + ')';
+    }
+    sel.addEventListener('change', function () { dibujar(parseInt(sel.value, 10)); });
+    document.getElementById('sec-ultimo').addEventListener('click', function () { sel.value = D.length - 1; dibujar(D.length - 1); });
+  }
+
+  // ---------------------------------------------------------------- informalidad: una ciudad
+  function ciudadSelector() {
+    var sel = document.getElementById('inf-ciudad'), el = document.getElementById('g-inf-ciudad');
+    if (!sel || !el) return;
+    var D = JSON.parse(document.getElementById('inf-ciudad-datos').textContent);
+    var X = JSON.parse(document.getElementById('inf-ciudad-textos').textContent);
+    var lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+    function dibujar() {
+      var c = sel.value, y = D.c[c].y;
+      var trazos = [
+        { x: D.f, y: D.nal, name: X.inf_nal, mode: 'lines', line: { color: '#a3a19b', width: 1.6, dash: 'dot' }, hovertemplate: '%{y:.1f}%' },
+        { x: D.f, y: D.c13, name: X.inf_13, mode: 'lines', line: { color: '#1baf7a', width: 1.6, dash: 'dot' }, hovertemplate: '%{y:.1f}%' },
+        { x: D.f, y: y, name: c, mode: 'lines', line: { color: '#2a78d6', width: 3 }, hovertemplate: '%{y:.1f}%' }
+      ];
+      var lay = Object.assign(BASE_LAYOUT(lang), {
+        height: 360, hovermode: 'x unified', showlegend: true,
+        xaxis: { type: 'date', showgrid: false, showline: true, linecolor: '#dcdad4', fixedrange: true, automargin: true, hoverformat: '%m/%Y', tickfont: { color: '#7a7974' } },
+        yaxis: { ticksuffix: '%', gridcolor: '#eeede8', zeroline: false, fixedrange: true, automargin: true, tickfont: { color: '#7a7974' } }
+      });
+      Plotly.react(el, trazos, lay, { displayModeBar: false, responsive: true });
+      var n = y.length, ult = y[n - 1], ant = n > 12 ? y[n - 13] : null, ch = ant === null ? null : ult - ant;
+      var cl = ch === null ? '' : (ch > 0.005 ? 'up' : (ch < -0.005 ? 'down' : 'flat'));
+      document.getElementById('inf-ciudad-stats').innerHTML = '<div class="stat"><span class="stat-n">' + c + '</span><span class="stat-v">' +
+        numTxt(ult, 1, lang) + '%</span><span class="stat-f">' + D.f[n - 1].slice(0, 7) + '</span><span class="stat-c">' +
+        (ch === null ? '' : '<span class="chg ' + cl + '">' + (ch > 0 ? '▲ ' : '▼ ') + numTxt(ch, 1, lang, true) + ' pp</span> <small>' + X.vs_ano + '</small>') + '</span></div>';
+    }
+    sel.addEventListener('change', dibujar);
+    dibujar();
+    var barras = document.getElementById('g-inf-ciudades');
+    if (barras && barras.on) barras.on('plotly_click', function (ev) {
+      if (ev.points && ev.points.length && D.c[ev.points[0].y]) { sel.value = ev.points[0].y; dibujar(); }
+    });
+  }
+
   function init() {
     document.querySelectorAll('script[data-for]').forEach(function (s) {
       var el = document.getElementById(s.getAttribute('data-for'));
@@ -402,6 +517,9 @@
     select(isNaN(saved) ? 10 : saved);
     curvaTES();
     relojCiclo();
+    cabecera();
+    sectoresSelector();
+    ciudadSelector();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

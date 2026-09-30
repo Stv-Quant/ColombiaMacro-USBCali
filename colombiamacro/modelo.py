@@ -73,6 +73,7 @@ class Datos:
     sectores: pd.DataFrame | None = None
     informalidad: pd.DataFrame | None = None
     informalidad_ramas: pd.DataFrame | None = None
+    informalidad_ciudades: pd.DataFrame | None = None
 
 
 def cargar() -> Datos:
@@ -110,7 +111,8 @@ def cargar() -> Datos:
                  acciones=_read("acciones_semanal.csv", parse_dates=["fecha"]),
                  sectores=_read("pib_sectores.csv", parse_dates=["fecha"]),
                  informalidad=_read("informalidad.csv", parse_dates=["fecha"]),
-                 informalidad_ramas=_read("informalidad_ramas.csv", parse_dates=["fecha"]))
+                 informalidad_ramas=_read("informalidad_ramas.csv", parse_dates=["fecha"]),
+                 informalidad_ciudades=_read("informalidad_ciudades.csv", parse_dates=["fecha"], dtype={"grupo": str}))
 
 
 # ---------------------------------------------------------------- bolsa por dentro
@@ -214,6 +216,24 @@ def _hace(df: pd.DataFrame, col: str, fecha: pd.Timestamp, dias: int):
     return None if sub.empty else float(sub.iloc[-1][col])
 
 
+def decision_pendiente(d: "Datos", tpm: pd.DataFrame) -> dict | None:
+    """Decision de la Junta ya anunciada que la serie oficial aun no registra (la nueva tasa entra
+    a la serie el dia en que empieza a regir). Se lee de data/decisiones_banrep.csv."""
+    dec = _read("decisiones_banrep.csv", parse_dates=["fecha_anuncio", "vigente_desde"])
+    if dec is None or dec.empty or tpm.empty:
+        return None
+    u = dec.sort_values("fecha_anuncio").iloc[-1]
+    serie = tpm.set_index("fecha")["tpm"]
+    registrada = serie[serie.index >= u["vigente_desde"]]
+    if not registrada.empty and abs(float(registrada.iloc[-1]) - float(u["tasa"])) < 1e-9:
+        return None  # la serie oficial ya la muestra
+    if not registrada.empty:
+        return None  # la serie ya paso la fecha y muestra otro valor: manda la serie oficial
+    return {"tasa": float(u["tasa"]), "anuncio": pd.Timestamp(u["fecha_anuncio"]),
+            "vigente": pd.Timestamp(u["vigente_desde"]), "anterior": float(serie.iloc[-1]),
+            "enlace": str(u.get("enlace", "") or "")}
+
+
 def instantanea(d: Datos) -> dict:
     s: dict = {}
     c = d.ciclo.dropna(subset=["brecha_hp_tiempo_real"]).iloc[-1]
@@ -246,6 +266,10 @@ def instantanea(d: Datos) -> dict:
             "fecha": pd.Timestamp(ultimo["fecha"]),
             "delta": float(ultimo["tpm"] - tpm[tpm["fecha"] < ultimo["fecha"]]["tpm"].iloc[-1])}
         s["tasas"]["tpm_hace_12m"] = _hace(tpm, "tpm", tpm["fecha"].max(), 365)
+        # La tasa vigente es el ultimo dato de la serie diaria (no el del dia de la curva TES).
+        s["tasas"]["tpm"] = float(tpm["tpm"].iloc[-1])
+        s["tasas"]["tpm_fecha"] = pd.Timestamp(tpm["fecha"].iloc[-1])
+        s["tasas"]["tpm_anunciada"] = decision_pendiente(d, tpm)
 
     m = d.mercado.iloc[-1]
     s["mercado"] = {"colcap": float(m["colcap_puntos"]), "fecha": pd.Timestamp(m["fecha"]),
@@ -503,6 +527,10 @@ def nivel_historico(pct: float | None) -> str | None:
     return "muy_alto"
 
 
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre",
+            "noviembre", "diciembre"]
+
+
 def resumen_simple(s: dict, lang: str = "es") -> str:
     """Tres frases sin jerga, derivadas de los mismos datos del veredicto tecnico."""
     c, i, t = s["ciclo"], s["inflacion"], s["tasas"]
@@ -527,6 +555,11 @@ def resumen_simple(s: dict, lang: str = "es") -> str:
                       "neutral": "ni frena ni estimula la economía",
                       "expansiva": "busca estimular la economía abaratando el crédito"}.get(post, "")
             f3 = f"El Banco de la República tiene su tasa de interés en {_n(t['tpm'], 2, lang)}%, un nivel que {efecto}."
+            an = t.get("tpm_anunciada")
+            if an:
+                f3 = (f"El Banco de la República anunció el {an['anuncio'].day} de {MESES_ES[an['anuncio'].month - 1]} "
+                      f"que {'sube' if an['tasa'] > an['anterior'] else 'baja'} su tasa de {_n(an['anterior'], 2, lang)}% "
+                      f"a {_n(an['tasa'], 2, lang)}%, un nivel que {efecto}.")
     else:
         crec = {"fuerte": "is growing faster than its usual pace", "normal": "is growing at a normal pace",
                 "lento": "is growing slowly", "contraccion": "is contracting"}[ec]
@@ -543,4 +576,9 @@ def resumen_simple(s: dict, lang: str = "es") -> str:
                       "neutral": "neither slows nor stimulates the economy",
                       "expansiva": "aims to stimulate the economy with cheaper credit"}.get(post, "")
             f3 = f"Banco de la República's policy rate is {_n(t['tpm'], 2, lang)}%, a level that {efecto}."
+            an = t.get("tpm_anunciada")
+            if an:
+                f3 = (f"Banco de la República announced on {an['anuncio']:%B} {an['anuncio'].day} a "
+                      f"{'hike' if an['tasa'] > an['anterior'] else 'cut'} from {_n(an['anterior'], 2, lang)}% to "
+                      f"{_n(an['tasa'], 2, lang)}%, a level that {efecto}.")
     return " ".join(x for x in (f1, f2, f3) if x)

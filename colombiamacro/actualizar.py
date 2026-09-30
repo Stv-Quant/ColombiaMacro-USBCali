@@ -16,6 +16,8 @@ import sys
 
 from colombiamacro.config import ROOT, data
 
+# Pasos de la actualizacion rapida (cada hora en dias habiles): series diarias de mercado y BanRep.
+RAPIDOS = {"colombiamacro.fuentes.tes", "colombiamacro.fuentes.colcap"}
 PASOS = [
     ("IPC — DANE y BanRep", "colombiamacro.fuentes.ipc", []),
     ("Curvas TES — BanRep", "colombiamacro.fuentes.tes", []),
@@ -50,11 +52,19 @@ def correr(nombre: str, modulo: str, extra: list[str], log) -> bool:
     return ok
 
 
-def main() -> int:
+def pasos(rapido: bool):
+    if not rapido:
+        return PASOS
+    return [(n, m, e) for n, m, e in PASOS if m in RAPIDOS or e == ["--solo", "banrep"]]
+
+
+def main(argv=None) -> int:
+    rapido = "--rapido" in (argv if argv is not None else sys.argv[1:])
     inicio = dt.datetime.now(dt.timezone.utc)
     with LOG.open("w", encoding="utf-8", newline="\n") as log:
-        log.write(f"Actualizacion ColombiaMacro — {inicio:%Y-%m-%d %H:%M} UTC\n")
-        resultados = [(n, correr(n, m, e, log)) for n, m, e in PASOS]
+        log.write(f"Actualizacion ColombiaMacro — {inicio:%Y-%m-%d %H:%M} UTC"
+                  f"{' (rapida: series diarias de BanRep y mercado)' if rapido else ''}\n")
+        resultados = [(n, correr(n, m, e, log)) for n, m, e in pasos(rapido)]
         resumen = "\nRESUMEN\n" + "\n".join(f"  [{'OK' if ok else 'FALLO'}] {n}" for n, ok in resultados) + "\n"
         print(resumen)
         log.write(resumen)

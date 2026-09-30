@@ -113,6 +113,15 @@ positiva. Al T2 2026 los tres métodos dan brecha positiva (+0,3% a +2,3%).
 PIB; el ritmo de corto plazo es $100\,[(\bar{x}_{t,3}/\bar{x}_{t-3,3})^4-1]$ sobre la serie desestacionalizada
 (promedios móviles de tres meses), anualizado.
 
+### 3.5b Producción frente a su capacidad
+
+La capacidad (PIB potencial) se obtiene del mismo filtro HP en tiempo real: $Y^*_t = Y_t\,e^{-g_t/100}$,
+con $g_t$ la brecha en log×100 y $Y_t$ el PIB real desestacionalizado. El gráfico muestra ambos niveles
+(billones de pesos de 2015 por trimestre) y colorea la distancia: verde por encima (sobrecalentamiento),
+naranja por debajo (holgura). Es la lectura de "frontera de posibilidades de producción" en el tiempo.
+El tamaño de la economía suma los últimos 4 trimestres a precios corrientes y constantes y lo convierte
+a dólares con la TRM promedio del mismo periodo.
+
 ### 3.6 Sectores y mercado laboral
 
 * **Sectores**: 12 agrupaciones CIIU Rev. 4 del PIB por el lado de la oferta (DANE, volúmenes

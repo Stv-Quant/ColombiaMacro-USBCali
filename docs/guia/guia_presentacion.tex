@@ -178,7 +178,7 @@ fallaba sin avisar. Lo que un inversionista necesita no es más datos, sino una 
 \slide{4}{Qué es ColombiaMacro}{1:00}
 \begin{guion}
 \di{Más de veinte series oficiales del DANE y del Banco de la República se descargan cada día, se
-verifican por número y por nombre, pasan 57 pruebas y se convierten en una lectura en español e inglés.
+verifican por número y por nombre, pasan 61 pruebas y se convierten en una lectura en español e inglés.
 Es abierto, reproducible y auditable: cada frase del tablero cita el dato que la sustenta.}
 \end{guion}
 
@@ -193,11 +193,12 @@ real.} Esto anticipa la objeción más probable de los profesores.
 
 \slide{7}{Actividad: cerca del potencial}{1:15}
 \begin{guion}
-\di{La brecha del producto al segundo trimestre es de +0,3\% del PIB potencial. La línea azul es la
-estimación principal; la banda es el rango entre tres métodos: de +0,3 a +2,3. Los tres coinciden en
-que la brecha es positiva. El PIB crece 3,5\% y el potencial estimado es 2,4\%.}
+\di{Al segundo trimestre, la economía produce 0,3\% por encima de su capacidad —la brecha del producto—.
+La línea azul es la estimación principal; la banda es el rango entre tres métodos: de +0,3 a +2,3. Los tres
+coinciden en que produce por encima. El PIB crece 3,5\% y el potencial estimado es 2,4\%.}
 Señalar con el puntero la banda en 2022–2023: \di{cuando la banda es ancha, los métodos no coinciden y
-lo decimos.}
+lo decimos.} Si preguntan por el sitio: \di{allí lo mostramos en pesos, como lo que produce la economía frente
+a su capacidad, y el rango entre métodos está en la ficha del gráfico.}
 \end{guion}
 
 \slide{8}{Sectores e informalidad}{0:45}
@@ -321,9 +322,11 @@ trimestres a T4 2020: los ejes se reescalan, el recorrido se hunde en Contracci�
 salta a Recuperación con $+15{,}3$~pp: \di{eso fue el COVID.} Cerrar con \emph{Volver al último dato}.
 \item \textbf{Resumen y tarjetas} (15 s): subir al párrafo; señalar la fecha “datos al…” y las etiquetas de estado.
 \item \textbf{Cambiar a EN} (5 s): \di{el mismo sitio en inglés para inversionistas extranjeros}. Volver a ES.
-\item \textbf{Sección 1} (15 s): con el horizonte en \emph{Todo}, mostrar que la caída de 2020 y el rebote de
-2021 se ven completos; pasar el cursor sobre una barra del PIB: la caja muestra el valor y, en el \emph{panel de
-cambios} de abajo, su variación en la misma fecha (barras azules suben, naranjas bajan).
+\item \textbf{Sección 1} (15 s): con el horizonte en \emph{Todo}, pasar el cursor sobre una barra del PIB (la caja
+muestra el valor, el PIB en pesos de 2015 y, en el \emph{panel de cambios}, su variación). Bajar a \emph{Lo que
+produce la economía frente a su capacidad}: \di{la línea azul es lo que producimos; la discontinua, lo que
+podemos producir sin generar inflación; en 2020 el hueco naranja, hoy apenas por encima.} Tocar el botón
+\emph{?} para mostrar la ficha metodológica.
 \item \textbf{Secciones 2 y 3, sectores e informalidad} (20 s, opcional: si el tiempo va justo, se omite y se
 devuelven los segundos a la curva TES): en el mapa de calor, señalar la columna naranja de 2020 (\di{en T2 2020 casi
 todos los sectores cayeron —construcción 43\%, comercio 32\%—; solo finanzas e inmobiliarias crecieron}) y la raya negra \emph{hace un año} en las barras;
@@ -376,8 +379,8 @@ Hamilton y el HP discrepan —como en 2022 y 2023— la banda se ensancha y lo d
 \item[“¿Por qué la fase cambia tanto de un trimestre a otro?”]
 \di{Porque la brecha lleva dos años cerca de cero: con un nivel entre $-1$ y $+0{,}5\%$, un movimiento pequeño
 basta para cruzar un eje y cambiar de cuadrante. Por eso el reloj muestra el recorrido de varios trimestres y
-la dirección, no solo el último punto; y la banda entre métodos —HP y Hamilton— en el detalle técnico de la
-sección~1 muestra cuánta incertidumbre hay en ese nivel.}
+la dirección, no solo el último punto; y la ficha del gráfico de capacidad de la sección~1 describe el rango
+entre métodos —HP y Hamilton—, que muestra cuánta incertidumbre hay en ese nivel.}
 
 \item[“¿Por qué $\lambda = 1600$?”]
 \di{Es el valor estándar para datos trimestrales desde Hodrick y Prescott; el parámetro es configurable y
@@ -418,6 +421,12 @@ frente a las primas, y lo documentamos.}
 \di{Es el techo del rango meta del Banco. Es una regla simple y transparente; el parámetro es editable y
 el número exacto se muestra siempre.}
 
+\item[“¿Qué es la tasa real ex ante?”]
+\di{Es la tasa del Banco menos la inflación que se espera para el próximo año: lo que de verdad cuesta
+endeudarse. Hoy, 12\% menos 7,1\% da cerca de 4,6\%. ‘Ex ante’ quiere decir ‘antes de que ocurra’: usamos la
+inflación esperada y no la pasada, porque quien pide un crédito hoy decide pensando en la inflación futura.
+Como está por encima de la neutral, 2,7 a 3,0\%, la política frena la economía.}
+
 \item[“¿De dónde sale la tasa neutral de 2,7–3,0\%?”]
 \di{De la estimación del equipo técnico del Banco de la República para 2025 y su ajuste para 2026. Es un
 parámetro externo con incertidumbre; con cualquier valor en el rango de estimaciones recientes la tasa
@@ -435,14 +444,14 @@ lo que descuentan los inversionistas, no nuestro pronóstico.}
 \subsection{Datos y operación}
 \begin{description}[style=nextline,leftmargin=0pt]
 \item[“¿De dónde salen las noticias?”]
-\di{No son titulares de prensa: el tablero las genera cada día a partir de los mismos datos oficiales que
+\di{Están en una nota al final de la página, antes de las fuentes. No son titulares de prensa: el tablero las genera cada día a partir de los mismos datos oficiales que
 descarga —PIB, IPC, tasa del Banco, TES, dólar, bolsa— y cada tarjeta enlaza a la fuente. No copiamos titulares
 porque el sitio del Banco bloquea los lectores automáticos con un captcha y los agregadores como Google News
 prohíben republicar. Así todo es verificable; para los comunicados completos dejamos los enlaces a las salas de
-prensa oficiales.}
+prensa oficiales y, en el caso del Banco, a las fichas verificadas de su portal de estadísticas.}
 \item[“¿Quién garantiza que los datos son correctos?”]
 \di{Cada serie se identifica por número y nombre; si la fuente cambia, el proceso falla en lugar de
-publicar otra variable. Recalculamos las fórmulas cada día, hay 57 pruebas automáticas y cada archivo
+publicar otra variable. Recalculamos las fórmulas cada día, hay 61 pruebas automáticas y cada archivo
 se puede descargar y contrastar con el DANE o el Banco.}
 \item[“¿Por qué la informalidad solo desde 2021?”]
 \di{Porque el DANE cambió la medición: desde la resolución 0203 de 2023, alineada con la OIT, publica la serie

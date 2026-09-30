@@ -65,7 +65,7 @@ class TestSitio(unittest.TestCase):
 
     def test_menu_no_usa_textos_de_metodo(self):
         es = (self.out / "index.html").read_text(encoding="utf-8")
-        menu = es[es.index('<nav class="menu">'):es.index("</nav>")]
+        menu = es[es.index('<nav class="menu"'):es.index("</nav>")]
         self.assertNotIn("Método", menu)
         self.assertIn("Curva TES", menu)
 

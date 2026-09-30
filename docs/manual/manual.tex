@@ -60,26 +60,27 @@ datos oficiales actualizados a diario:
 La pregunta se descompone en preguntas encadenadas, una por sección del sitio. El
 orden no es casual: sigue la secuencia causal con la que un banco central lee la economía
 (actividad $\rightarrow$ precios $\rightarrow$ reacción de política $\rightarrow$ curva y precios de activos).
-Cada sección responde primero en lenguaje sencillo y guarda el análisis técnico en un panel
-desplegable \emph{Detalle técnico (para economistas)}.
+Cada sección responde primero en lenguaje sencillo; cada gráfico indica su fuente y guarda su metodología en
+una \emph{ficha} (botón \emph{?}), y un panel desplegable \emph{Para entender mejor} explica los conceptos para
+cualquier lector.
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}lXX@{}}
 \toprule
-\textbf{Sección} & \textbf{Pregunta} & \textbf{Indicador principal (y detalle técnico)}\\
+\textbf{Sección} & \textbf{Pregunta} & \textbf{Indicadores principales}\\
 \midrule
 {\fontspec{DejaVu Sans}◷} Ciclo (sin número) & ¿En qué parte del ciclo está la economía? & Reloj del ciclo interactivo: fase, nivel y dirección de la brecha, trimestre a trimestre\\
-{\fontspec{DejaVu Sans}◉} Noticias (sin número) & Últimas publicaciones oficiales & Hasta 12 tarjetas generadas con los datos descargados, con enlace a la fuente\\
-1. Crecimiento & ¿Está creciendo la economía? & PIB e ISE frente al ritmo habitual; desempleo (brecha del producto)\\
+1. Crecimiento & ¿Está creciendo la economía? & PIB e ISE frente al ritmo habitual; desempleo; producción frente a su capacidad; tamaño de la economía en pesos y dólares\\
 2. Sectores & ¿Qué sectores impulsan la economía? & Crecimiento anual y aporte de 12 sectores; mapa de calor trimestre a trimestre\\
-3. Informalidad & ¿Cuánto del empleo es informal? & Proporción de ocupados informales (nacional y 13 ciudades) y por sector\\
-4. Precios & ¿Cómo están los precios? & Inflación total y de fondo frente a la meta; inflación esperada (5y5y)\\
+3. Informalidad & ¿Cuánto del empleo es informal? & Proporción de ocupados informales (nacional y 13 ciudades), por sector y por ciudad (23 ciudades)\\
+4. Precios & ¿Cómo están los precios? & Inflación total y de fondo frente a la meta; inflación esperada; trayectoria a 10 años (5y5y)\\
 5. Banco de la República & ¿Qué está haciendo el Banco? & Tasa de política frente a inflación (tasa real frente a la neutral)\\
 6. Curva TES & ¿Cuánto cobra el mercado por prestarle al Gobierno? & Curva cero cupón TES pesos y UVR, explorable desde 2003\\
 7. Dólar y bolsa & ¿Cómo están el dólar y la bolsa? & TRM y COLCAP (ITCR)\\
 8. Empresas & ¿Qué empresas mueven la bolsa? & COLCAP frente a un equiponderado y a las 7 Magníficas; peso de cada acción\\
 9. Externo y fiscal & Cuentas externas y fiscales & Cuenta corriente y deuda del Gobierno\\
 10. Indicadores & Todos los indicadores & Último dato, cambio y nivel frente a su historia desde 2010\\
+{\fontspec{DejaVu Sans}◉} Noticias (nota) & Últimas publicaciones oficiales & Nota discreta con tarjetas generadas con los datos descargados y enlaces a la fuente\\
 11. Fuentes & ¿De dónde salen los datos? & Estado de cada fuente, descargas CSV y glosario\\
 \bottomrule
 \end{tabularx}
@@ -102,7 +103,9 @@ Ministerio de Hacienda a través de BanRep; para la bolsa por dentro, la canasta
 MSCI COLCAP (BlackRock) y los precios de cierre de Yahoo Finance. Nada se digita a mano.
 \item \textbf{Identidad verificada}: cada serie se valida por número \emph{y} por nombre; si la fuente
 reasigna un número, el proceso falla en lugar de publicar otra variable.
-\item \textbf{Un eje, una unidad}: ningún gráfico tiene dos escalas verticales.
+\item \textbf{Un eje, una unidad}: los gráficos usan una sola escala vertical. La única excepción es el tamaño de
+la economía (sección~1), que agrega el PIB en dólares en un eje derecho rotulado y de otro color, porque es la
+misma magnitud en otra moneda.
 \item \textbf{Frases con respaldo}: el veredicto automático se deriva de reglas explícitas (sección~\ref{sec:veredicto}) y cita el dato que lo sustenta.
 \item \textbf{Incertidumbre visible}: la brecha del producto se muestra como banda entre métodos, no como una sola cifra.
 \item \textbf{Sin información futura}: los indicadores en tiempo real solo usan lo que se conocía en cada fecha.
@@ -122,7 +125,8 @@ El sitio es un conjunto de páginas HTML estáticas con gráficos Plotly: la ver
 \texttt{/} y la versión en inglés en \texttt{/en/}. No hay servidor de aplicación: todo lo que se ve se
 calculó al construir el sitio a partir de los CSV validados.
 
-\textbf{1. La barra superior.} Los botones de \emph{horizonte} (3, 5, 10 años o \emph{Todo}) recortan todos
+\textbf{1. La barra superior.} Se oculta al bajar por la página y reaparece al subir. El botón {\fontspec{DejaVu Sans}☰} muestra u oculta
+el menú de secciones (el navegador recuerda la elección); en el teléfono, {\fontspec{DejaVu Sans}☰} abre el menú. Los botones de \emph{horizonte} (3, 5, 10 años o \emph{Todo}) recortan todos
 los gráficos de series de tiempo a la misma ventana (si una serie empieza después del inicio de la ventana,
 como la informalidad en 2021, el gráfico arranca en su primer dato, sin espacio vacío); el enlace ES/EN
 cambia de idioma.
@@ -138,9 +142,6 @@ barra de horizonte y de la sección~1, un bloque interactivo sin número respond
 está la economía?}: la fase actual, cuánto produce la economía frente a su capacidad y hacia dónde se mueve
 (sección~\ref{sec:reloj}).
 
-\textbf{Últimas publicaciones oficiales} (menú \emph{Noticias}, ancla \texttt{\#noticias}). A continuación del reloj,
-otro bloque sin número con hasta 12 tarjetas que resumen en una línea lo más reciente que publicaron el DANE,
-el Banco de la República y la BVC, cada una con enlace a la fuente oficial (sección~\ref{sec:noticias}).
 
 \begin{figure}[htbp]\centering
 \includegraphics[width=\linewidth]{hero_es.png}
@@ -149,14 +150,15 @@ el Banco de la República y la BVC, cada una con enlace a la fuente oficial (sec
 
 \textbf{3. Once secciones}, cada una con un número, una pregunta, un párrafo de respuesta generado a partir
 de los datos, los gráficos (cada uno con su \emph{franja de cambios} encima y su \emph{panel de cambios} debajo,
-secciones~\ref{sec:franja} y~\ref{sec:delta}) y un panel
-desplegable \emph{Detalle técnico (para economistas)} con la brecha del producto por tres métodos, la tasa
-real, el anclaje 5y5y y la tasa de cambio real.
+secciones~\ref{sec:franja} y~\ref{sec:delta}), un pie \emph{Fuente:} con un botón \emph{?} que abre la ficha
+metodológica (sección~\ref{sec:ficha}) y un panel desplegable \emph{Para entender mejor}, con explicaciones
+sencillas y, en algunas secciones, un gráfico de apoyo (anclaje 5y5y, tasa real, tasa de cambio real).
 
 \textbf{4. Todos los indicadores}: una tabla con el último dato, su fecha, el cambio y el nivel frente a su
 propia historia desde 2010.
 
-\textbf{5. Al final}: el estado de cada fuente, los enlaces para descargar todos los datos en CSV, la
+\textbf{5. Al final}: una nota discreta con las \emph{últimas publicaciones oficiales} (menú \emph{Noticias},
+sección~\ref{sec:noticias}) y, en \emph{Fuentes}, el estado de cada fuente, los enlaces para descargar todos los datos en CSV, la
 documentación y el glosario.
 
 \begin{leer}[Regla de oro]
@@ -178,7 +180,7 @@ la bolsa son diarias. El tablero nunca rellena una frecuencia con otra.
 \node[src] (acc) at (0,-2.7) {iShares · Yahoo Finance\\canasta y acciones\\del COLCAP};
 \node[box] (upd) at (3.9,0) {Descarga\\\texttt{colombiamacro/}\\\texttt{fuentes/}};
 \node[box] (csv) at (7.8,0) {Tablas CSV en \texttt{data/}\\versionadas en Git};
-\node[box] (val) at (7.8,-1.9) {\texttt{python -m}\\\texttt{colombiamacro.validar}\\+ 57 pruebas};
+\node[box] (val) at (7.8,-1.9) {\texttt{python -m}\\\texttt{colombiamacro.validar}\\+ 61 pruebas};
 \node[box] (app) at (11.7,0) {\texttt{analitica} · \texttt{modelo}\\\texttt{sitio/construir}\\$\rightarrow$ \texttt{site/}};
 \node[box] (web) at (11.7,-1.9) {Sitio estático\\GitHub Pages};
 \node[src] (user) at (11.7,-3.6) {Navegador ES / EN};
@@ -208,7 +210,7 @@ el resumen y el veredicto, asigna las etiquetas de estado, arma la tabla de indi
 por dentro (\texttt{magnificas()}, \texttt{retornos\_semanales()}, \texttt{indice\_equiponderado()},
 \texttt{bolsa\_por\_dentro()}). Es la única fuente de cada cifra que aparece en pantalla.
 \item[Presentación] \archivo{colombiamacro/sitio/construir.py} genera el sitio estático en \archivo{site/}
-(HTML + Plotly, ES y EN) con los textos de \archivo{textos.py}; \archivo{app.js} maneja la interacción en el
+(HTML + Plotly, ES y EN) con los textos de \archivo{textos.py} y las fichas de \archivo{fichas.py}; \archivo{app.js} maneja la interacción en el
 navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apariencia. No calcula nada propio.
 \end{description}
 
@@ -229,6 +231,7 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 \archivo{colombiamacro/fuentes/acciones.py} & Canasta del COLCAP (fondo iShares) y cierres semanales de sus acciones (Yahoo Finance); empalme de tickers (\texttt{ALIAS}).\\
 \archivo{colombiamacro/sitio/construir.py} & Generador del sitio estático (clase \texttt{Graficos}).\\
 \archivo{colombiamacro/sitio/textos.py} & Textos del sitio en español e inglés.\\
+\archivo{colombiamacro/sitio/fichas.py} & Fichas de cada gráfico: diccionario \texttt{FICHAS}, por identificador de gráfico, con fuente y metodología (ES/EN).\\
 \archivo{colombiamacro/noticias.py} & Tarjetas de \emph{Últimas publicaciones oficiales} (\texttt{publicaciones()}).\\
 \archivo{colombiamacro/sitio/app.js}, \archivo{estilo.css} & Interacción en el navegador y estilos.\\
 \archivo{data/} & CSV publicados y \archivo{registro\_actualizacion.log}.\\
@@ -238,7 +241,7 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 \archivo{certs/} & Certificado intermedio de BanRep.\\
 \archivo{docs/METODOLOGIA.md} & Nota metodológica breve.\\
 \archivo{.github/workflows/actualizar-y-publicar.yml} & Actualización diaria y publicación en GitHub Pages.\\
-\archivo{tests/} & 57 pruebas: fórmulas, datos y sitio.\\
+\archivo{tests/} & 61 pruebas: fórmulas, datos y sitio.\\
 \bottomrule
 \end{longtable}
 
@@ -247,7 +250,7 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 python -m colombiamacro.actualizar        # descarga DANE, BanRep, iShares y Yahoo
 python -m colombiamacro.validar           # controles de calidad
 python -m colombiamacro.sitio.construir   # genera site/
-python -m unittest discover -s tests      # 57 pruebas
+python -m unittest discover -s tests      # 61 pruebas
 python scripts/generar_figuras.py         # figuras de documentos
 python scripts/lanzar_local.py            # abre el sitio en local
 \end{lstlisting}
@@ -427,7 +430,7 @@ lectura como error de control.
 \label{sec:datos-informalidad}
 \textbf{Archivos:} \archivo{informalidad.csv} (columnas \texttt{fecha}, \texttt{periodo}, \texttt{nacional},
 \texttt{ciudades\_13}, \texttt{ciudades\_23}) y \archivo{informalidad\_ramas.csv} (\texttt{fecha}, \texttt{rama},
-\texttt{ocupados}, \texttt{informales}, \texttt{tasa}; ocupados e informales en miles). \textbf{Origen:} anexo \emph{Empleo informal y seguridad social} de la GEIH
+\texttt{ocupados}, \texttt{informales}, \texttt{tasa}; ocupados e informales en miles) y \archivo{informalidad\_ciudades.csv} (abajo). \textbf{Origen:} anexo \emph{Empleo informal y seguridad social} de la GEIH
 (archivo \texttt{anex-GEIHEISS-}\allowbreak\texttt{<periodo>.xlsx}), que descarga \archivo{colombiamacro/fuentes/informalidad.py}.
 \begin{itemize}
 \item Definición de la resolución 0203 de 2023 (basada en la OIT): ocupados sin seguridad social o en
@@ -435,6 +438,11 @@ negocios no registrados. La serie empieza en 2021 y \textbf{no es comparable} co
 \item Cada columna del anexo es un trimestre móvil consecutivo; \texttt{fecha} es su último mes
 (\texttt{2026-07} = may–jul 2026). Como los rótulos del DANE no siempre traen el año, el lector valida el
 mes final de cada rótulo contra la secuencia esperada.
+\item Por ciudad: \archivo{informalidad\_ciudades.csv} (\texttt{fecha}, \texttt{ciudad}, \texttt{tasa}, \texttt{grupo}),
+de la hoja \emph{Prop informalidad} del mismo anexo: 23 ciudades; \texttt{grupo} = 13 para las 13 ciudades
+principales (Barranquilla A.M., Bogotá D.C., Bucaramanga A.M., Cali A.M., Cartagena, Cúcuta A.M., Ibagué,
+Manizales A.M., Medellín A.M., Montería, Pasto, Pereira A.M. y Villavicencio) y 23 para las otras 10
+capitales. A.M. = área metropolitana.
 \item Por rama: \texttt{tasa} $=100\cdot$ informales$/$ocupados, 13 ramas. Una prueba automática comprueba que
 la suma de informales entre la suma de ocupados de todas las ramas reproduce la tasa nacional ($\pm0{,}2$~pp).
 \end{itemize}
@@ -575,6 +583,30 @@ caída de 17,6\% en un trimestre arrastra la tendencia y distorsiona la lectura 
 \subsubsection*{Crecimiento potencial}
 $g^{pot}_t=100\,[\exp((\tau_t-\tau_{t-4})/100)-1]$ con la tendencia HP de dos colas. Al T2 2026: 2,37\%.
 
+\subsection{Capacidad (PIB potencial) en pesos}
+\label{sec:capacidad}
+El gráfico \emph{Lo que produce la economía frente a su capacidad} lleva la brecha a niveles. Con $Y_t$ el PIB real
+desestacionalizado (billones de pesos de 2015 por trimestre) y $g_t$ la brecha HP en tiempo real (\%):
+\[
+g_t = 100\,(\ln Y_t-\ln Y^*_t)\quad\Longleftrightarrow\quad Y^*_t = Y_t\,e^{-g_t/100}.
+\]
+$Y^*_t$ es la capacidad; el panel inferior del gráfico es $g_t$. Es una \emph{frontera de posibilidades de
+producción} que se desplaza con el tiempo: la producción sostenible sin presiones de inflación.
+\begin{dato}[T2 2026]
+$Y\approx262$ billones de pesos de 2015 y $g=+0{,}3\%$ $\Rightarrow Y^*\approx262\,e^{-0{,}003}\approx261$ billones.
+\end{dato}
+
+\subsection{Tamaño de la economía en pesos y en dólares}
+\label{sec:tamano}
+Con $N_t$ el PIB nominal trimestral, $Y_t$ el real (pesos de 2015) y $\overline{TRM}$ el promedio de la TRM diaria:
+\[
+PIB^{12m}_{t}=\sum_{k=0}^{3}N_{t-k},\qquad
+PIB^{12m,\,2015}_{t}=\sum_{k=0}^{3}Y_{t-k},\qquad
+PIB^{12m,\,US\$}_{t}=\frac{PIB^{12m}_{t}}{\overline{TRM}_{t-3..t}} .
+\]
+La TRM promedio es la de los mismos cuatro trimestres. Al T2 2026: cerca de \$1.927 billones de pesos
+corrientes ($+7{,}8\%$ anual, que incluye inflación) y unos US\$510 mil millones.
+
 \subsection{Reloj del ciclo}
 Con $\Delta_2 g_t=g_t-g_{t-2}$ (cambio en dos trimestres, para suavizar el ruido de un solo dato):
 \begin{center}
@@ -619,8 +651,10 @@ etc.), ordenadas de la más reciente a la más antigua, hasta 12. La fecha es ex
 publicación del PIB y del IPC (vintages), fecha del último cambio de la TPM, fecha de mercado de TES, TRM y
 COLCAP—; si no, la tarjeta dice \emph{dato más reciente}. El titular lleva la cifra en una línea (por ejemplo
 \emph{“La inflación anual fue 6,24\% en agosto de 2026”}) y un detalle corto, y cada tarjeta enlaza a la página
-oficial. Debajo hay enlaces fijos a las salas de prensa oficiales (BanRep comunicados y minutas, DANE sala de
-prensa, MinHacienda, Superfinanciera).
+oficial. Los enlaces del Banco de la República apuntan a páginas verificadas de su portal de estadísticas
+(\texttt{suameca.banrep.gov.co}, fichas de las series 59, 1, 220002, 2500 y 4130), porque varias direcciones
+\texttt{www.banrep.gov.co/es/estadisticas/*} respondían \emph{Página no encontrada}. Debajo hay enlaces fijos a las
+salas de prensa oficiales (BanRep comunicados y minutas, DANE sala de prensa, MinHacienda, Superfinanciera).
 
 \textbf{Por qué no titulares de prensa.} El sitio del Banco de la República bloquea los lectores automáticos con
 un captcha (Radware), y los agregadores comerciales (por ejemplo, el RSS de Google News) prohíben republicar sus
@@ -670,9 +704,11 @@ solo se excluyen de los cálculos y se registran.
 \label{sec:lectura}
 
 El sitio sigue once secciones numeradas, que se numeran automáticamente en el orden de la página (el reloj del ciclo, al inicio, no lleva número). Cada una responde su pregunta con un párrafo en lenguaje sencillo
-generado a partir de los datos; debajo de cada gráfico hay una nota \emph{?} que explica cómo leerlo. Los
-cálculos técnicos quedan en el panel desplegable \emph{Detalle técnico (para economistas)} al final de la
-sección.
+generado a partir de los datos; debajo de cada gráfico hay una nota \emph{?} que explica cómo leerlo y un pie \emph{Fuente:} con el botón de
+la ficha metodológica. Al final de cada sección, el panel desplegable \emph{Para entender mejor} explica los
+conceptos en palabras sencillas (por qué importa la capacidad, qué son las expectativas de mercado, qué es la
+tasa real ex ante, cómo leer la curva TES por años, el dólar y la tasa de cambio real, peso frente a
+crecimiento de los sectores, la lista de las 13 ciudades y qué significa A.M.).
 
 \subsection{Cómo leer la franja de cambios}
 \label{sec:franja}
@@ -709,7 +745,7 @@ cuándo una variable aceleró, frenó o cambió de dirección, algo que en el ni
 \begin{tabularx}{\linewidth}{@{}Xl@{}}
 \toprule
 \textbf{Serie} & \textbf{Barra del panel de cambios}\\\midrule
-PIB y brecha del producto & frente al trimestre anterior, en pp\\
+PIB y distancia a la capacidad & frente al trimestre anterior, en pp\\
 Tasas: inflación, desempleo (promedio 3 meses), TPM, inflación esperada a 1 año, tasa real, 5y5y & frente a hace 1 año, en pp\\
 Informalidad (nacional) & frente a hace 1 año, en pp\\
 Niveles: TRM, COLCAP, ITCR & frente a hace 1 año, en \%\\
@@ -724,6 +760,17 @@ Una sucesión de barras azules que se acortan indica que la serie sigue subiendo
 ejemplo, una inflación que aún sube frente a hace un año pero ya pierde impulso). El cambio de color de azul a
 naranja marca el punto de giro.
 \end{leer}
+
+\subsection{Cómo usar la ficha de cada gráfico}
+\label{sec:ficha}
+\captura[0.5]{ficha_metodologia.png}{Un gráfico con su pie \emph{Fuente:} y el botón \emph{?} de la ficha
+metodológica.}
+Todo gráfico termina en un pie \emph{Fuente: …} con la entidad y la publicación de donde salen los datos, y un
+botón redondo \emph{?}. Al pasar el cursor por el botón (o tocarlo en el teléfono) aparece un recuadro oscuro con
+la \emph{metodología}: fórmula, parámetros, frecuencia y advertencias. Así, la nota de lectura bajo el gráfico
+explica \emph{qué} mirar y la ficha explica \emph{cómo} se calculó. Las fichas viven en
+\archivo{colombiamacro/sitio/fichas.py} (diccionario \texttt{FICHAS}, una entrada por identificador de gráfico, en
+español e inglés) y reemplazan los antiguos párrafos \emph{Método:} de los paneles desplegables.
 
 \subsection{Resumen y tarjetas}
 La primera pantalla (figura~\ref{fig:hero}) resume el estado de la economía en tres o cuatro frases y seis
@@ -760,14 +807,16 @@ su cambio en dos trimestres. Cuatro cuadrantes sombreados: Expansión (arriba a 
 un trimestre del recorrido y las flechas muestran el camino; los puntos más antiguos se desvanecen y el punto
 grande, con su rótulo, es el trimestre elegido. Los ejes se ajustan al recorrido visible.
 \item[Recorrido del ciclo trimestre a trimestre] Barras de la brecha de cada trimestre coloreadas por fase
-(leyenda con las cuatro fases) y una línea punteada con el cambio en dos trimestres. La franja gris marca el
+(leyenda con las cuatro fases) y una línea punteada con el cambio en dos trimestres. Ejes rotulados: horizontal
+\emph{Trimestre}; vertical \emph{Brecha: producción frente a su capacidad (\%) · línea: cambio en 2 trimestres (pp)}. La franja gris marca el
 recorrido que se ve en el reloj. Al pasar el cursor o hacer clic en un trimestre, el reloj se mueve a esa fecha.
 \end{description}
 \begin{leer}
 La economía suele girar en el sentido del reloj: expansión $\rightarrow$ desaceleración $\rightarrow$ contracción
 $\rightarrow$ recuperación. Cuando la brecha está cerca de cero, un movimiento pequeño cambia el cuadrante y la
 fase puede alternar de un trimestre a otro: lea el \emph{recorrido} (varios trimestres), no un solo punto. La
-incertidumbre entre métodos (HP y Hamilton) se ve en la banda del panel \emph{Detalle técnico} de la sección~1.
+incertidumbre entre métodos (HP en tiempo real, HP de dos colas y Hamilton) está descrita en la ficha del
+gráfico de capacidad de la sección~1.
 \end{leer}
 \begin{dato}[Ejemplo 1: T2 2026, el último dato]
 Brecha $+0{,}3\%$ y cambio en dos trimestres $+0{,}8$~pp: cuadrante de expansión, primer trimestre en la fase.
@@ -781,49 +830,53 @@ trimestres de $+15{,}3$~pp. La fase es recuperación aunque la economía sigue m
 la dirección, no el nivel, define el cuadrante.
 \end{dato}
 
-\subsection{Últimas publicaciones oficiales}
-\label{sec:noticias}
-\captura[0.9]{sec_noticias.png}{Bloque \emph{Últimas publicaciones oficiales}: tarjetas generadas con los datos
-descargados y enlaces a las salas de prensa.}
-Bloque sin número (menú \emph{Noticias}, icono {\fontspec{DejaVu Sans}◉}, ancla \texttt{\#noticias}) entre el reloj del ciclo y la barra de
-horizonte. Cada tarjeta muestra la fuente (DANE, Banco de la República o BVC) y la fecha, un titular con la cifra
-y un detalle corto; está ordenada de la más reciente a la más antigua y enlaza a la página oficial.
-\begin{leer}
-La fecha dice cuándo se publicó o se observó el dato; \emph{dato más reciente} indica que la fuente no trae fecha
-de publicación y se muestra el último período disponible. Para comunicados completos, use los enlaces fijos a las
-salas de prensa al pie del bloque. Cómo se generan: sección~\ref{sec:noticias-metodo}.
-\end{leer}
-
 \subsection{Sección 1 · ¿Está creciendo la economía?}
-\captura[1]{sec_crecimiento.png}{Sección 1: crecimiento del PIB e ISE frente al ritmo habitual, y desempleo.}
+\label{sec:s1}
+\captura[0.8]{sec_crecimiento.png}{Sección 1: crecimiento, desempleo, producción frente a su capacidad y tamaño
+de la economía.}
+La sección tiene cuatro gráficos.
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[Crecimiento anual de la economía] Cada barra es un trimestre: cuánto creció el PIB real frente al mismo
+trimestre del año anterior. La línea naranja es el ISE mensual desestacionalizado, que adelanta el PIB del
+trimestre en curso; la punteada, el \emph{ritmo habitual} (crecimiento potencial). La escala se ajusta al horizonte
+elegido, así que con horizontes largos se ven completos la caída de 2020 (PIB cerca de $-16\%$, ISE cerca de
+$-20\%$) y el rebote de 2021. La caja emergente muestra además el PIB del trimestre en pesos de 2015. Debajo, el
+panel de cambios frente al trimestre anterior.
+\item[Tasa de desempleo] Serie desestacionalizada, mensual y promedio de 3 meses: un desempleo que cae mientras la
+economía crece por encima de lo habitual refuerza la lectura de presión de demanda.
+\item[Lo que produce la economía frente a su capacidad] Reemplaza al antiguo gráfico de brecha del producto. La
+línea azul es el PIB real desestacionalizado (billones de pesos de 2015 por trimestre); la línea discontinua es
+la \emph{capacidad} (PIB potencial). El área entre ambas es verde cuando la economía produce por encima de su
+capacidad (se calienta) y naranja cuando produce por debajo (holgura: capacidad ociosa, desempleo). El panel
+inferior muestra la distancia a la capacidad en \%, que es la brecha del producto (fórmula en la
+sección~\ref{sec:capacidad}).
+\item[Tamaño de la economía: PIB de los últimos 12 meses] Barras: PIB nominal de los últimos 4 trimestres en
+billones de pesos corrientes; línea naranja: lo mismo a precios de 2015; línea verde punteada (eje derecho): en
+miles de millones de dólares, con la TRM promedio de esos 4 trimestres (sección~\ref{sec:tamano}).
+\end{description}
 \begin{leer}
-Cada barra es un trimestre: cuánto creció el PIB real frente al mismo trimestre del año anterior. La línea
-naranja es el ISE mensual desestacionalizado, que adelanta el PIB del trimestre en curso. La línea punteada es
-el \emph{ritmo habitual} (crecimiento potencial): si las barras están por encima, la economía crece más rápido
-de lo normal. La escala vertical se ajusta a los datos visibles del horizonte elegido (3, 5, 10 años o
-\emph{Todo}): con horizontes largos aparecen completos la caída de 2020 (PIB cerca de $-16\%$, ISE cerca de
-$-20\%$) y el rebote de 2021; con 3 años la escala se concentra en la lectura reciente. Debajo, el panel de
-cambios muestra la variación del PIB frente al trimestre anterior. A la derecha, la tasa de desempleo desestacionalizada (mensual y promedio de 3 meses):
-un desempleo que cae mientras la economía crece por encima de lo habitual refuerza la lectura de presión de
-demanda.
+Piense en la capacidad como una \emph{frontera de posibilidades de producción} que se desplaza con el tiempo: lo
+máximo que la economía puede producir de forma sostenida, sin presiones de inflación. Cuando la línea azul pasa
+por encima de la frontera, las empresas trabajan a tope, el empleo se estrecha y los precios tienden a subir;
+cuando queda por debajo, sobra capacidad y la inflación tiende a ceder. En T2 2026 la economía produce 0,3\% por
+encima de su capacidad (unos 262 billones de pesos de 2015 en el trimestre frente a una capacidad de 261).
 \end{leer}
+\begin{dato}[Tamaño, T2 2026]
+PIB de los últimos cuatro trimestres: cerca de \$1.927 billones de pesos corrientes, $+7{,}8\%$ anual en pesos
+corrientes (incluye inflación), unos US\$510 mil millones.
+\end{dato}
 \begin{alerta}[Error frecuente]
-Confundir crecimiento con brecha. Una economía puede crecer 3,5\% y aun así estar \emph{cerca} del potencial si
-viene de una brecha negativa. Lo relevante para la inflación es el \emph{nivel} de la brecha, que está en el
-reloj del ciclo y, con sus tres métodos, en el detalle técnico.
+Confundir crecimiento con capacidad. Una economía puede crecer 3,5\% y aun así estar \emph{cerca} de su capacidad si
+venía por debajo. Lo relevante para la inflación es la \emph{distancia} a la capacidad (panel inferior del gráfico
+de capacidad y reloj del ciclo), no la tasa de crecimiento.
 \end{alerta}
 
-\subsubsection*{Detalle técnico: brecha del producto}
-\captura[0.9]{detalle_tecnico.png}{Panel \emph{Detalle técnico} de la sección 1: brecha del producto con rango
-entre métodos.}
-\begin{leer}
-En la brecha, la línea azul es la estimación principal (HP en tiempo real) y la banda es el rango entre los
-tres métodos (HP en tiempo real, HP de dos colas y Hamilton). Como en el crecimiento, la escala se ajusta al
-horizonte, así que 2020 se ve completo; el panel inferior muestra su cambio frente al trimestre anterior (pp). Arriba de cero, la economía produce más que su
-potencial; abajo, hay holgura. Una banda angosta indica consenso; una ancha, que la lectura depende del
-supuesto. Debajo del gráfico, un texto resume los métodos. El reloj del ciclo, que antes estaba en este
-panel, es ahora el bloque interactivo del inicio (sección~\ref{sec:reloj}).
-\end{leer}
+\subsubsection*{Para entender mejor}
+\captura[0.9]{detalle_tecnico.png}{Panel desplegable \emph{Para entender mejor} de la sección 1.}
+El panel explica en palabras sencillas por qué importa la capacidad y recuerda que es una estimación: lo
+importante es la dirección (si la distancia crece o se cierra), que es lo que usa el reloj del ciclo. El rango
+entre métodos (HP en tiempo real, HP de dos colas y Hamilton) ya no se grafica: se describe en la ficha del
+gráfico de capacidad.
 
 \subsection{Sección 2 · ¿Qué sectores impulsan la economía?}
 \label{sec:sectores}
@@ -834,7 +887,8 @@ es Gobierno, educación y salud, con 1,8 de los 3,9 puntos de crecimiento del va
 Información y comunicaciones ($-0{,}1\%$) y Agro y pesca ($-2{,}1\%$).
 \begin{description}[style=nextline,leftmargin=0pt]
 \item[Crecimiento anual por sector] Barras horizontales ordenadas de mayor a menor: azul si el sector crece,
-naranja si cae. La \textbf{raya negra} es el mismo dato \emph{hace un año} (T2 2025): si la barra pasa la raya,
+naranja si cae. El selector \emph{Ver el trimestre:} muestra cualquier trimestre desde 2010 frente al mismo
+trimestre un año antes; \emph{Volver al último dato} regresa al más reciente. La \textbf{raya negra} es el mismo dato \emph{hace un año} (T2 2025): si la barra pasa la raya,
 el sector se aceleró; si no la alcanza, se frenó. La caja emergente muestra el peso del sector en la economía
 y su aporte en pp.
 \item[Mapa del crecimiento por sector] Mapa de calor: una fila por sector (ordenados por tamaño, el más grande
@@ -851,7 +905,8 @@ crece mucho (fórmula en la sección~\ref{sec:aportes}).
 
 \subsection{Sección 3 · ¿Cuánto del empleo es informal?}
 \label{sec:informalidad}
-\captura[1]{sec_informalidad.png}{Sección 3: proporción de ocupados informales e informalidad por sector.}
+\captura[0.66]{sec_informalidad.png}{Sección 3: proporción de ocupados informales, por sector, por ciudad y
+evolución en una ciudad.}
 \begin{dato}[May–jul 2026]
 El 54,6\% de las personas ocupadas es informal (13,4 millones), frente a 55,0\% un año antes. En las 13
 principales ciudades, 40,6\%. Al inicio de la serie, en 2021, era 60,7\%.
@@ -863,11 +918,18 @@ total nacional (barras naranjas = la informalidad bajó).
 \item[Informalidad por sector] Porcentaje de ocupados informales en cada una de las 13 ramas, de mayor a menor
 (Agro y pesca 85\%, Alojamiento y comida 73\%, \dots, Finanzas y seguros 12\%), con la misma convención de la
 \textbf{raya negra = hace un año}. La caja emergente muestra informales y ocupados en personas.
+\item[Informalidad por ciudad] Ranking de las 23 ciudades; en azul las 13 principales (Barranquilla A.M., Bogotá
+D.C., Bucaramanga A.M., Cali A.M., Cartagena, Cúcuta A.M., Ibagué, Manizales A.M., Medellín A.M., Montería, Pasto,
+Pereira A.M. y Villavicencio), en gris las otras 10 capitales; raya negra = hace un año. En jul 2026 va de
+32,6\% (Bogotá D.C.) a 65,2\% (Sincelejo). Un clic en una ciudad la muestra en el gráfico siguiente.
+\item[Evolución de la informalidad en una ciudad] Lista desplegable de ciudades: la línea de la ciudad frente al
+total nacional y al promedio de las 13 ciudades, con una cifra de su cambio frente a hace un año.
 \end{description}
 \begin{leer}
 La informalidad es estructural y baja despacio: medio punto en un año es un movimiento relevante. La brecha
 entre el total nacional y las 13 ciudades refleja el peso del campo, donde casi nueve de cada diez ocupados
-son informales. Cada punto es un trimestre móvil, así que dos meses consecutivos comparten dos de sus tres
+son informales; A.M. significa área metropolitana (la ciudad y sus municipios vecinos). Cada punto es un
+trimestre móvil, así que dos meses consecutivos comparten dos de sus tres
 meses.
 \end{leer}
 \begin{alerta}[Comparabilidad]
@@ -884,7 +946,8 @@ regulados) mide la presión persistente: si la total sube pero la de fondo no, e
 transitorio. A la derecha, la inflación que el mercado espera para el próximo año (implícita en los TES a
 1 año) frente a la observada: si la línea morada está sobre la franja, el mercado cree que la inflación
 seguirá alta. Debajo, a todo el ancho, la trayectoria que el mercado espera para los próximos 10 años
-(sección~\ref{sec:leer5y5y}). En el detalle técnico está la historia de la 5y5y: si se mantiene dentro del rango,
+(sección~\ref{sec:leer5y5y}). En \emph{Para entender mejor} se explica por qué importan las expectativas y está
+la historia de la 5y5y: si se mantiene dentro del rango,
 las expectativas de largo plazo están \emph{ancladas}; por encima de 4\%, \emph{desancladas}.
 \end{leer}
 
@@ -905,7 +968,7 @@ de 3\%: 6,0\% está lejos, por eso las expectativas se leen \emph{desancladas}.
 \item[¿Cómo veo el futuro?] En este gráfico: los tres escalones se dibujan hacia adelante hasta 2036. Si los
 escalones morados están por encima de los grises punteados, el mercado espera hoy más inflación que hace un año;
 si bajan hacia la franja verde, cree que la inflación volverá a la meta.
-\item[¿Por qué la historia de la 5y5y termina hoy?] Porque cada punto del gráfico de anclaje del detalle técnico
+\item[¿Por qué la historia de la 5y5y termina hoy?] Porque cada punto del gráfico de anclaje del panel \emph{Para entender mejor}
 es lo que el mercado esperaba \emph{ese día} para la inflación promedio de los años 5 a 10: no es un pronóstico
 de su propia línea. La proyección completa está en este gráfico.
 \end{description}
@@ -913,10 +976,14 @@ de su propia línea. La proyección completa está en este gráfico.
 \subsection{Sección 5 · ¿Qué está haciendo el Banco de la República?}
 \captura[1]{sec_banco.png}{Sección 5: tasa de política frente a la inflación.}
 \begin{leer}
-La distancia entre la tasa de política y la inflación es, en esencia, la tasa real. La postura depende de la
-tasa \emph{real}, no de la nominal: en el detalle técnico, la tasa real ex ante (con la inflación que descuenta
-el mercado) se compara con la neutral estimada de 2,7–3,0\%. Por encima, la política frena la demanda; por
-debajo, la estimula.
+La postura depende de la tasa \emph{real}, no de la nominal. La \textbf{tasa real ex ante} es la tasa del Banco
+menos la inflación que se espera para el próximo año: lo que de verdad cuesta endeudarse. \emph{Ex ante}
+significa \emph{antes de que ocurra}: usa la inflación esperada, no la que ya pasó, porque quien pide un crédito
+hoy decide pensando en la inflación futura. Ejemplo: $12{,}00\%-7{,}1\%\approx4{,}6\%$ (con la fórmula exacta de
+Fisher, sección~\ref{sec:formulas}, también 4,6\%). Se compara con la tasa neutral de 2,7–3,0\%, la que ni
+acelera ni frena la economía: por encima, la política es restrictiva; por debajo, expansiva. Esta explicación
+aparece en el párrafo de respuesta, en la nota del gráfico y en \emph{Para entender mejor}, donde está además
+el gráfico de la tasa real ex ante frente a la neutral.
 \end{leer}
 
 \subsection{Sección 6 · ¿Cuánto cobra el mercado por prestarle al Gobierno?}
@@ -943,7 +1010,8 @@ cambio frente a un año antes de la fecha elegida. La pendiente se rotula \emph{
 La curva muestra cuánto rinde prestarle al Gobierno a 1, 5 y 10 años. Una curva que sube de izquierda a
 derecha es lo normal: el mercado exige más por prestar a más plazo. Un desplazamiento hacia arriba de toda la
 curva refleja una tasa de política más alta y mayores primas. Una curva plana o invertida suele anticipar
-recortes de tasas o menor crecimiento.
+recortes de tasas o menor crecimiento. \emph{Para entender mejor} explica, comparando años (2021 frente a
+2022–2023), cómo un alza de toda la curva encarece el crédito para empresas, hogares y el propio Gobierno.
 \end{leer}
 \begin{dato}[Ejemplo: el ciclo de alzas 2021–2022]
 Al marcar 2021 y 2022, la tasa a 1 año pasa de 5,44\% a 11,90\% y la de 10 años de 8,46\% a 13,23\%: toda la
@@ -958,7 +1026,8 @@ queda por encima de la de 5 años (9,59\%).
 Una TRM que baja significa un peso más fuerte. La franja de ambos gráficos muestra el cambio en un año y en un
 mes. Para un inversionista extranjero el retorno relevante combina el precio de las acciones y la tasa de
 cambio: si el peso se aprecia, el retorno en dólares supera al de pesos. COLCAP es un índice de precios: no
-incluye dividendos. El 28 de mayo de 2021 pasó a la metodología MSCI. En el detalle técnico, el ITCR compara
+incluye dividendos. El 28 de mayo de 2021 pasó a la metodología MSCI. En \emph{Para entender mejor} se explica
+qué implica un dólar alto o bajo, y el gráfico del ITCR compara
 precios de Colombia con los de sus socios comerciales: por debajo de 100 el peso está más fuerte en términos
 reales que en 2010. Los paneles de cambios muestran la variación en \% frente a hace un año de la TRM, el
 COLCAP y el ITCR.
@@ -1019,6 +1088,20 @@ y una barra con su posición frente a su propia historia desde 2010 (percentil),
 alejan de su normalidad histórica y merecen atención.
 \end{leer}
 
+\subsection{Nota: últimas publicaciones oficiales}
+\label{sec:noticias}
+\captura[0.9]{sec_noticias.png}{Nota \emph{Últimas publicaciones oficiales}: tarjetas generadas con los datos
+descargados y enlaces a las salas de prensa.}
+Nota discreta, con borde punteado, cerca del final de la página: después de \emph{Todos los indicadores} y antes
+de \emph{Fuentes} (menú \emph{Noticias}, al final; icono {\fontspec{DejaVu Sans}◉}, ancla \texttt{\#noticias}). Cada tarjeta muestra la fuente
+(DANE, Banco de la República o BVC) y la fecha, un titular con la cifra y un detalle corto; está ordenada de la más
+reciente a la más antigua y enlaza a la página oficial.
+\begin{leer}
+La fecha dice cuándo se publicó o se observó el dato; \emph{dato más reciente} indica que la fuente no trae fecha
+de publicación y se muestra el último período disponible. Para comunicados completos, use los enlaces fijos a las
+salas de prensa al pie de la nota. Cómo se generan: sección~\ref{sec:noticias-metodo}.
+\end{leer}
+
 \subsection{Sección 11 · Fuentes}
 \captura[1]{sec_fuentes.png}{Sección 11: estado de cada fuente, descargas CSV, documentación y glosario.}
 \begin{leer}
@@ -1076,9 +1159,9 @@ tasa nacional ($\pm0{,}2$~pp).
 se conserva su versión anterior, sin bloquear las demás.
 \item Canasta del COLCAP y precios de acciones: sin tickers duplicados y pesos que suman cerca de 100\%; sin
 pares ticker/fecha duplicados, precios no positivos ni fechas futuras; rezago máximo de 10 días para ambas tablas.
-\item 57 pruebas en tres grupos (las últimas ampliaciones cubren sectores e informalidad —lectura de las 12
-agrupaciones, aportes, fechas de los trimestres móviles y suma de ramas—, la trayectoria esperada de inflación
-y las tarjetas de publicaciones): fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de
+\item 61 pruebas en tres grupos (las últimas ampliaciones cubren sectores e informalidad —lectura de las 12
+agrupaciones, aportes, fechas de los trimestres móviles, suma de ramas, informalidad por ciudad—, la trayectoria
+esperada de inflación, las tarjetas de publicaciones, la capacidad y el tamaño de la economía, y las fichas): fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de
 información futura en el HP en tiempo real, Hamilton en una caminata con deriva, índice equiponderado,
 selección de las 7 Magníficas con clases sumadas, descarte de saltos semanales), datos (cliente BanRep,
 lectores DANE, canasta iShares, precios de Yahoo con fechas en viernes, empalme de tickers, rangos y fechas) y sitio (construcción completa en ambos
@@ -1289,6 +1372,8 @@ python scripts/generar_figuras.py     # docs/figuras/*.pdf, *.png y resumen.json
 cada fecha. La brecha en tiempo real elimina la información futura del filtro, pero no las revisiones del DANE.
 \item \textbf{La fase depende del método} (coincidencia de fase de 43\% entre HP en tiempo real y Hamilton).
 \item \textbf{La tasa neutral es externa} y tiene incertidumbre amplia.
+\item \textbf{La capacidad es una estimación}: $Y^*$ se deriva de la tendencia HP; su nivel en pesos hereda la
+incertidumbre de la brecha (lo importante es la dirección).
 \item \textbf{Los aportes sectoriales son aproximados}: los volúmenes encadenados no son aditivos (pesos que
 suman $\approx100{,}6\%$).
 \item \textbf{La informalidad empieza en 2021}: la definición vigente no es comparable con la historia anterior.

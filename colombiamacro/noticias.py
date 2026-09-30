@@ -18,12 +18,12 @@ ENLACES = {
     "empleo": "https://www.dane.gov.co/index.php/estadisticas-por-tema/mercado-laboral/empleo-y-desempleo",
     "informal": "https://www.dane.gov.co/index.php/estadisticas-por-tema/mercado-laboral/empleo-informal-y-seguridad-social",
     "ise": "https://www.dane.gov.co/index.php/estadisticas-por-tema/cuentas-nacionales/indicador-de-seguimiento-a-la-economia-ise",
-    "tpm": "https://www.banrep.gov.co/es/estadisticas/tasas-de-interes-de-politica-monetaria",
-    "comunicados": "https://www.banrep.gov.co/es/noticias",
-    "trm": "https://www.banrep.gov.co/es/estadisticas/trm",
-    "bop": "https://www.banrep.gov.co/es/estadisticas/balanza-pagos",
-    "tes": "https://www.banrep.gov.co/es/estadisticas/tes",
-    "colcap": "https://www.bvc.com.co",
+    "tpm": "https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/59/tasas_interes_politica_monetaria",
+    "comunicados": "https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/59/tasas_interes_politica_monetaria",
+    "trm": "https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/1/tasa_cambio_peso_colombiano_trm_dolar_usd",
+    "bop": "https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/4130/cuenta_corriente_como_porcentaje_pib",
+    "tes": "https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/220002/tasas_interes_cero_cupon_tes",
+    "colcap": "https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/2500/indice_mercado_accionario_colcap",
 }
 SALAS = [  # salas de prensa oficiales (enlaces fijos)
     ("Banco de la República · comunicados y minutas", "https://www.banrep.gov.co/es/noticias"),
@@ -139,6 +139,15 @@ def publicaciones(d: mt.Datos, s: dict, lang: str = "es") -> list[dict]:
                 (f"Última decisión con cambio de tasa (vigente desde esta fecha). Hace un año la tasa era {_n(tt['tpm_hace_12m'], 2, lang)}%." if es else
                  f"Latest rate change (effective from this date). A year ago the rate was {_n(tt['tpm_hace_12m'], 2, lang)}%."),
                 ENLACES["comunicados"])
+    an = tt.get("tpm_anunciada") if tt else None
+    if an:
+        sube = an["tasa"] > an["anterior"]
+        add(an["anuncio"], "Banco de la República",
+            (f"La Junta del Banco de la República {'subió' if sube else 'bajó'} la tasa de política a {_n(an['tasa'], 2, lang)}%" if es else
+             f"Banco de la República's board {'raised' if sube else 'cut'} the policy rate to {_n(an['tasa'], 2, lang)}%"),
+            (f"Anuncio del {an['anuncio']:%d/%m/%Y}; antes {_n(an['anterior'], 2, lang)}%. Rige desde el {an['vigente']:%d/%m/%Y}, cuando entra a la serie oficial." if es else
+             f"Announced {an['anuncio']:%Y-%m-%d}; previously {_n(an['anterior'], 2, lang)}%. Effective {an['vigente']:%Y-%m-%d}, when it enters the official series."),
+            an["enlace"] or ENLACES["tpm"])
     m = s.get("mercado") or {}
     if m.get("trm") is not None:
         add(m["trm_fecha"], "Banco de la República",
