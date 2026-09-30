@@ -72,8 +72,17 @@ def esc(s):
 
 
 # ------------------------------------------------------------------ graficos
-def base(lang, height=330, suffix="%", fecha_x=True):
+CHG_UP, CHG_DN = "rgba(42,120,214,0.62)", "rgba(235,104,52,0.68)"
+
+
+def base(lang, height=330, suffix="%", fecha_x=True, delta=False):
+    """Figura base. delta=True agrega abajo un panel con el cambio de la serie principal
+    (mismo eje de fechas: el recuadro flotante muestra ambos paneles a la vez)."""
     fig = go.Figure()
+    if delta:
+        height += 110
+        fig.update_layout(yaxis=dict(domain=[0.35, 1]), yaxis2=dict(domain=[0, 0.24], anchor="x"),
+                          xaxis=dict(anchor="y2"), hoversubplots="axis")
     fig.update_layout(
         height=height, margin=dict(l=6, r=10, t=6, b=6), paper_bgcolor="#ffffff", plot_bgcolor="#ffffff",
         font=dict(family=FONT, size=12.5, color=INK2), separators=",." if lang == "es" else ".,",
@@ -139,6 +148,24 @@ def linea(fig, x, y, name, color, width=2.2, dash=None, fmt=".1f", suf="%", shap
                              line=dict(color=color, width=width, dash=dash, shape=shape), **kw))
 
 
+def panel_cambio(fig, x, y, modo, periodo, lang, titulo):
+    """Barras del cambio (vs. hace 1 ano, trimestre o mes) en el panel inferior."""
+    ch = serie_cambio(x, y, modo, periodo)
+    vals = [None if pd.isna(v) else round(float(v), 3) for v in ch]
+    suf = " pp" if modo == "pp" else "%"
+    et = etiqueta_periodo(periodo, lang)
+    fig.add_trace(go.Bar(x=list(ch.index), y=vals, yaxis="y2", showlegend=False, name=f"Δ {titulo}",
+                         marker=dict(color=[CHG_UP if (v or 0) >= 0 else CHG_DN for v in vals], line=dict(width=0)),
+                         customdata=[num(v, 1, lang, True, suf) if v is not None else "" for v in vals],
+                         hovertemplate=f"%{{customdata}} {et}"))
+    fig.add_shape(type="line", xref="x domain", x0=0, x1=1, yref="y2", y0=0, y1=0,
+                  line=dict(color=INK2, width=0.8))
+    fig.update_layout(yaxis2=dict(ticksuffix=suf, nticks=4, gridcolor=GRID, zeroline=False, fixedrange=True,
+                                  tickfont=dict(size=11, color=MUTED), automargin=True), bargap=0.12)
+    fig.add_annotation(xref="paper", x=0, yref="y2 domain", y=1.03, yanchor="bottom", xanchor="left", showarrow=False,
+                       text=f"<b>{t('panel_cambio', lang)}</b> · {titulo} ({et})", font=dict(size=11.5, color=MUTED))
+
+
 def franja(lang, items):
     """Franja sobre el grafico: ultimo dato de cada serie y su cambio.
     items: (nombre, x, y, modo, periodo, freq, dec, suf)"""
@@ -195,7 +222,7 @@ class Graficos:
     def crecimiento(self):
         L, d = self.lang, self.d
         c = d.ciclo
-        fig = base(L)
+        fig = base(L, delta=True)
         xq = qend(c["fecha"])
         yq = [round(float(v), 2) for v in c["pib_real_yoy"]]
         ch = serie_cambio(xq, yq, "pp", "t")
@@ -211,19 +238,18 @@ class Graficos:
         self._l(fig, xq, c["crecimiento_potencial_hp"], t("ritmo_normal", L), INK2, width=1.6, dash="dot")
         fig.add_hline(y=0, line=dict(color=INK2, width=1))
         fig.update_layout(bargap=0.35)
-        fig.update_yaxes(range=[-8, 14])
-        fig.add_annotation(xref="paper", yref="paper", x=0.99, y=0.02, xanchor="right", yanchor="bottom",
-                           showarrow=False, text=t("covid_escala", L), font=dict(size=11, color=MUTED))
+        panel_cambio(fig, xq, yq, "pp", "t", L, t("pib_trim", L))
         fig.update_xaxes(range=rango_inicial(xq.max()))
-        return fig, {"yfijo": True, "franja": franja(L, items)}
+        return fig, {"franja": franja(L, items)}
 
     def desempleo(self):
         L, lb = self.lang, self.d.laboral
         if lb is None:
             return None, {}
-        fig = base(L)
+        fig = base(L, delta=True)
         self._l(fig, lb["fecha"], lb["td_sa"], t("td_mensual", L), GRAY, width=1.2, cambio=("pp", "a"))
         self._l(fig, lb["fecha"], lb["td_sa_3m"], t("td_3m", L), C1, width=2.4, cambio=("pp", "a"))
+        panel_cambio(fig, lb["fecha"], lb["td_sa_3m"], "pp", "a", L, t("td_3m", L))
         fig.update_xaxes(range=rango_inicial(lb["fecha"].max()))
         return fig, {"franja": franja(L, [(t("td_3m", L), lb["fecha"], lb["td_sa_3m"], "pp", "a", "m", 1, "%"),
                                           (t("td_mensual", L), lb["fecha"], lb["td_sa"], "pp", "a", "m", 1, "%")])}
@@ -231,9 +257,10 @@ class Graficos:
     # --- 2. precios
     def inflacion(self):
         L, inf = self.lang, self.d.inflacion
-        fig = base(L)
+        fig = base(L, delta=True)
         meta_banda(fig, L)
         x = inf["fecha"] + pd.offsets.MonthEnd(0)
+        panel_cambio(fig, x, inf["inflacion_anual"], "pp", "a", L, t("inf_total", L))
         self._l(fig, x, inf["inflacion_anual"], t("inf_total", L), C1, width=2.6, fmt=".2f", cambio=("pp", "a"))
         items = [(t("inf_total", L), x, inf["inflacion_anual"], "pp", "a", "m", 2, "%")]
         if "inflacion_basica_sar" in inf and inf["inflacion_basica_sar"].notna().any():
@@ -247,8 +274,9 @@ class Graficos:
     def expectativas(self):
         L, d = self.lang, self.d
         w = semanal(d.tasas, ["bei_1y", "bei_5y5y"])
-        fig = base(L)
+        fig = base(L, delta=True)
         meta_banda(fig, L)
+        panel_cambio(fig, w["fecha"], w["bei_1y"], "pp", "a", L, t("espera_1a", L))
         self._l(fig, d.inflacion["fecha"] + pd.offsets.MonthEnd(0), d.inflacion["inflacion_anual"], t("inf_observada", L),
                 GRAY, width=1.5, fmt=".2f")
         self._l(fig, w["fecha"], w["bei_1y"], t("espera_1a", L), C7, width=2.2, cambio=("pp", "a"))
@@ -262,7 +290,8 @@ class Graficos:
         if d.extra["tpm"].empty:
             return None, {}
         w = semanal(d.tasas, ["tpm"])
-        fig = base(L)
+        fig = base(L, delta=True)
+        panel_cambio(fig, w["fecha"], w["tpm"], "pp", "a", L, t("tpm_linea", L))
         self._l(fig, w["fecha"], w["tpm"], t("tpm_linea", L), C1, width=2.6, fmt=".2f", shape="hv", cambio=("pp", "a"))
         xi = d.inflacion["fecha"] + pd.offsets.MonthEnd(0)
         self._l(fig, xi, d.inflacion["inflacion_anual"], t("inf_total", L), C2, fmt=".2f", cambio=("pp", "a"))
@@ -278,7 +307,8 @@ class Graficos:
         if trm.empty:
             return None, {}
         w = semanal(trm, ["trm"])
-        fig = base(L, suffix="")
+        fig = base(L, suffix="", delta=True)
+        panel_cambio(fig, w["fecha"], w["trm"], "pct", "a", L, t("trm_linea", L))
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
         self._l(fig, w["fecha"], w["trm"], t("trm_linea", L), C1, fmt=",.0f", suf="", cambio=("pct", "a"))
         fig.update_xaxes(range=rango_inicial(w["fecha"].max()))
@@ -287,7 +317,8 @@ class Graficos:
     def bolsa(self):
         L, m = self.lang, self.d.mercado
         w = semanal(m, ["colcap_puntos"])
-        fig = base(L, suffix="")
+        fig = base(L, suffix="", delta=True)
+        panel_cambio(fig, w["fecha"], w["colcap_puntos"], "pct", "a", L, t("colcap_linea", L))
         fig.update_yaxes(tickformat=",.0f")
         self._l(fig, w["fecha"], w["colcap_puntos"], t("colcap_linea", L), C1, fmt=",.0f", suf=" pts", cambio=("pct", "a"))
         fig.update_xaxes(range=rango_inicial(w["fecha"].max()))
@@ -313,11 +344,51 @@ class Graficos:
             fig.update_xaxes(range=rango_inicial(x.max()))
         return fig, {"franja": franja(L, [(t("g_" + ("cc" if freq == "q" else "deuda") + "_corto", L), x, y, "pp", "a", freq, 1, "%")])}
 
+    # --- 5b. bolsa por dentro
+    def bolsa_indices(self, b):
+        """COLCAP oficial vs equiponderado vs 7 Magnificas, base 100 (el navegador re-basa al horizonte)."""
+        L = self.lang
+        ix = b["indices"]
+        fig = base(L, suffix="", delta=True)
+        series = [("colcap", t("idx_colcap", L), C1, 2.6), ("equiponderado", t("idx_equi", L), C3, 2.0),
+                  ("magnificas", t("idx_mag", L), C2, 2.0)]
+        for col, nombre, color, ancho in series:
+            self._l(fig, ix["fecha"], ix[col], nombre, color, width=ancho, fmt=".1f", suf="", cambio=("pct", "a"))
+        for col, nombre, color, _ in series:
+            ch = serie_cambio(ix["fecha"], ix[col], "pct", "a")
+            fig.add_trace(go.Scatter(x=list(ch.index), y=[None if pd.isna(v) else round(float(v), 2) for v in ch],
+                                     yaxis="y2", mode="lines", line=dict(color=color, width=1.4), showlegend=False,
+                                     name=f"Δ {nombre}", customdata=[num(v, 1, L, True, "%") if pd.notna(v) else "" for v in ch],
+                                     hovertemplate="%{customdata} " + t("vs_ano", L)))
+        fig.add_shape(type="line", xref="x domain", x0=0, x1=1, yref="y2", y0=0, y1=0, line=dict(color=INK2, width=0.8))
+        fig.update_layout(yaxis2=dict(ticksuffix="%", nticks=4, gridcolor=GRID, zeroline=False, fixedrange=True,
+                                      tickfont=dict(size=11, color=MUTED), automargin=True))
+        fig.add_annotation(xref="paper", x=0, yref="y2 domain", y=1.03, yanchor="bottom", xanchor="left", showarrow=False,
+                           text=f"<b>{t('panel_cambio', L)}</b> · {t('rent_12m', L)}", font=dict(size=11.5, color=MUTED))
+        fig.update_xaxes(range=rango_inicial(ix["fecha"].max()))
+        return fig, {"rebase": True, "franja": franja_indices(L, ix, series)}
+
+    def pesos(self, b):
+        """Peso de cada accion en el COLCAP; las 7 Magnificas resaltadas."""
+        L = self.lang
+        c = b["canasta"].head(15).iloc[::-1]
+        top = set(mt.magnificas(b["canasta"])["emisor"])
+        fig = base(L, height=420, suffix="%", fecha_x=False)
+        fig.add_trace(go.Bar(y=[f"{r.ticker}" for r in c.itertuples()], x=list(c["peso"]), orientation="h",
+                             marker=dict(color=[C2 if e in top else "#c9c7c0" for e in c["emisor"]], line=dict(width=0)),
+                             customdata=[[mt.nombre_corto(r.emisor), r.sector] for r in c.itertuples()], showlegend=False,
+                             text=[num(v, 1, L, suf="%") for v in c["peso"]], textposition="outside", cliponaxis=False,
+                             hovertemplate="<b>%{y}</b> · %{customdata[0]}<br>%{customdata[1]}<br>%{x:.2f}%<extra></extra>"))
+        fig.update_layout(hovermode="closest", bargap=0.25, margin=dict(l=6, r=40, t=6, b=6))
+        fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID, range=[0, float(c["peso"].max()) * 1.18])
+        fig.update_yaxes(ticksuffix="", tickfont=dict(size=11.5, color=INK2))
+        return fig, {"notime": True}
+
     # --- detalle tecnico
     def brecha(self):
         L, c = self.lang, self.d.ciclo.dropna(subset=["brecha_hp_tiempo_real"])
         x = qend(c["fecha"])
-        fig = base(L)
+        fig = base(L, delta=True)
         fig.add_trace(go.Scatter(x=list(x), y=[round(float(v), 3) for v in c["brecha_max"]], line=dict(width=0),
                                  hoverinfo="skip", showlegend=False))
         fig.add_trace(go.Scatter(x=list(x), y=[round(float(v), 3) for v in c["brecha_min"]], fill="tonexty",
@@ -325,11 +396,9 @@ class Graficos:
                                  hoverinfo="skip"))
         self._l(fig, x, c["brecha_hp_tiempo_real"], t("brecha_principal", L), C1, width=2.4, fmt="+.1f", cambio=("pp", "t"))
         fig.add_hline(y=0, line=dict(color=INK2, width=1))
-        fig.update_yaxes(range=[-4, 5])
-        fig.add_annotation(xref="paper", yref="paper", x=0.99, y=0.02, xanchor="right", yanchor="bottom",
-                           showarrow=False, text=t("covid_escala", L), font=dict(size=11, color=MUTED))
+        panel_cambio(fig, x, c["brecha_hp_tiempo_real"], "pp", "t", L, t("brecha_principal", L))
         fig.update_xaxes(range=rango_inicial(x.max()))
-        return fig, {"yfijo": True, "franja": franja(L, [(t("brecha_principal", L), x, c["brecha_hp_tiempo_real"], "pp", "t", "q", 1, "%")])}
+        return fig, {"franja": franja(L, [(t("brecha_principal", L), x, c["brecha_hp_tiempo_real"], "pp", "t", "q", 1, "%")])}
 
     def reloj(self):
         L = self.lang
@@ -364,7 +433,8 @@ class Graficos:
             return None, {}
         w = semanal(d.tasas, ["tpm_real_exante"])
         lo, hi = mt.NEUTRAL_REAL
-        fig = base(L)
+        fig = base(L, delta=True)
+        panel_cambio(fig, w["fecha"], w["tpm_real_exante"], "pp", "a", L, t("tasa_real", L))
         fig.add_hrect(y0=lo, y1=hi, fillcolor="rgba(82,81,78,0.13)", line_width=0, layer="below")
         fig.add_annotation(xref="paper", x=0.01, y=hi, yanchor="bottom", xanchor="left", showarrow=False,
                            text=t("neutral_label", L), font=dict(size=11, color=INK2))
@@ -375,7 +445,8 @@ class Graficos:
 
     def anclaje(self):
         L, w = self.lang, semanal(self.d.tasas, ["bei_5y5y"])
-        fig = base(L)
+        fig = base(L, delta=True)
+        panel_cambio(fig, w["fecha"], w["bei_5y5y"], "pp", "a", L, t("espera_largo", L))
         meta_banda(fig, L)
         self._l(fig, w["fecha"], w["bei_5y5y"], t("espera_largo", L), C7, cambio=("pp", "a"))
         fig.update_xaxes(range=rango_inicial(w["fecha"].max()))
@@ -385,12 +456,100 @@ class Graficos:
         L, it = self.lang, self.d.extra["itcr_ipc"]
         if it.empty:
             return None, {}
-        fig = base(L, suffix="")
+        fig = base(L, suffix="", delta=True)
         x = it["fecha"] + pd.offsets.MonthEnd(0)
+        panel_cambio(fig, x, it["itcr_ipc"], "pct", "a", L, t("itcr_linea", L))
         self._l(fig, x, it["itcr_ipc"], t("itcr_linea", L), C1, fmt=".1f", suf="", cambio=("pct", "a"))
         fig.add_hline(y=100, line=dict(color=INK2, width=1))
         fig.update_xaxes(range=rango_inicial(it["fecha"].max()))
         return fig, {"franja": franja(L, [(t("itcr_linea", L), x, it["itcr_ipc"], "pct", "a", "m", 1, "")])}
+
+
+def franja_indices(lang, ix, series):
+    """Rentabilidad de cada indice en el ultimo mes y en 12 meses."""
+    partes = []
+    for col, nombre, color, _ in series:
+        s_ = pd.Series(list(ix[col]), index=pd.to_datetime(ix["fecha"])).dropna()
+        cambios = []
+        for per in ("a", "m"):
+            ch = serie_cambio(s_.index, s_.values, "pct", per).iloc[-1]
+            if pd.notna(ch):
+                clase = "up" if ch > 0.005 else ("down" if ch < -0.005 else "flat")
+                cambios.append(f'<span class="chg {clase}">{txt_cambio(ch, "pct", lang)}</span> <small>{etiqueta_periodo(per, lang)}</small>')
+        partes.append(f'<div class="stat"><span class="stat-n"><i class="dot" style="background:{color}"></i>{esc(nombre)}</span>'
+                      f'<span class="stat-c">{" &nbsp;·&nbsp; ".join(cambios)}</span></div>')
+    return f'<div class="stats">{"".join(partes)}</div>'
+
+
+def tabla_magnificas(b, L):
+    head = "".join(f"<th>{t(k, L)}</th>" for k in ("col_empresa", "col_peso", "col_precio", "col_1m", "col_ano", "col_12m"))
+    rows = []
+    for r in b["magnificas"].itertuples():
+        def c(v):
+            if v is None or pd.isna(v):
+                return "—"
+            clase = "up" if v > 0.005 else ("down" if v < -0.005 else "flat")
+            return f'<span class="chg {clase}">{txt_cambio(v, "pct", L)}</span>'
+        rows.append(f"<tr><td><b>{esc(r.emisor)}</b><br><small>{esc(r.clases)} · {esc(r.sector)}</small></td>"
+                    f"<td class='n'>{num(r.peso, 1, L, suf='%')}</td><td class='n'>${num(r.precio, 0, L)}</td>"
+                    f"<td class='n'>{c(r.var_1m)}</td><td class='n'>{c(r.var_ano)}</td><td class='n'>{c(r.var_12m)}</td></tr>")
+    return f"<div class='table-wrap'><table class='tbl'><thead><tr>{head}</tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
+
+
+# ------------------------------------------------------------------ reloj del ciclo interactivo
+def datos_ciclo(d: mt.Datos, lang: str) -> dict:
+    """Trimestres con brecha (nivel) y su cambio en 2 trimestres (direccion) para el reloj."""
+    c = d.ciclo.dropna(subset=["brecha_hp_tiempo_real", "delta_brecha", "fase"])
+    trimestres = [{"q": fecha(f, "q", lang), "f": qend(pd.Series([f])).iloc[0].strftime("%Y-%m-%d"),
+                   "x": round(float(x), 3), "y": round(float(y), 3), "fase": fz}
+                  for f, x, y, fz in zip(c["fecha"], c["brecha_hp_tiempo_real"], c["delta_brecha"], c["fase"])]
+    fases = {k: {"nombre": v[0 if lang == "es" else 1], "color": v[2], "desc": t("fd_" + k, lang)}
+             for k, v in am.FASES.items()}
+    return {"trimestres": trimestres, "fases": fases}
+
+
+def explorador_ciclo(d: mt.Datos, lang: str) -> str:
+    L = lang
+    datos = json.dumps(datos_ciclo(d, L), ensure_ascii=False, separators=(",", ":"))
+    textos = json.dumps({k: t(k, L) for k in (
+        "ck_fase", "ck_brecha", "ck_dir", "ck_racha", "ck_encima", "ck_debajo", "ck_mejora", "ck_empeora",
+        "ck_trim", "ck_trim1", "ck_eje_x", "ck_eje_y", "ck_hover", "vs_2t")}, ensure_ascii=False)
+    tr = datos_ciclo(d, L)["trimestres"]
+    ult = tr[-1]
+    racha = 1
+    while racha < len(tr) and tr[-1 - racha]["fase"] == ult["fase"]:
+        racha += 1
+    resp = t("resp_ciclo", L).format(
+        q=ult["q"], fase=am.FASES[ult["fase"]][0 if L == "es" else 1].lower(),
+        nivel=t("ck_encima" if ult["x"] >= 0 else "ck_debajo", L).format(v=num(abs(ult["x"]), 1, L)),
+        dir=t("ck_mejora" if ult["y"] >= 0 else "ck_empeora", L).format(v=num(abs(ult["y"]), 1, L)),
+        n=racha, racha=t("ck_racha1", L) if racha == 1 else t("ck_rachan", L).format(n=racha)) + " " + t("fd_" + ult["fase"], L)
+    leyenda = "".join(f'<span class="ph"><i style="background:{v[2]}"></i>{esc(v[0 if L == "es" else 1])}</span>'
+                      for v in am.FASES.values())
+    return f"""<section id="ciclo" class="cycle">
+  <div class="sec-head"><span class="sec-num">◷</span><h2>{t("q_ciclo", L)}</h2></div>
+  <p class="answer" id="ciclo-resp">{resp}</p>
+  <div class="curve-app cycle-app" id="ciclo-app" data-lang="{L}">
+    <div class="curve-ctrl">
+      <label class="curve-date">{t("ck_ver", L)} <b id="ciclo-q">—</b></label>
+      <input type="range" id="ciclo-slider" min="0" max="1" value="1" step="1" aria-label="{t('ck_ver', L)}">
+      <div class="seg" role="group" aria-label="{t('ck_estela', L)}">
+        <button data-n="4">{t("ck_1a", L)}</button><button data-n="8" class="on">{t("ck_2a", L)}</button><button data-n="12">{t("ck_3a", L)}</button>
+      </div>
+      <button class="linkbtn" id="ciclo-hoy">{t("tes_volver", L)}</button>
+    </div>
+    <div class="stats" id="ciclo-stats"></div>
+    <div class="curve-grid">
+      <figure class="chart"><figcaption>{t("g_reloj_main", L)}</figcaption><div class="plot" id="g-ciclo-reloj" style="height:420px"></div>
+        <p class="how"><span>?</span>{t("h_reloj_main", L)}</p></figure>
+      <figure class="chart"><figcaption>{t("g_ciclo_hist", L)}</figcaption><div class="phases">{leyenda}</div>
+        <div class="plot" id="g-ciclo-hist" style="height:380px"></div>
+        <p class="how"><span>?</span>{t("h_ciclo_hist", L)}</p></figure>
+    </div>
+  </div>
+  <script type="application/json" id="ciclo-datos">{datos}</script>
+  <script type="application/json" id="ciclo-textos">{textos}</script>
+</section>"""
 
 
 # ------------------------------------------------------------------ curva TES interactiva
@@ -436,8 +595,9 @@ def fig_html(fig, meta, gid):
         return None
     data = pio.to_json(fig, validate=False, pretty=False, engine="json")
     attrs = ' data-notime="1"' if meta.get("notime") else ""
-    attrs += ' data-yfijo="1"' if meta.get("yfijo") else ""
-    return (meta.get("franja", "") + f'<div class="plot" id="{gid}"{attrs}></div>'
+    attrs += ' data-rebase="1"' if meta.get("rebase") else ""
+    alto = int(fig.layout.height or 330)
+    return (meta.get("franja", "") + f'<div class="plot" id="{gid}"{attrs} style="height:{alto}px"></div>'
             f'<script type="application/json" data-for="{gid}">{data}</script>')
 
 
@@ -455,9 +615,14 @@ def bloque_grafico(titulo, fig_html_str, como_leer, nota=None):
             f'<p class="how"><span>?</span>{como_leer}</p>{extra}</figure>')
 
 
-def seccion(sid, num_, titulo, respuesta, graficos, detalle_html, lang):
-    det = (f'<details class="tech"><summary>{t("detalle_tecnico", lang)}</summary><div class="tech-body">{detalle_html}</div></details>'
-           if detalle_html else "")
+def seccion(sid, num_, titulo, respuesta, graficos, detalle_html, lang, abierto=False):
+    """abierto=True: el bloque extra se muestra siempre (no es detalle tecnico)."""
+    if detalle_html and abierto:
+        det = f'<div class="extra">{detalle_html}</div>'
+    elif detalle_html:
+        det = f'<details class="tech"><summary>{t("detalle_tecnico", lang)}</summary><div class="tech-body">{detalle_html}</div></details>'
+    else:
+        det = ""
     return (f'<section id="{sid}" class="section"><div class="sec-head"><span class="sec-num">{num_}</span>'
             f'<h2>{esc(titulo)}</h2></div><p class="answer">{respuesta}</p>'
             f'<div class="grid">{"".join(graficos)}</div>{det}</section>')
@@ -513,7 +678,6 @@ def pagina(d, s, lang, generado):
     s1_det = "".join(filter(None, [
         f'<p>{tecnico["actividad"]}</p>',
         bloque_grafico(t("g_brecha", L), fig_html(*g.brecha(), "g-brecha"), t("h_brecha", L)),
-        bloque_grafico(t("g_reloj", L), fig_html(*g.reloj(), "g-reloj"), t("h_reloj", L).format(fase=fase)),
         f'<p class="method">{t("m_brecha", L)}</p>']))
     ise_txt = ""
     if s.get("ise"):
@@ -582,12 +746,33 @@ def pagina(d, s, lang, generado):
                   bloque_grafico(t("g_bolsa", L), fig_html(fb, mb, "g-bolsa"), t("h_bolsa", L))],
                  s4_det, L)
 
+    # --- 6. bolsa por dentro
+    s_emp = ""
+    b = mt.bolsa_por_dentro(d)
+    if b is not None:
+        ix = b["indices"].set_index("fecha")
+        r12 = {c: serie_cambio(ix.index, ix[c], "pct", "a").iloc[-1] for c in ("colcap", "equiponderado", "magnificas")}
+        nombres = ", ".join(b["magnificas"]["emisor"])
+        conc = "resp_conc_si" if r12["colcap"] - r12["equiponderado"] > 2 else (
+            "resp_conc_no" if r12["equiponderado"] - r12["colcap"] > 2 else "resp_conc_igual")
+        resp_emp = t("resp_empresas", L).format(
+            n=nombres, p=num(b["peso_magnificas"], 0, L), c=num(r12["colcap"], 1, L, True),
+            e=num(r12["equiponderado"], 1, L, True), m=num(r12["magnificas"], 1, L, True)) + " " + t(conc, L)
+        fbi, mbi = g.bolsa_indices(b)
+        fpe, mpe = g.pesos(b)
+        s_emp = seccion("empresas", "6", t("q_empresas", L), resp_emp,
+                        [bloque_grafico(t("g_indices", L), fig_html(fbi, mbi, "g-indices"), t("h_indices", L)),
+                         bloque_grafico(t("g_pesos", L).format(f=fecha(b["fecha_canasta"], "d", L)),
+                                        fig_html(fpe, mpe, "g-pesos"), t("h_pesos", L))],
+                        f'<h3 class="sub">{t("t_magnificas", L)}</h3>{tabla_magnificas(b, L)}'
+                        f'<p class="method">{t("m_empresas", L)}</p>', L, abierto=True)
+
     resp5 = []
     if s.get("cc"):
         resp5.append(t("resp_cc", L).format(v=num(abs(s["cc"]["valor"]), 1, L), f=fecha(s["cc"]["fecha"], "q", L)))
     if s.get("deuda"):
         resp5.append(t("resp_deuda", L).format(v=num(s["deuda"]["valor"], 1, L), f=fecha(s["deuda"]["fecha"], "y", L)))
-    s5 = seccion("externo", "6", t("q_externo", L), " ".join(resp5) or t("pendiente", L),
+    s5 = seccion("externo", "7", t("q_externo", L), " ".join(resp5) or t("pendiente", L),
                  [bloque_grafico(t("g_cc", L), fig_html(*g.barras("cuenta_corriente_pct_pib", "q"), "g-cc"), t("h_cc", L)),
                   bloque_grafico(t("g_deuda", L), fig_html(*g.barras("deuda_bruta_gnc_pct_pib", "y", C7, False), "g-deuda"),
                                  t("h_deuda", L))], "", L)
@@ -609,7 +794,7 @@ def pagina(d, s, lang, generado):
 </head><body>
 <header class="top"><div class="wrap top-in">
   <a class="brand" href="#inicio"><img src="{raiz}assets/logo_usb.png" alt="USB Cali"><span><b>ColombiaMacro</b><small>{t("sub_marca", L)}</small></span></a>
-  <nav class="menu"><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a></nav>
+  <nav class="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a></nav>
   <a class="lang" href="{otro}">{t("otro_idioma", L)}</a>
 </div></header>
 <main id="inicio" class="wrap">
@@ -620,12 +805,13 @@ def pagina(d, s, lang, generado):
   <div class="cards">{"".join(cards)}</div>
   <p class="disclaimer">{t("aviso_estados", L)}</p>
 </section>
+{explorador_ciclo(d, L)}
 <div class="horizon" role="group" aria-label="{t('horizonte', L)}"><span>{t("horizonte", L)}:</span>
   <button data-years="3">{t("h3", L)}</button><button data-years="5">{t("h5", L)}</button><button data-years="10" class="on">{t("h10", L)}</button><button data-years="0">{t("htodo", L)}</button></div>
-{s1}{s2}{s3}{s_curva}{s4}{s5}
-<section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">7</span><h2>{t("q_todos", L)}</h2></div>
+{s1}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
+<section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">8</span><h2>{t("q_todos", L)}</h2></div>
 <p class="answer">{t("resp_todos", L)}</p>{tabla}</section>
-<section id="fuentes" class="section"><div class="sec-head"><span class="sec-num">8</span><h2>{t("q_fuentes", L)}</h2></div>
+<section id="fuentes" class="section"><div class="sec-head"><span class="sec-num">9</span><h2>{t("q_fuentes", L)}</h2></div>
 <p class="answer">{t("resp_fuentes", L)}</p>{fuentes}
 <p class="downloads"><b>{t("descargar", L)}:</b> {descargas}</p>
 <p class="downloads"><b>{t("documentos", L)}:</b> <a href="{REPO_URL}/blob/main/docs/METODOLOGIA.md">{t("metodologia", L)}</a> · <a href="{REPO_URL}/raw/main/docs/Manual_ColombiaMacro.pdf">{t("manual", L)}</a> · <a href="{REPO_URL}">GitHub</a></p>

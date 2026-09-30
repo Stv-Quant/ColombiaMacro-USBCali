@@ -46,9 +46,11 @@ class TestSitio(unittest.TestCase):
         es = (self.out / "index.html").read_text(encoding="utf-8")
         en = (self.out / "en" / "index.html").read_text(encoding="utf-8")
         for html_ in (es, en):
-            for sid in ("crecimiento", "precios", "banco", "curva", "mercados", "externo", "indicadores", "fuentes"):
+            for sid in ("crecimiento", "precios", "banco", "curva", "mercados", "empresas", "externo", "indicadores", "fuentes"):
                 self.assertIn(f'id="{sid}"', html_)
             self.assertIn('id="curva-app"', html_)
+            self.assertIn('id="ciclo-app"', html_)
+            self.assertIn('id="ciclo-datos"', html_)
             self.assertIn('class="stats"', html_)
         self.assertIn('lang="es"', es)
         self.assertIn('lang="en"', en)
@@ -85,6 +87,38 @@ class TestSitio(unittest.TestCase):
             self.assertIn("data", fig)
             n += 1
         self.assertGreaterEqual(n, 8)
+
+
+class TestPanelesDeCambio(unittest.TestCase):
+    def test_graficos_principales_tienen_panel_de_cambio(self):
+        d = mt.cargar()
+        g = cs.Graficos(d, mt.instantanea(d), "es")
+        for nombre in ("crecimiento", "inflacion", "expectativas", "bolsa", "brecha", "anclaje"):
+            fig, _ = getattr(g, nombre)()
+            ejes = {getattr(tr, "yaxis", None) or "y" for tr in fig.data}
+            self.assertIn("y2", ejes, nombre)
+
+    def test_2020_no_queda_fuera_de_escala(self):
+        d = mt.cargar()
+        fig, meta = cs.Graficos(d, mt.instantanea(d), "es").crecimiento()
+        self.assertIsNone(fig.layout.yaxis.range)   # el navegador ajusta la escala a los datos visibles
+        self.assertNotIn("yfijo", meta)
+
+
+class TestRelojCiclo(unittest.TestCase):
+    def test_datos_del_reloj_coinciden_con_el_modelo(self):
+        d = mt.cargar()
+        r = cs.datos_ciclo(d, "es")
+        c = d.ciclo.dropna(subset=["brecha_hp_tiempo_real", "delta_brecha", "fase"])
+        self.assertEqual(len(r["trimestres"]), len(c))
+        ult = r["trimestres"][-1]
+        self.assertAlmostEqual(ult["x"], round(float(c["brecha_hp_tiempo_real"].iloc[-1]), 3))
+        self.assertEqual(ult["fase"], c["fase"].iloc[-1])
+        self.assertEqual(set(r["fases"]), {"expansion", "desaceleracion", "contraccion", "recuperacion"})
+        for p in r["trimestres"]:   # la fase es coherente con el cuadrante
+            esperada = ("expansion" if p["y"] >= 0 else "desaceleracion") if p["x"] >= 0 else (
+                "recuperacion" if p["y"] >= 0 else "contraccion")
+            self.assertEqual(p["fase"], esperada, p["q"])
 
 
 class TestTextos(unittest.TestCase):

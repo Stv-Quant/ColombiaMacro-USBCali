@@ -13,26 +13,43 @@
     return [lo, hi];
   }
 
-  function yRange(fig, x0, x1) {
+  // Rango vertical de un eje (y o y2) con los datos visibles entre x0 y x1.
+  function yRange(fig, x0, x1, eje) {
     var lo = Infinity, hi = -Infinity, bars = false;
     fig.data.forEach(function (tr) {
+      if ((tr.yaxis || 'y') !== eje) return;
       if (tr.type === 'bar') bars = true;
       var xs = tr.x || [], ys = tr.y || [];
       for (var i = 0; i < xs.length; i++) {
         var t = toDate(xs[i]), y = ys[i];
-        if (y === null || y === undefined || t < x0 || t > x1) continue;
+        if (y === null || y === undefined || isNaN(y) || t < x0 || t > x1) continue;
         if (y < lo) lo = y; if (y > hi) hi = y;
       }
     });
     (fig.layout.shapes || []).forEach(function (s) {
-      if (s.yref === 'y' || s.yref === undefined) {
+      if ((s.yref || 'y') === eje) {
         [s.y0, s.y1].forEach(function (v) { if (typeof v === 'number') { if (v < lo) lo = v; if (v > hi) hi = v; } });
       }
     });
-    if (bars) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
+    if (bars || eje === 'y2') { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
     if (!isFinite(lo)) return null;
     var pad = (hi - lo) * 0.08 || 1;
     return [lo - pad, hi + pad];
+  }
+
+  // Graficos base 100: cada serie se re-basa a 100 en el primer dato visible del horizonte.
+  function rebase(p, x0) {
+    var ys = p.orig.map(function (o) {
+      if (!o) return null;
+      var base = null;
+      for (var i = 0; i < o.x.length; i++) {
+        if (toDate(o.x[i]) >= x0 && o.y[i] !== null && !isNaN(o.y[i])) { base = o.y[i]; break; }
+      }
+      return base ? o.y.map(function (v) { return v === null ? null : 100 * v / base; }) : o.y;
+    });
+    var idx = [], upd = [];
+    ys.forEach(function (y, k) { if (p.orig[k]) { idx.push(k); upd.push(y); } });
+    if (idx.length) Plotly.restyle(p.el, { y: upd }, idx);
   }
 
   function applyHorizon(years) {
@@ -41,12 +58,13 @@
       var ext = p.ext, x1 = ext[1] + 25 * 864e5, x0;
       if (years === 0) { x0 = ext[0] - 25 * 864e5; }
       else { var d = new Date(ext[1]); d.setFullYear(d.getFullYear() - years); x0 = d.getTime(); }
+      if (p.orig) rebase(p, x0);
       var upd = { 'xaxis.range': [new Date(x0).toISOString().slice(0, 10), new Date(x1).toISOString().slice(0, 10)] };
-      if (!p.yfijo) { var yr = yRange(p.fig, x0, x1); if (yr) upd['yaxis.range'] = yr; }
+      var yr = yRange(p.fig, x0, x1, 'y'); if (yr) upd['yaxis.range'] = yr;
+      if (p.fig.layout.yaxis2) { var y2 = yRange(p.fig, x0, x1, 'y2'); if (y2) upd['yaxis2.range'] = y2; }
       Plotly.relayout(p.el, upd);
     });
   }
-
 
   // ---------------------------------------------------------------- curva TES
   var PALETA = ['#eb6834', '#1baf7a', '#eda100', '#4a3aa7', '#d6457a', '#0f8fa3', '#8a6d3b', '#6b6a66'];
@@ -215,6 +233,144 @@
     });
   }
 
+  // ---------------------------------------------------------------- reloj del ciclo
+  function relojCiclo() {
+    var app = document.getElementById('ciclo-app');
+    if (!app) return;
+    var D = JSON.parse(document.getElementById('ciclo-datos').textContent);
+    var X = JSON.parse(document.getElementById('ciclo-textos').textContent);
+    var lang = app.dataset.lang === 'en' ? 'en' : 'es';
+    var Q = D.trimestres, F = D.fases, n = Q.length, idx = n - 1, estela = 8;
+    var slider = document.getElementById('ciclo-slider');
+    var gR = document.getElementById('g-ciclo-reloj'), gH = document.getElementById('g-ciclo-hist');
+    slider.max = n - 1; slider.value = idx;
+    var FONT = { family: "Inter, 'Segoe UI', system-ui, sans-serif", size: 12.5, color: '#52514e' };
+    var CFG = { displayModeBar: false, responsive: true };
+    function fmt(v, dec, signo) {
+      var s = Math.abs(v).toFixed(dec); if (lang === 'es') s = s.replace('.', ',');
+      return (v < 0 ? '−' : (signo ? '+' : '')) + s;
+    }
+    function tinte(hex, a) {
+      var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+    }
+    function racha(i) { var k = 1; while (i - k >= 0 && Q[i - k].fase === Q[i].fase) k++; return k; }
+
+    function dibujarReloj() {
+      var ini = Math.max(0, idx - estela + 1), tr = Q.slice(ini, idx + 1);
+      var lx = 2, ly = 1.5;
+      tr.forEach(function (p) { lx = Math.max(lx, Math.abs(p.x) * 1.3); ly = Math.max(ly, Math.abs(p.y) * 1.3); });
+      var cuad = { expansion: [0, lx, 0, ly], desaceleracion: [0, lx, -ly, 0], contraccion: [-lx, 0, -ly, 0], recuperacion: [-lx, 0, 0, ly] };
+      var shapes = Object.keys(cuad).map(function (k) {
+        var c = cuad[k];
+        return { type: 'rect', xref: 'x', yref: 'y', x0: c[0], x1: c[1], y0: c[2], y1: c[3], line: { width: 0 },
+                 fillcolor: tinte(F[k].color, 0.07), layer: 'below' };
+      });
+      var anot = [];
+      var pos = { expansion: [1, 1], desaceleracion: [1, -1], contraccion: [-1, -1], recuperacion: [-1, 1] };
+      Object.keys(pos).forEach(function (k) {
+        var sx = pos[k][0], sy = pos[k][1];
+        anot.push({ x: sx * lx * 0.97, y: sy * ly * 0.95, xanchor: sx > 0 ? 'right' : 'left', yanchor: sy > 0 ? 'top' : 'bottom',
+                    showarrow: false, text: '<b>' + F[k].nombre + '</b>', font: { size: 13, color: F[k].color } });
+      });
+      for (var i = 1; i < tr.length; i++) {
+        anot.push({ x: tr[i].x, y: tr[i].y, ax: tr[i - 1].x, ay: tr[i - 1].y, axref: 'x', ayref: 'y', xref: 'x', yref: 'y',
+                    showarrow: true, arrowhead: 2, arrowsize: 1.1, arrowwidth: 1.4, standoff: 7, startstandoff: 5,
+                    arrowcolor: tinte('#52514e', 0.25 + 0.6 * i / tr.length), text: '' });
+      }
+      var ult = tr[tr.length - 1];
+      anot.push({ x: ult.x, y: ult.y, text: '<b>' + ult.q + '</b>', showarrow: false, yshift: 20, font: { size: 13, color: '#0b0b0b' } });
+      var hover = tr.map(function (p) {
+        return p.q + ' · ' + F[p.fase].nombre + '<br>' + X.ck_hover + ': ' + fmt(p.x, 1, true) + '%<br>' + X.vs_2t + ': ' + fmt(p.y, 1, true) + ' pp';
+      });
+      var datos = [{
+        x: tr.map(function (p) { return p.x; }), y: tr.map(function (p) { return p.y; }), mode: 'markers',
+        marker: { size: tr.map(function (p, i) { return i === tr.length - 1 ? 20 : 9; }),
+                  color: tr.map(function (p) { return F[p.fase].color; }),
+                  opacity: tr.map(function (p, i) { return 0.35 + 0.65 * (i + 1) / tr.length; }),
+                  line: { color: '#fff', width: 2 } },
+        text: hover, hovertemplate: '%{text}<extra></extra>', showlegend: false
+      }];
+      var lay = {
+        height: 420, margin: { l: 6, r: 10, t: 6, b: 6 }, paper_bgcolor: '#fff', plot_bgcolor: '#fff', font: FONT,
+        hovermode: 'closest', shapes: shapes, annotations: anot, showlegend: false,
+        hoverlabel: { bgcolor: '#fff', bordercolor: '#dcdad4', font: { size: 12.5, color: '#0b0b0b' } },
+        xaxis: { range: [-lx, lx], zeroline: true, zerolinecolor: '#b9b7b0', zerolinewidth: 1.2, showgrid: false, ticksuffix: '%',
+                 fixedrange: true, automargin: true, title: { text: X.ck_eje_x, font: { size: 12 } }, tickfont: { color: '#7a7974' } },
+        yaxis: { range: [-ly, ly], zeroline: true, zerolinecolor: '#b9b7b0', zerolinewidth: 1.2, showgrid: false, ticksuffix: ' pp',
+                 fixedrange: true, automargin: true, title: { text: X.ck_eje_y, font: { size: 12 } }, tickfont: { color: '#7a7974' } }
+      };
+      Plotly.react(gR, datos, lay, CFG);
+    }
+
+    function marcaHist() {
+      var ini = Math.max(0, idx - estela + 1);
+      var d0 = new Date(Q[ini].f), d1 = new Date(Q[idx].f);
+      d0.setMonth(d0.getMonth() - 2); d0.setDate(1); d1.setDate(d1.getDate() + 10);
+      return [{ type: 'rect', xref: 'x', yref: 'paper', x0: d0.toISOString().slice(0, 10), x1: d1.toISOString().slice(0, 10),
+                y0: 0, y1: 1, fillcolor: 'rgba(11,11,11,0.07)', line: { width: 0 }, layer: 'below' },
+              { type: 'line', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 0, y1: 0, line: { color: '#52514e', width: 1 } }];
+    }
+    function dibujarHist() {
+      var datos = [{
+        type: 'bar', x: Q.map(function (p) { return p.f; }), y: Q.map(function (p) { return p.x; }),
+        marker: { color: Q.map(function (p) { return F[p.fase].color; }), line: { width: 0 } }, showlegend: false,
+        customdata: Q.map(function (p) { return [p.q, F[p.fase].nombre, fmt(p.x, 1, true), fmt(p.y, 1, true)]; }),
+        hovertemplate: '<b>%{customdata[0]}</b> · %{customdata[1]}<br>' + X.ck_hover + ': %{customdata[2]}%<br>' + X.vs_2t + ': %{customdata[3]} pp<extra></extra>'
+      }, {
+        type: 'scatter', mode: 'lines', x: Q.map(function (p) { return p.f; }), y: Q.map(function (p) { return p.y; }),
+        line: { color: '#0b0b0b', width: 1.2, dash: 'dot' }, name: X.ck_dir, hoverinfo: 'skip'
+      }];
+      var lay = {
+        height: 380, margin: { l: 6, r: 10, t: 6, b: 6 }, paper_bgcolor: '#fff', plot_bgcolor: '#fff', font: FONT,
+        hovermode: 'closest', bargap: 0.15, shapes: marcaHist(), showlegend: true,
+        legend: { orientation: 'h', x: 0, y: 1, yanchor: 'bottom', font: { size: 12 } },
+        separators: lang === 'es' ? ',.' : '.,',
+        xaxis: { type: 'date', showgrid: false, showline: true, linecolor: '#dcdad4', fixedrange: true, automargin: true, tickfont: { color: '#7a7974' } },
+        yaxis: { ticksuffix: '%', gridcolor: '#eeede8', zeroline: false, fixedrange: true, automargin: true, tickfont: { color: '#7a7974' } }
+      };
+      Plotly.react(gH, datos, lay, CFG);
+    }
+    function stats() {
+      var p = Q[idx], f = F[p.fase];
+      function bloque(nombre, valor, detalle) {
+        return '<div class="stat"><span class="stat-n">' + nombre + '</span><span class="stat-v">' + valor + '</span><span class="stat-f">' + p.q +
+               '</span><span class="stat-c">' + (detalle || '') + '</span></div>';
+      }
+      var nivel = (p.x >= 0 ? X.ck_encima : X.ck_debajo).replace('{v}', fmt(Math.abs(p.x), 1));
+      var dir = (p.y >= 0 ? X.ck_mejora : X.ck_empeora).replace('{v}', fmt(Math.abs(p.y), 1));
+      document.getElementById('ciclo-stats').innerHTML =
+        '<div class="stat"><span class="stat-n">' + X.ck_fase + '</span><span class="stat-v"><span class="phase-pill" style="background:' +
+        tinte(f.color, 0.12) + ';color:' + f.color + '">' + f.nombre + '</span></span><span class="stat-f">' + p.q + '</span><span class="stat-c">' + f.desc + '</span></div>' +
+        bloque(X.ck_brecha, fmt(p.x, 1, true) + '%', nivel) +
+        bloque(X.ck_dir, '<span class="chg ' + (p.y >= 0 ? 'up' : 'down') + '">' + (p.y >= 0 ? '▲ ' : '▼ ') + fmt(p.y, 1, true) + ' pp</span>', dir) +
+        bloque(X.ck_racha, String(racha(idx)), racha(idx) === 1 ? X.ck_trim1 : X.ck_trim);
+      document.getElementById('ciclo-q').textContent = p.q;
+    }
+    function ir(i) {
+      idx = Math.max(0, Math.min(n - 1, i)); slider.value = idx;
+      dibujarReloj(); stats(); Plotly.relayout(gH, { shapes: marcaHist() });
+    }
+    slider.addEventListener('input', function () { ir(parseInt(slider.value, 10)); });
+    document.getElementById('ciclo-hoy').addEventListener('click', function () { ir(n - 1); });
+    app.querySelectorAll('.seg button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        estela = parseInt(b.dataset.n, 10);
+        app.querySelectorAll('.seg button').forEach(function (o) { o.classList.toggle('on', o === b); });
+        ir(idx);
+      });
+    });
+    dibujarHist(); ir(idx);
+    function porFecha(ev) {
+      if (!ev.points || !ev.points.length) return null;
+      var f = String(ev.points[0].x).slice(0, 10);
+      for (var i = 0; i < n; i++) if (Q[i].f === f) return i;
+      return null;
+    }
+    gH.on('plotly_click', function (ev) { var i = porFecha(ev); if (i !== null) ir(i); });
+    gH.on('plotly_hover', function (ev) { var i = porFecha(ev); if (i !== null && i !== idx) ir(i); });
+  }
+
   function init() {
     document.querySelectorAll('script[data-for]').forEach(function (s) {
       var el = document.getElementById(s.getAttribute('data-for'));
@@ -224,7 +380,14 @@
       var notime = el.dataset.notime === '1';
       // el.data contiene los arreglos ya decodificados por Plotly (incluye datos binarios).
       var live = { data: el.data, layout: el.layout };
-      plots.push({ el: el, fig: live, ext: notime ? null : extentX(live), notime: notime, yfijo: el.dataset.yfijo === '1' });
+      var p = { el: el, fig: live, ext: notime ? null : extentX(live), notime: notime };
+      if (el.dataset.rebase === '1') {
+        // copia de los niveles originales de las series del panel principal
+        p.orig = live.data.map(function (tr) {
+          return (tr.yaxis || 'y') === 'y' ? { x: Array.prototype.slice.call(tr.x), y: Array.prototype.slice.call(tr.y) } : null;
+        });
+      }
+      plots.push(p);
     });
     var saved = 10;
     try { saved = parseInt(localStorage.getItem('cm-horizonte') || '10', 10); } catch (e) {}
@@ -237,6 +400,7 @@
     buttons.forEach(function (b) { b.addEventListener('click', function () { select(parseInt(b.dataset.years, 10)); }); });
     select(isNaN(saved) ? 10 : saved);
     curvaTES();
+    relojCiclo();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

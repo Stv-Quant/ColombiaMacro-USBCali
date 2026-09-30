@@ -1,7 +1,8 @@
 # ColombiaMacro · ¿Cómo va la economía colombiana?
 
-Tablero abierto (español / inglés) sobre el ciclo económico colombiano, construido solo con
-datos oficiales del **DANE** y el **Banco de la República**. Se actualiza solo todos los días
+Tablero abierto (español / inglés) sobre el ciclo económico colombiano, construido con
+datos oficiales del **DANE** y el **Banco de la República** (y, para las acciones, la canasta
+del fondo iShares COLCAP y precios de Yahoo Finance). Se actualiza solo todos los días
 y se publica como sitio web estático en GitHub Pages.
 
 Proyecto académico · Universidad de San Buenaventura Cali.
@@ -10,17 +11,21 @@ Proyecto académico · Universidad de San Buenaventura Cali.
 
 | # | Pregunta | Gráficos principales |
 |---|----------|----------------------|
+| ◷ | ¿En qué parte del ciclo está la economía? | **Reloj del ciclo interactivo** (fase, nivel y dirección; recorrido por trimestre desde 2014) |
 | 1 | ¿Está creciendo la economía? | PIB trimestral e ISE mensual, desempleo |
 | 2 | ¿Qué pasa con los precios? | Inflación vs. meta 2–4 %, inflación esperada |
 | 3 | ¿Qué hace el Banco de la República? | Tasa de política vs. inflación |
 | 4 | ¿Cuánto cobra el mercado por prestarle al Gobierno? | **Curva cero cupón TES** interactiva (cualquier día desde 2003, comparación por años) |
 | 5 | ¿Cómo están el dólar y la bolsa? | TRM, COLCAP |
-| 6 | ¿Cómo están las cuentas externas y fiscales? | Cuenta corriente, deuda del Gobierno |
-| 7 | Todos los indicadores | Último dato, cambio y nivel frente a su historia |
-| 8 | Fuentes | Estado de cada fuente, descargas CSV, metodología |
+| 6 | ¿Qué empresas mueven la bolsa? | COLCAP vs. equiponderado vs. **7 Magníficas** (base 100), pesos de la canasta, tabla de las 7 |
+| 7 | ¿Cómo están las cuentas externas y fiscales? | Cuenta corriente, deuda del Gobierno |
+| 8 | Todos los indicadores | Último dato, cambio y nivel frente a su historia |
+| 9 | Fuentes | Estado de cada fuente, descargas CSV, metodología |
 
 Cada gráfico muestra arriba el **último dato y su cambio** (frente a hace un año, al trimestre
-o al mes anterior) y el recuadro flotante indica el cambio de cada punto. Los métodos técnicos
+o al mes anterior), abajo un **panel de barras con ese cambio a lo largo del tiempo**, y el
+recuadro flotante indica el cambio de cada punto. Las escalas se ajustan al periodo visible
+(2020 incluido). Los métodos técnicos
 (brecha del producto HP/Hamilton, reloj del ciclo, tasa real, 5y5y) están en los paneles
 "Detalle técnico", siempre explicados.
 

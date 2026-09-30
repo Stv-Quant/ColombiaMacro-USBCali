@@ -10,8 +10,8 @@ dato se conocio. Cada archivo mantiene su frecuencia propia.
 | `inflacion_clean.csv` | Un mes, fechado al primer dia | [DANE, IPC](https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc/ipc-informacion-tecnica) y BanRep, serie 15000 | Inflacion |
 | `tasas_interes_clean.csv` | Dia de observacion | BanRep, series 15272 a 15277 | Curva cero cupon TES |
 | `colcap_oficial.csv` | Dia de mercado | [BanRep/BVC, indice COLCAP](https://suameca.banrep.gov.co/estadisticas-economicas/informacionSerie/2500/indice_mercado_accionario_colcap), serie 6 | Mercado accionario oficial |
-| `indices_experimentales_mensuales.csv` | Mes, fechado al primer dia | Precios locales y canasta historica local | Auditoria y cobertura de las canastas propias |
-| `indices_colombia.csv` | Dia sintetico historico | Construccion heredada con precios mensuales y empalme NAV | Lineas comparativas punteadas, no datos oficiales diarios |
+| `colcap_canasta.csv` | Una accion de la canasta vigente | [iShares MSCI COLCAP (BlackRock)](https://www.blackrock.com/co/productos/251708/ishares-colcap-fund), composicion diaria | Pesos del COLCAP y 7 Magnificas |
+| `acciones_semanal.csv` | Accion × semana (largo), fechada al viernes | Yahoo Finance, simbolos `<TICKER>.CL` | Equiponderado y 7 Magnificas |
 | `series_banrep.csv` | Serie × fecha (largo) | BanRep, ids en `colombiamacro/fuentes/complementarias.py` | Politica, TRM, inflacion basica, externo, fiscal |
 | `ise_mensual.csv` | Un mes | DANE, anexo ISE 9 actividades | Actividad mensual |
 | `mercado_laboral.csv` | Un mes | DANE, anexo GEIH desestacionalizado | Mercado laboral |
@@ -81,47 +81,31 @@ la historia completa para captar correcciones de la fuente.
 La transicion y la continuidad de niveles estan documentadas en la
 [metodologia MSCI COLCAP de mayo de 2021](https://www.msci.com/eqb/methodology/meth_docs/MSCI_COLCAP_Index_Methodology_May2021.pdf).
 
-La tabla heredada `indices_colombia.csv` empalma `icolcap_referencia.csv` con
-retornos de BlackRock. La antigua `datos_colombia_clean.csv` salta de escala
-el 2011-07-06. Ninguna se usa para la linea o tarjeta oficial.
-La linea empalmada (`icolcap_base100`) se retiro del grafico el 2026-09-25:
-la auditoria encontro indicios de que `icolcap_referencia.csv` esta en otra
-moneda (probable ETF cotizado en dolares) mezclado con retornos en pesos.
-La columna se conserva en el CSV solo como insumo historico.
+## Acciones del COLCAP
 
-## Canastas experimentales
+`colcap_canasta.csv`
 
-`retorno_equiponderado_pct` y `retorno_lideres_pct` son promedios simples
-de retornos mensuales de tickers de la canasta con precios en ambos meses.
-`canasta_tickers`, `pares_precio_validos`, `cobertura_canasta` y las
-columnas equivalentes de lideres muestran el denominador real. El retorno
-queda vacio si la cobertura es menor de 70%, hay menos de cinco pares
-(o menos tickers disponibles), o se detecta un retorno individual absoluto
-superior a 80%. Los valores atipicos se cuentan y el mes se marca
-`sin_cobertura_o_atipicos`; nunca se reemplazan por cero ni se interpolan
-a frecuencia diaria.
+| Columna | Descripcion |
+| --- | --- |
+| `ticker` | Nemotecnico BVC |
+| `nombre` | Nombre en la canasta del fondo |
+| `emisor` | Empresa sin la clase de accion (agrupa ordinaria y preferencial) |
+| `sector` | Sector segun iShares |
+| `peso` | Peso en el fondo, % (efectivo excluido) |
+| `precio` | Precio de valoracion del fondo, COP |
+| `fecha_canasta` | Fecha de la composicion |
 
-Esta tabla es **experimental**: faltan precios ajustados por dividendos,
-splits y demas eventos corporativos, hay alias historicos y la composicion
-posterior a 2021 utiliza una canasta local actual. No permite afirmar que
-replica el COLCAP ni comparar rentabilidad total con el indice de precios.
-El archivo de precios legado conserva filas futuras vacias que el constructor
-excluye por fecha y cobertura.
+`acciones_semanal.csv`
 
-El grafico conserva las dos curvas sinteticas originales. La azul representa
-un indice de retornos mensuales equiponderados entre los componentes con
-precio disponible en ambos meses; no es el indicador clasico de numero de
-acciones al alza menos numero de acciones a la baja. La amarilla, llamada
-"7 Magnificas", usa la interseccion de una lista fija de siete tickers con
-la canasta y los precios disponibles: el numero efectivo puede ser menor.
-`indices_colombia.csv` distribuyo esos retornos mensuales a fechas diarias
-siguiendo la forma del indice empalmado (o linealmente en saltos), por lo
-que sus puntos intramensuales son una visualizacion sintetica. Esa tabla
-heredada no se sobreescribe en el actualizador diario; la tabla mensual
-experimental muestra la cobertura que debe revisarse antes de atribuir
-significado a un tramo.
-La canasta de "7 Magnificas" es una hipotesis de liderazgo bursatil elegida
-en el proyecto, no una medida de contribucion empresarial al PIB del DANE.
+| Columna | Descripcion |
+| --- | --- |
+| `fecha` | Viernes de la semana (la semana en curso se fecha con el dia de descarga) |
+| `ticker` | Nemotecnico BVC |
+| `simbolo` | Simbolo(s) de Yahoo usados; `+` indica empalme con un ticker anterior |
+| `cierre` | Cierre semanal en COP, sin ajuste por dividendos |
+
+Las canastas heredadas (ICOLCAP, sintetico, "grandes") se retiraron en la v10; la seccion
+"¿Qué empresas mueven la bolsa?" las reemplaza con fuentes que se actualizan solas.
 
 ## Interpretacion temporal
 

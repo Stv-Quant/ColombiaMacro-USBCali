@@ -68,6 +68,8 @@ class Datos:
     ise: pd.DataFrame | None
     laboral: pd.DataFrame | None
     extra: dict = field(default_factory=dict)
+    canasta: pd.DataFrame | None = None
+    acciones: pd.DataFrame | None = None
 
 
 def cargar() -> Datos:
@@ -100,7 +102,96 @@ def cargar() -> Datos:
                  ciclo=am.tabla_ciclo(pib), inflacion=inflacion,
                  tasas=am.depurar_derivadas(am.tabla_tasas(tes, tpm, ipc))[0],
                  mercado=am.tabla_mercado(colcap, trm, ipc),
-                 ise=ise, laboral=laboral, extra=extra)
+                 ise=ise, laboral=laboral, extra=extra,
+                 canasta=_read("colcap_canasta.csv"),
+                 acciones=_read("acciones_semanal.csv", parse_dates=["fecha"]))
+
+
+# ---------------------------------------------------------------- bolsa por dentro
+N_MAGNIFICAS = 7
+NOMBRES_CORTOS = {
+    "GRUPO CIBEST": "Grupo Cibest", "GRUPO DE INVERSIONES SURAMERICANA": "Grupo Sura", "ECOPETROL": "Ecopetrol",
+    "INTERCONEXION ELECTRICA": "ISA", "INVERSIONES ARGOS": "Grupo Argos", "GRUPO ENERGIA BOGOTA": "Grupo Energía Bogotá",
+    "CEMENTOS ARGOS": "Cementos Argos", "DAVIVIENDA GROUP": "Davivienda", "GRUPO AVAL ACCIONES Y VALORES": "Grupo Aval",
+    "CELSIA": "Celsia", "PATRIMONIO ESTRATEGIAS INMOBIL REI": "PEI", "MINEROS": "Mineros",
+    "CORPORACION FINANCIERA COLOMBIANA": "Corficolombiana", "GRUPO BOLIVAR": "Grupo Bolívar",
+    "BANCO DE BOGOTA": "Banco de Bogotá", "ORGANIZACION TERPEL": "Terpel", "ALMACENES EXITO": "Grupo Éxito",
+    "PROMIGAS": "Promigas", "CANACOL ENERGY LTD": "Canacol", "GRUPO NUTRESA": "Grupo Nutresa",
+}
+
+
+def nombre_corto(emisor: str) -> str:
+    return NOMBRES_CORTOS.get(str(emisor), str(emisor).title())
+SALTO_MAX = 0.6  # retorno semanal por encima de +/-60% = error de precio de la fuente
+
+
+def magnificas(canasta: pd.DataFrame, n: int = N_MAGNIFICAS) -> pd.DataFrame:
+    """Las n empresas (emisores) de mayor peso en el COLCAP. Si una empresa tiene acciones
+    ordinarias y preferenciales se suman sus pesos y se usa la clase de mayor peso."""
+    c = canasta.sort_values("peso", ascending=False)
+    g = (c.groupby("emisor", sort=False)
+          .agg(peso=("peso", "sum"), ticker=("ticker", "first"), nombre=("nombre", "first"),
+               sector=("sector", "first"), clases=("ticker", lambda x: " + ".join(x)))
+          .sort_values("peso", ascending=False).head(n).reset_index())
+    return g
+
+
+def retornos_semanales(acciones: pd.DataFrame) -> pd.DataFrame:
+    precios = acciones.pivot_table(index="fecha", columns="ticker", values="cierre").sort_index()
+    r = precios.pct_change(fill_method=None)
+    return r.where(r.abs() <= SALTO_MAX)
+
+
+def indice_equiponderado(r: pd.DataFrame, tickers=None) -> pd.Series:
+    """Indice base 100: cada semana todas las acciones disponibles pesan igual (rebalanceo semanal)."""
+    sub = r if tickers is None else r[[t for t in tickers if t in r]]
+    prom = sub.mean(axis=1, skipna=True)
+    prom.iloc[0] = 0.0
+    return 100 * (1 + prom.fillna(0)).cumprod()
+
+
+def bolsa_por_dentro(d: "Datos") -> dict | None:
+    """COLCAP oficial (ponderado por capitalizacion) frente a un equiponderado de su canasta
+    y frente a las 7 Magnificas, en frecuencia semanal y base 100."""
+    if d.canasta is None or d.acciones is None or d.canasta.empty or d.acciones.empty:
+        return None
+    canasta = d.canasta
+    top = magnificas(canasta)
+    acc = d.acciones[d.acciones["ticker"].isin(canasta["ticker"])].copy()
+    acc["fecha"] = acc["fecha"].dt.to_period("W-FRI").dt.end_time.dt.normalize()
+    acc = acc.drop_duplicates(["ticker", "fecha"], keep="last")
+    r = retornos_semanales(acc)
+    eq = indice_equiponderado(r)
+    m7 = indice_equiponderado(r, top["ticker"])
+    col = d.colcap.dropna(subset=["colcap_puntos"]).set_index("fecha")["colcap_puntos"]
+    col = col.resample("W-FRI").last()
+    tabla = pd.DataFrame({"colcap": col, "equiponderado": eq, "magnificas": m7}).dropna(how="all")
+    tabla = tabla[tabla.index >= max(eq.index.min(), col.index.min())]
+    # La semana en curso se fecha con el ultimo dato observado, no con el viernes futuro.
+    ultimo = max(d.acciones["fecha"].max(), d.colcap["fecha"].max())
+    tabla = tabla.ffill()
+    tabla.index = tabla.index.where(tabla.index <= ultimo, ultimo)
+    base = tabla.iloc[0]
+    tabla = 100 * tabla / base
+    precios = d.acciones.pivot_table(index="fecha", columns="ticker", values="cierre").sort_index()
+    filas = []
+    for _, e in top.iterrows():
+        p = precios[e["ticker"]].dropna()
+        if p.empty:
+            continue
+        f = p.index[-1]
+
+        def var(dias):
+            prev = p[p.index <= f - pd.Timedelta(days=dias)]
+            return None if prev.empty else 100 * (p.iloc[-1] / prev.iloc[-1] - 1)
+        ini_ano = p[p.index < pd.Timestamp(f.year, 1, 1)]
+        filas.append({"emisor": nombre_corto(e["emisor"]), "ticker": e["ticker"], "clases": e["clases"], "sector": e["sector"],
+                      "peso": e["peso"], "precio": float(p.iloc[-1]), "fecha": f,
+                      "var_1m": var(28), "var_12m": var(364),
+                      "var_ano": None if ini_ano.empty else 100 * (p.iloc[-1] / ini_ano.iloc[-1] - 1)})
+    return {"indices": tabla.reset_index(names="fecha"), "magnificas": pd.DataFrame(filas),
+            "canasta": canasta, "fecha_canasta": canasta["fecha_canasta"].iloc[0],
+            "peso_magnificas": float(top["peso"].sum())}
 
 
 # ---------------------------------------------------------------- instantanea

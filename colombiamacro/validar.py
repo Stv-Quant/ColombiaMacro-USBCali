@@ -94,6 +94,37 @@ def validate_extras():
     return errors, warnings, states
 
 
+def validate_acciones():
+    """Canasta del COLCAP (iShares) y precios semanales de sus acciones (Yahoo Finance)."""
+    errors, warnings, states = [], [], []
+    for label, filename, freq, col, stale in (
+        ("Canasta COLCAP (iShares)", "colcap_canasta.csv", "diaria", "fecha_canasta", 10),
+        ("Acciones del COLCAP (Yahoo Finance)", "acciones_semanal.csv", "semanal", "fecha", 10),
+    ):
+        path = BASE / filename
+        if not path.exists():
+            warnings.append(f"{filename}: pendiente de primera descarga")
+            states.append({"fuente": label, "archivo": filename, "frecuencia": freq, "ultima_observacion": "",
+                           "ultima_publicacion_o_corte": "", "estado": "pendiente"})
+            continue
+        df = pd.read_csv(path, parse_dates=[col])
+        if filename == "colcap_canasta.csv":
+            if df["ticker"].duplicated().any() or not 80 <= df["peso"].sum() <= 101:
+                errors.append("Canasta COLCAP: tickers duplicados o pesos que no suman ~100%")
+        else:
+            if df.duplicated(["ticker", "fecha"]).any() or (df["cierre"] <= 0).any():
+                errors.append("Acciones: pares ticker/fecha duplicados o precios no positivos")
+            if (df["fecha"] > TODAY).any():
+                errors.append("Acciones: observaciones futuras")
+        latest = df[col].max()
+        age = (TODAY - latest).days
+        states.append({"fuente": label, "archivo": filename, "frecuencia": freq,
+                       "ultima_observacion": latest.strftime("%Y-%m-%d"),
+                       "ultima_publicacion_o_corte": latest.strftime("%Y-%m-%d"),
+                       "estado": "rezagado" if age > stale else "vigente"})
+    return errors, warnings, states
+
+
 def isolated_tes_spikes(series):
     previous = series.shift(1)
     following = series.shift(-1)
@@ -196,7 +227,8 @@ def validate():
 def main():
     errors, warnings, states, alerts = validate()
     e2, w2, s2 = validate_extras()
-    errors, warnings, states = errors + e2, warnings + w2, states + s2
+    e3, w3, s3 = validate_acciones()
+    errors, warnings, states = errors + e2 + e3, warnings + w2 + w3, states + s2 + s3
     for item in warnings:
         print("AVISO:", item)
     for item in errors:

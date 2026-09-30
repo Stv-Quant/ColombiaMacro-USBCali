@@ -72,7 +72,7 @@ Una lectura: fase del ciclo, presión de precios, postura monetaria y lo que des
   arr/.style={-{Stealth[length=2.2mm]},color=cmmuted,thick}]
 \node[box,fill=cmsoft] (a) {DANE · BanRep\\20+ series oficiales};
 \node[box,right=4mm of a] (b) {Descarga diaria\\verificada};
-\node[box,right=4mm of b] (c) {Validación\\+ 43 pruebas};
+\node[box,right=4mm of b] (c) {Validación\\+ 47 pruebas};
 \node[box,right=4mm of c] (d) {Analítica\\explícita};
 \node[box,right=4mm of d,fill=cmsoft] (e) {Lectura\\ES / EN};
 \draw[arr] (a)--(b); \draw[arr] (b)--(c); \draw[arr] (c)--(d); \draw[arr] (d)--(e);
@@ -119,6 +119,7 @@ PIB real +3,5\% · potencial 2,4\%
 \item Eje horizontal: \textbf{nivel} de la brecha
 \item Eje vertical: \textbf{dirección} (cambio en 2 trimestres)
 \item Tras dos años en contracción/recuperación, T2 2026 cruza a \textcolor{cmgreen}{\textbf{expansión}}
+\item En el sitio es \alert{interactivo}: barra de trimestres (T4 2014–T2 2026) y recorrido; en 2020 se hunde a $-20\%$ y rebota
 \end{itemize}
 \end{columns}
 \fuente{Metodología del \emph{business cycle clock} de la OCDE aplicada a la brecha HP en tiempo real.}
@@ -189,6 +190,22 @@ Cuenta corriente −3,5\% del PIB
 \fuente{BanRep (BVC/MSCI COLCAP; TRM). Índice de precios: no incluye dividendos.}
 \end{frame}
 
+\begin{frame}{La bolsa por dentro: 7 Magníficas}
+\begin{columns}[c]
+\column{0.4\textwidth}\centering
+\includegraphics[height=0.66\textheight,trim=0 1670 1165 537,clip]{sec_empresas.png}
+\column{0.58\textwidth}
+\small
+\begin{itemize}
+\item \textbf{Concentración}: 7 empresas suman \alert{$\approx$85\%} del COLCAP; Grupo Cibest solo, 37,8\%
+\item 12 meses: COLCAP \textbf{+38,1\%} · 7 Magníficas \textbf{+35,2\%} · equiponderado \textbf{+28,8\%}
+\item El COLCAP supera al equiponderado por más de 2 pts: \alert{ganancias concentradas} en las grandes
+\item Método: pesos iShares MSCI COLCAP; cierres semanales Yahoo Finance; pesos iguales, rebalanceo semanal
+\end{itemize}
+\end{columns}
+\fuente{Datos semanales al 30-sep-2026; pesos al 29-sep-2026. Canasta actual hacia atrás: sesgo de supervivencia.}
+\end{frame}
+
 % ---------------------------------------------------------------- 13
 \begin{frame}{La lectura integrada}
 \begin{center}
@@ -249,7 +266,7 @@ $\Rightarrow$ Por eso el tablero muestra la \alert{banda} entre métodos y cuán
 \item La tasa neutral es una estimación externa
 \item Las implícitas contienen primas de riesgo y liquidez
 \item COLCAP es índice de precios (sin dividendos)
-\item Las canastas bursátiles heredadas se retiraron del proyecto
+\item Bolsa por dentro: canasta actual hacia atrás (sesgo de supervivencia); pesos del fondo iShares $\approx$ oficiales
 \end{itemize}
 \end{frame}
 
@@ -257,7 +274,7 @@ $\Rightarrow$ Por eso el tablero muestra la \alert{banda} entre métodos y cuán
 \centering
 {\Large El sitio en vivo}\\[1em]
 {\color{cmblue}\large stv-quant.github.io/ColombiaMacro-USBCali}\\[1.2em]
-\small Resumen $\rightarrow$ crecimiento y brecha $\rightarrow$ precios $\rightarrow$ \alert{curva TES: 2021 frente a 2022} $\rightarrow$ todos los indicadores
+\small Reloj del ciclo (hoy y T4 2020) $\rightarrow$ resumen $\rightarrow$ crecimiento $\rightarrow$ precios $\rightarrow$ \alert{curva TES: 2021 frente a 2022} $\rightarrow$ 7 Magníficas $\rightarrow$ todos los indicadores
 \end{frame}
 
 \begin{frame}{Próximos pasos}
@@ -336,6 +353,7 @@ Actividad & PIB real ref. 2015 (Cuadros 1 y 4), ISE, GEIH desestacionalizada & D
 Precios & IPC; básica 15388/15390/15392; regulados 15398; alimentos 15404; meta 853 & DANE, BanRep\\
 Tasas & TES cero cupón pesos y UVR 15272–15277; TPM 59; IBR 15324 & BanRep\\
 Mercados & COLCAP 6; TRM 1; ITCR 235 & BanRep (BVC/MSCI, SFC)\\
+Bolsa por dentro & Canasta y pesos del COLCAP; cierres semanales \texttt{<TICKER>.CL} & iShares, Yahoo Finance\\
 Externo y fiscal & Cuenta corriente 15290; IED 15133; reservas 15051; deuda GNC 15328 & BanRep, MinHacienda\\
 \bottomrule
 \end{tabularx}
@@ -359,7 +377,7 @@ Externo y fiscal & Cuenta corriente 15290; IED 15133; reservas 15051; deuda GNC 
 \item Rangos, fechas, frecuencias
 \item Fórmulas recalculadas cada día
 \item Saltos aislados excluidos y registrados
-\item 43 pruebas automáticas
+\item 47 pruebas automáticas
 \end{itemize}
 \end{columns}
 \end{frame}

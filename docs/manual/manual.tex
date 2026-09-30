@@ -38,7 +38,7 @@
 \includegraphics[width=\linewidth]{hero_es.png}
 \vfill
 \begin{tabularx}{\linewidth}{@{}Xr@{}}
-{\sffamily\small Versión 10.0 · septiembre de 2026} & {\sffamily\small github.com/Stv-Quant/ColombiaMacro-USBCali}\\
+{\sffamily\small Versión 11.0 · septiembre de 2026} & {\sffamily\small github.com/Stv-Quant/ColombiaMacro-USBCali}\\
 \end{tabularx}
 \end{titlepage}
 
@@ -67,14 +67,16 @@ desplegable \emph{Detalle técnico (para economistas)}.
 \toprule
 \textbf{Sección} & \textbf{Pregunta} & \textbf{Indicador principal (y detalle técnico)}\\
 \midrule
-1. Crecimiento & ¿Está creciendo la economía? & PIB e ISE frente al ritmo habitual; desempleo (brecha del producto, reloj del ciclo)\\
+{\fontspec{DejaVu Sans}◷} Ciclo (sin número) & ¿En qué parte del ciclo está la economía? & Reloj del ciclo interactivo: fase, nivel y dirección de la brecha, trimestre a trimestre\\
+1. Crecimiento & ¿Está creciendo la economía? & PIB e ISE frente al ritmo habitual; desempleo (brecha del producto)\\
 2. Precios & ¿Cómo están los precios? & Inflación total y de fondo frente a la meta; inflación esperada (5y5y)\\
 3. Banco de la República & ¿Qué está haciendo el Banco? & Tasa de política frente a inflación (tasa real frente a la neutral)\\
 4. Curva TES & ¿Cuánto cobra el mercado por prestarle al Gobierno? & Curva cero cupón TES pesos y UVR, explorable desde 2003\\
 5. Dólar y bolsa & ¿Cómo están el dólar y la bolsa? & TRM y COLCAP (ITCR)\\
-6. Externo y fiscal & Cuentas externas y fiscales & Cuenta corriente y deuda del Gobierno\\
-7. Indicadores & Todos los indicadores & Último dato, cambio y nivel frente a su historia desde 2010\\
-8. Fuentes & ¿De dónde salen los datos? & Estado de cada fuente, descargas CSV y glosario\\
+6. Empresas & ¿Qué empresas mueven la bolsa? & COLCAP frente a un equiponderado y a las 7 Magníficas; peso de cada acción\\
+7. Externo y fiscal & Cuentas externas y fiscales & Cuenta corriente y deuda del Gobierno\\
+8. Indicadores & Todos los indicadores & Último dato, cambio y nivel frente a su historia desde 2010\\
+9. Fuentes & ¿De dónde salen los datos? & Estado de cada fuente, descargas CSV y glosario\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -91,8 +93,9 @@ con un solo comando.
 
 \subsection{Principios de diseño}
 \begin{enumerate}
-\item \textbf{Solo datos oficiales}: DANE, Banco de la República (BanRep), BVC/MSCI a través de BanRep y
-Ministerio de Hacienda a través de BanRep. Nada se digita a mano.
+\item \textbf{Datos de fuente primaria}: DANE, Banco de la República (BanRep), BVC/MSCI a través de BanRep y
+Ministerio de Hacienda a través de BanRep; para la bolsa por dentro, la canasta publicada por el fondo iShares
+MSCI COLCAP (BlackRock) y los precios de cierre de Yahoo Finance. Nada se digita a mano.
 \item \textbf{Identidad verificada}: cada serie se valida por número \emph{y} por nombre; si la fuente
 reasigna un número, el proceso falla en lugar de publicar otra variable.
 \item \textbf{Un eje, una unidad}: ningún gráfico tiene dos escalas verticales.
@@ -124,14 +127,20 @@ la República. Debajo, seis tarjetas —Crecimiento, Inflación, Tasa del Banco,
 la cifra, su fecha de referencia, el dato de hace un año y una \emph{etiqueta de estado} de color (por
 ejemplo \emph{Por encima de lo habitual}, \emph{Alta}, \emph{Mejorando}, \emph{Peso más fuerte}).
 
+\textbf{El reloj del ciclo} (menú \emph{Ciclo}, ancla \texttt{\#ciclo}). Justo después del resumen y antes de la
+barra de horizonte y de la sección~1, un bloque interactivo sin número responde \emph{¿En qué parte del ciclo
+está la economía?}: la fase actual, cuánto produce la economía frente a su capacidad y hacia dónde se mueve
+(sección~\ref{sec:reloj}).
+
 \begin{figure}[htbp]\centering
 \includegraphics[width=\linewidth]{hero_es.png}
 \caption{Resumen y seis tarjetas principales (vista en español).}\label{fig:hero}
 \end{figure}
 
-\textbf{3. Ocho secciones}, cada una con un número, una pregunta, un párrafo de respuesta generado a partir
-de los datos, los gráficos (cada uno con su \emph{franja de cambios}, sección~\ref{sec:franja}) y un panel
-desplegable \emph{Detalle técnico (para economistas)} con la brecha del producto, el reloj del ciclo, la tasa
+\textbf{3. Nueve secciones}, cada una con un número, una pregunta, un párrafo de respuesta generado a partir
+de los datos, los gráficos (cada uno con su \emph{franja de cambios} encima y su \emph{panel de cambios} debajo,
+secciones~\ref{sec:franja} y~\ref{sec:delta}) y un panel
+desplegable \emph{Detalle técnico (para economistas)} con la brecha del producto por tres métodos, la tasa
 real, el anclaje 5y5y y la tasa de cambio real.
 
 \textbf{4. Todos los indicadores}: una tabla con el último dato, su fecha, el cambio y el nivel frente a su
@@ -156,13 +165,14 @@ la bolsa son diarias. El tablero nunca rellena una frecuencia con otra.
   arr/.style={-{Stealth[length=2mm]},color=cmmuted,thick}]
 \node[src] (dane) at (0,0.9) {DANE\\PIB · IPC · ISE · GEIH};
 \node[src] (banrep) at (0,-0.9) {BanRep\\TES · COLCAP · TPM · TRM\\básica · sector externo};
+\node[src] (acc) at (0,-2.7) {iShares · Yahoo Finance\\canasta y acciones\\del COLCAP};
 \node[box] (upd) at (3.9,0) {Descarga\\\texttt{colombiamacro/}\\\texttt{fuentes/}};
 \node[box] (csv) at (7.8,0) {Tablas CSV en \texttt{data/}\\versionadas en Git};
-\node[box] (val) at (7.8,-1.9) {\texttt{python -m}\\\texttt{colombiamacro.validar}\\+ 32 pruebas};
+\node[box] (val) at (7.8,-1.9) {\texttt{python -m}\\\texttt{colombiamacro.validar}\\+ 47 pruebas};
 \node[box] (app) at (11.7,0) {\texttt{analitica} · \texttt{modelo}\\\texttt{sitio/construir}\\$\rightarrow$ \texttt{site/}};
 \node[box] (web) at (11.7,-1.9) {Sitio estático\\GitHub Pages};
 \node[src] (user) at (11.7,-3.6) {Navegador ES / EN};
-\draw[arr] (dane.east) -- (upd.west); \draw[arr] (banrep.east) -- (upd.west);
+\draw[arr] (dane.east) -- (upd.west); \draw[arr] (banrep.east) -- (upd.west); \draw[arr] (acc.east) -- (upd.west);
 \draw[arr] (upd) -- (csv); \draw[arr] (csv) -- (val);
 \draw[arr] (csv) -- (app); \draw[arr] (app) -- (web); \draw[arr] (web) -- (user);
 \node[font=\sffamily\scriptsize,color=cmmuted,below=1mm of upd] {GitHub Actions · 19:30 diario};
@@ -174,16 +184,18 @@ y se sirve como archivos estáticos.}
 \subsection{Capas}
 \begin{description}[style=nextline,leftmargin=0pt]
 \item[Captura] Los módulos de \archivo{colombiamacro/fuentes/} descargan cada fuente: \archivo{pib.py},
-\archivo{ipc.py}, \archivo{tes.py}, \archivo{colcap.py} y \archivo{complementarias.py} (16 series de BanRep,
-ISE y GEIH). Todas las series de BanRep pasan por \archivo{banrep.py}. El orquestador es
+\archivo{ipc.py}, \archivo{tes.py}, \archivo{colcap.py}, \archivo{complementarias.py} (16 series de BanRep,
+ISE y GEIH) y \archivo{acciones.py} (canasta del COLCAP según iShares y precios semanales de sus acciones en
+Yahoo Finance). Todas las series de BanRep pasan por \archivo{banrep.py}. El orquestador es
 \archivo{colombiamacro/actualizar.py}, que deja un registro en \archivo{data/registro\_actualizacion.log}.
 \item[Validación] \archivo{colombiamacro/validar.py} recalcula fórmulas, revisa fechas, rangos y saltos, y
 escribe \archivo{estado\_fuentes.csv} y \archivo{alertas\_datos.csv}.
 \item[Analítica] \archivo{colombiamacro/analitica.py} contiene funciones puras (entra una tabla, sale una
 tabla): Fisher, inflación implícita, filtro HP, Hamilton, reloj del ciclo, percentiles.
 \item[Modelo] \archivo{colombiamacro/modelo.py} carga todo, calcula la instantánea del último dato, redacta
-el resumen y el veredicto, asigna las etiquetas de estado y arma la tabla de indicadores. Es la única fuente
-de cada cifra que aparece en pantalla.
+el resumen y el veredicto, asigna las etiquetas de estado, arma la tabla de indicadores y calcula la bolsa
+por dentro (\texttt{magnificas()}, \texttt{retornos\_semanales()}, \texttt{indice\_equiponderado()},
+\texttt{bolsa\_por\_dentro()}). Es la única fuente de cada cifra que aparece en pantalla.
 \item[Presentación] \archivo{colombiamacro/sitio/construir.py} genera el sitio estático en \archivo{site/}
 (HTML + Plotly, ES y EN) con los textos de \archivo{textos.py}; \archivo{app.js} maneja la interacción en el
 navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apariencia. No calcula nada propio.
@@ -197,10 +209,11 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 \archivo{colombiamacro/actualizar.py} & Orquestador de todas las fuentes.\\
 \archivo{colombiamacro/validar.py} & Controles de calidad y estado de fuentes.\\
 \archivo{colombiamacro/analitica.py} & Fórmulas y filtros; parámetros HP, Hamilton y ventana COVID.\\
-\archivo{colombiamacro/modelo.py} & Carga, instantánea, resumen, veredicto, tabla de indicadores; parámetros \texttt{NEUTRAL\_REAL}, \texttt{UMBRAL\_*}.\\
+\archivo{colombiamacro/modelo.py} & Carga, instantánea, resumen, veredicto, tabla de indicadores y bolsa por dentro; parámetros \texttt{NEUTRAL\_REAL}, \texttt{UMBRAL\_*}, \texttt{N\_MAGNIFICAS}, \texttt{SALTO\_MAX}, \texttt{NOMBRES\_CORTOS}.\\
 \archivo{colombiamacro/fuentes/banrep.py} & Cliente BanRep con cadena TLS completa.\\
 \archivo{colombiamacro/fuentes/pib.py}, \archivo{ipc.py}, \archivo{tes.py}, \archivo{colcap.py} & Descarga de PIB, IPC, curvas TES y COLCAP.\\
 \archivo{colombiamacro/fuentes/complementarias.py} & 16 series BanRep + ISE + GEIH.\\
+\archivo{colombiamacro/fuentes/acciones.py} & Canasta del COLCAP (fondo iShares) y cierres semanales de sus acciones (Yahoo Finance); empalme de tickers (\texttt{ALIAS}).\\
 \archivo{colombiamacro/sitio/construir.py} & Generador del sitio estático (clase \texttt{Graficos}).\\
 \archivo{colombiamacro/sitio/textos.py} & Textos del sitio en español e inglés.\\
 \archivo{colombiamacro/sitio/app.js}, \archivo{estilo.css} & Interacción en el navegador y estilos.\\
@@ -211,25 +224,27 @@ navegador (horizonte, explorador de la curva TES) y \archivo{estilo.css} la apar
 \archivo{certs/} & Certificado intermedio de BanRep.\\
 \archivo{docs/METODOLOGIA.md} & Nota metodológica breve.\\
 \archivo{.github/workflows/actualizar-y-publicar.yml} & Actualización diaria y publicación en GitHub Pages.\\
-\archivo{tests/} & 32 pruebas: fórmulas, datos y sitio.\\
+\archivo{tests/} & 47 pruebas: fórmulas, datos y sitio.\\
 \bottomrule
 \end{longtable}
 
 \subsection{Comandos principales}
 \begin{lstlisting}
-python -m colombiamacro.actualizar        # descarga DANE y BanRep
+python -m colombiamacro.actualizar        # descarga DANE, BanRep, iShares y Yahoo
 python -m colombiamacro.validar           # controles de calidad
 python -m colombiamacro.sitio.construir   # genera site/
-python -m unittest discover -s tests      # 32 pruebas
+python -m unittest discover -s tests      # 47 pruebas
 python scripts/generar_figuras.py         # figuras de documentos
 python scripts/lanzar_local.py            # abre el sitio en local
 \end{lstlisting}
 
 \begin{alerta}[Tablero anterior]
 La aplicación Dash de versiones anteriores (\archivo{dashboard\_colombia.py}, \archivo{dashboard\_legacy.py}),
-\archivo{render.yaml}, el \archivo{Dockerfile} y el laboratorio de canastas bursátiles heredadas fueron
-retirados del proyecto; siguen disponibles en el historial del repositorio original
-\texttt{GRAFICO-ECONOMIA-COLOMBIANA}.
+\archivo{render.yaml}, el \archivo{Dockerfile} y el laboratorio de canastas bursátiles heredadas (ICOLCAP,
+índice sintético, canasta de “grandes”) fueron retirados del proyecto en la v10; siguen disponibles en el
+historial del repositorio original \texttt{GRAFICO-ECONOMIA-COLOMBIANA}. La idea de la canasta de las siete
+grandes sobrevive, ahora automatizada, como las \emph{7 Magníficas} de la sección~6 del sitio
+(sección~\ref{sec:empresas}).
 \end{alerta}
 
 % ================================================================== 4
@@ -294,6 +309,8 @@ ISE (DANE) & Mensual & $\approx$50 días después & Adelanta el PIB del trimestr
 IPC (DANE) & Mensual & 5–8 días después & El IPC de agosto se conoce en la primera semana de septiembre.\\
 Desempleo GEIH & Mensual & $\approx$30 días después & Serie desestacionalizada del DANE.\\
 TES, COLCAP, TRM, TPM & Diaria & Mismo día o siguiente & Base de la lectura de mercado.\\
+Canasta COLCAP (iShares) & Diaria & Día hábil siguiente & Pesos de cada acción.\\
+Acciones (Yahoo Finance) & Semanal & Mismo día & Índices equiponderado y 7 Magníficas.\\
 Cuenta corriente & Trimestral & $\approx$75 días después & Rezago largo; leer tendencia.\\
 Deuda del GNC & Anual & Varios meses & Contexto estructural.\\
 \bottomrule
@@ -373,8 +390,27 @@ Salario mínimo, variación & 15418 & \% anual & Contexto de precios\\
 participación (TGP), tasa de ocupación (TO) y tasa de desocupación (TD). El validador comprueba la identidad
 $TD = 100\,(1-TO/TGP)$.
 
-Las tablas heredadas de las canastas bursátiles (ICOLCAP e índices experimentales) fueron retiradas del
-proyecto; todos los archivos de \archivo{data/} alimentan cifras del sitio.
+\subsection{Canasta del COLCAP y precios de sus acciones}
+\label{sec:datos-acciones}
+Dos tablas alimentan la sección~6 del sitio (\emph{¿Qué empresas mueven la bolsa?}); las descarga
+\archivo{colombiamacro/fuentes/acciones.py}.
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[\archivo{colcap\_canasta.csv}] Columnas \texttt{(ticker, nombre, emisor, sector, peso, precio,
+fecha\_canasta)}. \textbf{Origen:} composición del fondo \emph{iShares MSCI COLCAP} (BlackRock), que replica el
+índice y publica sus tenencias cada día hábil. \texttt{peso} es el peso de cada acción en el fondo, en \%,
+excluido el efectivo; es una aproximación cercana a los pesos oficiales de la BVC. Al 29 de septiembre de 2026
+la canasta tiene 23 acciones de 20 emisores.
+\item[\archivo{acciones\_semanal.csv}] Columnas \texttt{(fecha, ticker, simbolo, cierre)}. \textbf{Origen:}
+Yahoo Finance, símbolo \texttt{<TICKER>.CL}; \texttt{fecha} es el viernes de cada semana y \texttt{cierre} el
+último precio de la semana en pesos. Es un precio sin dividendos, igual que el COLCAP. Desde 2010.
+\end{description}
+\begin{alerta}[Cambios de ticker]
+Cuando una acción cambia de nemotécnico (por ejemplo \texttt{PFDAVVNDA} $\rightarrow$ \texttt{PFDAVIGRP}, la
+preferencial de Davivienda), la serie nueva se empalma con la anterior en la primera semana común, de modo que
+la historia no se corta. Las equivalencias viven en el diccionario \texttt{ALIAS} de \archivo{acciones.py}.
+\end{alerta}
+Las tablas heredadas de las canastas bursátiles (ICOLCAP e índices experimentales) fueron retiradas en la v10;
+todos los archivos de \archivo{data/} alimentan cifras del sitio.
 
 % ================================================================== 6
 \section{Transformaciones y fórmulas}
@@ -472,7 +508,8 @@ $g_t<0$ & \textcolor{cmblue}{\textbf{Recuperación}} & \textcolor{cmred}{\textbf
 \bottomrule
 \end{tabular}
 \end{center}
-Es la lógica del \emph{business cycle clock} de la OCDE.
+Es la lógica del \emph{business cycle clock} de la OCDE. En el sitio se muestra como bloque interactivo al
+inicio del tablero (sección~\ref{sec:reloj}).
 
 \subsection{ISE: ritmo de corto plazo}
 Variación anual con la serie original (comparable con el PIB) y ritmo trimestral anualizado con la
@@ -487,6 +524,30 @@ Un percentil de 96 significa que el dato actual es mayor que el 96\% de su propi
 Retorno a 12 meses: último dato frente al último dato disponible 365 días antes.
 COLCAP en dólares: puntos divididos por la TRM del mismo día (tolerancia de 7 días).
 
+\subsection{Índices equiponderado y de las 7 Magníficas}
+\label{sec:equi}
+Sea $P_{j,t}$ el cierre semanal de la acción $j$ y $R_{j,t}=P_{j,t}/P_{j,t-1}-1$ su retorno semanal. Retornos
+con $|R_{j,t}|>60\%$ se descartan como errores de precio de la fuente (\texttt{SALTO\_MAX}). Con $A_t$ el
+conjunto de acciones con retorno disponible en la semana $t$:
+\[
+I_t = I_{t-1}\Big(1+\frac{1}{|A_t|}\sum_{j\in A_t} R_{j,t}\Big),\qquad I_0=100 .
+\]
+Es un índice de precios con rebalanceo semanal a pesos iguales (\texttt{indice\_equiponderado()}).
+\begin{itemize}
+\item \textbf{Equiponderado}: $A_t$ incluye todas las acciones de la canasta actual del COLCAP.
+\item \textbf{7 Magníficas}: $A_t$ se limita a los siete emisores de mayor peso agregado
+(\texttt{magnificas()}): si una empresa tiene acción ordinaria y preferencial, sus pesos se suman y el índice
+usa la clase de mayor peso. La lista se recalcula con cada canasta nueva.
+\item \textbf{COLCAP oficial}: último dato de cada semana (viernes) de la serie de BanRep.
+\end{itemize}
+En el gráfico las tres series se llevan a base 100 al inicio del horizonte elegido,
+$\tilde I_t = 100\,I_t/I_{t_0}$, de modo que cambiar el horizonte las rebasa. La diferencia entre el retorno a
+12 meses del COLCAP (ponderado por capitalización) y el del equiponderado mide la concentración de las ganancias.
+\begin{dato}[Ejemplo al 30 de septiembre de 2026 (datos semanales)]
+Retorno a 12 meses: COLCAP $+38{,}1\%$, equiponderado $+28{,}8\%$, 7 Magníficas $+35{,}2\%$. El COLCAP supera al
+equiponderado en 9,3 puntos: las ganancias se concentran en las empresas grandes.
+\end{dato}
+
 \subsection{Saltos aislados}
 Una observación se considera salto aislado si se aleja más de $u$ de ambos vecinos mientras los vecinos
 difieren menos de $v$: $|x_t-x_{t-1}|>u$, $|x_t-x_{t+1}|>u$, $|x_{t-1}-x_{t+1}|<v$. Para las tasas TES
@@ -497,7 +558,7 @@ solo se excluyen de los cálculos y se registran.
 \section{Guía de lectura, sección por sección}
 \label{sec:lectura}
 
-El sitio sigue ocho secciones numeradas. Cada una responde su pregunta con un párrafo en lenguaje sencillo
+El sitio sigue nueve secciones numeradas. Cada una responde su pregunta con un párrafo en lenguaje sencillo
 generado a partir de los datos; debajo de cada gráfico hay una nota \emph{?} que explica cómo leerlo. Los
 cálculos técnicos quedan en el panel desplegable \emph{Detalle técnico (para economistas)} al final de la
 sección.
@@ -527,6 +588,31 @@ Confundir pp con \%. Una tasa que sube de 10\% a 12\% sube 2~pp, pero un 20\% en
 siempre usa pp para tasas.
 \end{alerta}
 
+\subsection{Cómo leer el panel de cambios}
+\label{sec:delta}
+Debajo de cada gráfico principal de series de tiempo hay un segundo panel, titulado
+\emph{Cambio · <serie> (vs. hace 1 año)}, con barras que muestran, fecha por fecha, el cambio de la serie
+principal: \textbf{barras azules} cuando sube y \textbf{barras naranjas} cuando baja. Así se ve de un vistazo
+cuándo una variable aceleró, frenó o cambió de dirección, algo que en el nivel es difícil de apreciar.
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}Xl@{}}
+\toprule
+\textbf{Serie} & \textbf{Barra del panel de cambios}\\\midrule
+PIB y brecha del producto & frente al trimestre anterior, en pp\\
+Tasas: inflación, desempleo (promedio 3 meses), TPM, inflación esperada a 1 año, tasa real, 5y5y & frente a hace 1 año, en pp\\
+Niveles: TRM, COLCAP, ITCR & frente a hace 1 año, en \%\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Ambos paneles comparten el eje de fechas: al pasar el cursor, la caja emergente muestra el valor del panel
+superior y el cambio del inferior \emph{en la misma fecha}. La franja de encima sigue resumiendo el último valor y
+su cambio; el panel de cambios muestra la historia completa de ese cambio.
+\begin{leer}
+Una sucesión de barras azules que se acortan indica que la serie sigue subiendo pero cada vez menos (por
+ejemplo, una inflación que aún sube frente a hace un año pero ya pierde impulso). El cambio de color de azul a
+naranja marca el punto de giro.
+\end{leer}
+
 \subsection{Resumen y tarjetas}
 La primera pantalla (figura~\ref{fig:hero}) resume el estado de la economía en tres o cuatro frases y seis
 tarjetas. La \emph{etiqueta de estado} de cada tarjeta sale de reglas explícitas de
@@ -535,33 +621,83 @@ la inflación con la meta de 3\% y su rango de 2\% a 4\%, la tasa del Banco con 
 nivel de hace un año, y el dólar y la bolsa con su cambio en un año. Las etiquetas describen, no recomiendan.
 \captura[1]{hero_en.png}{La misma pantalla en inglés (\texttt{/en/}): todos los textos y rótulos se traducen.}
 
+\subsection{El reloj del ciclo (inicio del tablero)}
+\label{sec:reloj}
+\captura[1]{sec_ciclo.png}{Bloque \emph{¿En qué parte del ciclo está la economía?}: controles, cifras, reloj del
+ciclo y recorrido trimestre a trimestre.}
+Es lo primero que se ve después del resumen (menú \emph{Ciclo}, icono {\fontspec{DejaVu Sans}◷}, ancla \texttt{\#ciclo}); no lleva
+número porque resume las secciones que siguen. Aplica el \emph{business cycle clock} de la OCDE a la brecha del
+producto HP en tiempo real (sección~\ref{sec:formulas}): la \emph{fase} es el cuadrante que forman el
+\emph{nivel} de la brecha y su \emph{dirección} (cambio en dos trimestres).
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[Respuesta] Un párrafo generado automáticamente, por ejemplo en T2 2026: \emph{“la economía está en
+expansión: produce 0,3\% por encima de su capacidad y, en los últimos dos trimestres, esa diferencia aumentó
+0,8 puntos. Es su primer trimestre en esta fase.”} Le sigue una línea que describe la fase:
+\textcolor{cmgreen}{\textbf{Expansión}}, por encima de la capacidad y cada vez más (suele traer presión sobre
+precios); \textcolor{cmamber}{\textbf{Desaceleración}}, por encima pero perdiendo impulso;
+\textcolor{cmred}{\textbf{Contracción}}, por debajo y la distancia aumenta; \textcolor{cmblue}{\textbf{Recuperación}},
+por debajo pero acercándose.
+\item[Controles] Una barra recorre cada trimestre con datos (T4 2014 a T2 2026, 48 trimestres). Los botones
+\emph{1 año de recorrido}, \emph{2 años} (predeterminado) y \emph{3 años} fijan cuántos trimestres previos se
+dibujan (4, 8 o 12). \emph{Volver al último dato} regresa al trimestre más reciente.
+\item[Cifras] \emph{Fase} (etiqueta de color y descripción); \emph{Nivel: producción frente a su capacidad}
+(brecha, \%); \emph{Dirección: cambio en 2 trimestres} (pp, con ▲ o ▼); \emph{Trimestres seguidos en la fase}.
+\item[Reloj del ciclo: dónde estamos y hacia dónde vamos] Eje horizontal: nivel de la brecha; eje vertical:
+su cambio en dos trimestres. Cuatro cuadrantes sombreados: Expansión (arriba a la derecha), Desaceleración
+(abajo a la derecha), Contracción (abajo a la izquierda) y Recuperación (arriba a la izquierda). Cada punto es
+un trimestre del recorrido y las flechas muestran el camino; los puntos más antiguos se desvanecen y el punto
+grande, con su rótulo, es el trimestre elegido. Los ejes se ajustan al recorrido visible.
+\item[Recorrido del ciclo trimestre a trimestre] Barras de la brecha de cada trimestre coloreadas por fase
+(leyenda con las cuatro fases) y una línea punteada con el cambio en dos trimestres. La franja gris marca el
+recorrido que se ve en el reloj. Al pasar el cursor o hacer clic en un trimestre, el reloj se mueve a esa fecha.
+\end{description}
+\begin{leer}
+La economía suele girar en el sentido del reloj: expansión $\rightarrow$ desaceleración $\rightarrow$ contracción
+$\rightarrow$ recuperación. Cuando la brecha está cerca de cero, un movimiento pequeño cambia el cuadrante y la
+fase puede alternar de un trimestre a otro: lea el \emph{recorrido} (varios trimestres), no un solo punto. La
+incertidumbre entre métodos (HP y Hamilton) se ve en la banda del panel \emph{Detalle técnico} de la sección~1.
+\end{leer}
+\begin{dato}[Ejemplo 1: T2 2026, el último dato]
+Brecha $+0{,}3\%$ y cambio en dos trimestres $+0{,}8$~pp: cuadrante de expansión, primer trimestre en la fase.
+Con 2 años de recorrido se ve que la economía venía alternando entre contracción y recuperación con brechas
+de $-0{,}3$ a $-1{,}3\%$ y que recién cruza a la derecha del eje.
+\end{dato}
+\begin{dato}[Ejemplo 2: T4 2020, el COVID]
+Al llevar la barra a T4 2020 los ejes se reescalan: el recorrido baja hasta una brecha cercana a $-20\%$ en
+T2 2020 (hondo en Contracción) y salta a Recuperación en T4 2020, con brecha de $-4{,}3\%$ y un cambio en dos
+trimestres de $+15{,}3$~pp. La fase es recuperación aunque la economía sigue muy por debajo de su capacidad:
+la dirección, no el nivel, define el cuadrante.
+\end{dato}
+
 \subsection{Sección 1 · ¿Está creciendo la economía?}
 \captura[1]{sec_crecimiento.png}{Sección 1: crecimiento del PIB e ISE frente al ritmo habitual, y desempleo.}
 \begin{leer}
 Cada barra es un trimestre: cuánto creció el PIB real frente al mismo trimestre del año anterior. La línea
 naranja es el ISE mensual desestacionalizado, que adelanta el PIB del trimestre en curso. La línea punteada es
 el \emph{ritmo habitual} (crecimiento potencial): si las barras están por encima, la economía crece más rápido
-de lo normal. Los valores de 2020–2021 quedan fuera de escala para no aplastar la lectura reciente; la caja
-emergente los muestra. A la derecha, la tasa de desempleo desestacionalizada (mensual y promedio de 3 meses):
+de lo normal. La escala vertical se ajusta a los datos visibles del horizonte elegido (3, 5, 10 años o
+\emph{Todo}): con horizontes largos aparecen completos la caída de 2020 (PIB cerca de $-16\%$, ISE cerca de
+$-20\%$) y el rebote de 2021; con 3 años la escala se concentra en la lectura reciente. Debajo, el panel de
+cambios muestra la variación del PIB frente al trimestre anterior. A la derecha, la tasa de desempleo desestacionalizada (mensual y promedio de 3 meses):
 un desempleo que cae mientras la economía crece por encima de lo habitual refuerza la lectura de presión de
 demanda.
 \end{leer}
 \begin{alerta}[Error frecuente]
 Confundir crecimiento con brecha. Una economía puede crecer 3,5\% y aun así estar \emph{cerca} del potencial si
 viene de una brecha negativa. Lo relevante para la inflación es el \emph{nivel} de la brecha, que está en el
-detalle técnico.
+reloj del ciclo y, con sus tres métodos, en el detalle técnico.
 \end{alerta}
 
-\subsubsection*{Detalle técnico: brecha del producto y reloj del ciclo}
+\subsubsection*{Detalle técnico: brecha del producto}
 \captura[0.9]{detalle_tecnico.png}{Panel \emph{Detalle técnico} de la sección 1: brecha del producto con rango
-entre métodos y reloj del ciclo.}
+entre métodos.}
 \begin{leer}
 En la brecha, la línea azul es la estimación principal (HP en tiempo real) y la banda es el rango entre los
-tres métodos (HP en tiempo real, HP de dos colas y Hamilton). Arriba de cero, la economía produce más que su
+tres métodos (HP en tiempo real, HP de dos colas y Hamilton). Como en el crecimiento, la escala se ajusta al
+horizonte, así que 2020 se ve completo; el panel inferior muestra su cambio frente al trimestre anterior (pp). Arriba de cero, la economía produce más que su
 potencial; abajo, hay holgura. Una banda angosta indica consenso; una ancha, que la lectura depende del
-supuesto. En el reloj, cada punto es un trimestre (el grande es el último): el eje horizontal es el nivel de
-la brecha y el vertical su cambio en dos trimestres. El recorrido típico gira en sentido horario:
-recuperación $\rightarrow$ expansión $\rightarrow$ desaceleración $\rightarrow$ contracción.
+supuesto. Debajo del gráfico, un texto resume los métodos. El reloj del ciclo, que antes estaba en este
+panel, es ahora el bloque interactivo del inicio (sección~\ref{sec:reloj}).
 \end{leer}
 
 \subsection{Sección 2 · ¿Cómo están los precios?}
@@ -625,19 +761,58 @@ mes. Para un inversionista extranjero el retorno relevante combina el precio de 
 cambio: si el peso se aprecia, el retorno en dólares supera al de pesos. COLCAP es un índice de precios: no
 incluye dividendos. El 28 de mayo de 2021 pasó a la metodología MSCI. En el detalle técnico, el ITCR compara
 precios de Colombia con los de sus socios comerciales: por debajo de 100 el peso está más fuerte en términos
-reales que en 2010.
+reales que en 2010. Los paneles de cambios muestran la variación en \% frente a hace un año de la TRM, el
+COLCAP y el ITCR.
 \end{leer}
 
-\subsection{Sección 6 · Cuentas externas y fiscales}
-\captura[1]{sec_externo.png}{Sección 6: cuenta corriente y deuda bruta del Gobierno Nacional Central.}
+\subsection{Sección 6 · ¿Qué empresas mueven la bolsa?}
+\label{sec:empresas}
+\captura[0.62]{sec_empresas.png}{Sección 6: COLCAP frente al equiponderado y a las 7 Magníficas, peso de cada
+acción y tabla de las 7 Magníficas.}
+El COLCAP pondera cada acción por su capitalización ajustada, así que unas pocas empresas grandes pueden mover
+todo el índice. Esta sección responde si la bolsa sube \emph{en general} o solo por unas cuantas empresas.
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[COLCAP, equiponderado y 7 Magníficas (base 100)] Tres líneas: el \textbf{COLCAP oficial} (azul, ponderado
+por capitalización), el \textbf{equiponderado} (verde: todas las acciones de la canasta actual con el mismo
+peso, rebalanceo semanal) y las \textbf{7 Magníficas} (naranja: las siete empresas más grandes, con el mismo
+peso). Las tres parten de 100 al inicio del horizonte elegido; cambiar entre 3, 5, 10 años o \emph{Todo} las
+rebasa. El panel inferior muestra el retorno a 12 meses de cada una y la franja, el retorno a 12 meses y a
+1 mes (fórmulas en la sección~\ref{sec:equi}).
+\item[Cuánto pesa cada acción en el COLCAP] Barras horizontales con las 15 acciones de mayor peso a la fecha de
+la canasta; las de las 7 Magníficas en naranja. Para cada una de ellas se suman la acción ordinaria y la
+preferencial de la misma empresa.
+\item[Las 7 Magníficas hoy] Tabla con la empresa (sus clases de acción y su sector), su peso en el COLCAP, el
+precio y el cambio en 1 mes, en lo corrido del año y en 12 meses.
+\end{description}
+\begin{dato}[Al 29 de septiembre de 2026]
+Las 7 Magníficas pesan cerca de 85\% del COLCAP: Grupo Cibest 37,8\%, Grupo Sura 12,0\%, Ecopetrol 8,9\%,
+ISA 8,8\%, Grupo Argos 7,8\%, Grupo Energía Bogotá 5,3\% y Cementos Argos 4,4\%. En 12 meses (datos
+semanales al 30 de septiembre) el COLCAP sube 38,1\%, las 7 Magníficas 35,2\% y el equiponderado 28,8\%.
+\end{dato}
+\begin{leer}
+Regla de lectura del párrafo automático: si el COLCAP supera al equiponderado por más de 2 puntos en 12 meses,
+las ganancias se concentran en las empresas grandes; si ocurre lo contrario, el alza es amplia y la
+acompañan las empresas pequeñas; entre ambos umbrales, el comportamiento es parejo. Una bolsa que sube solo por
+sus empresas grandes es más frágil frente a un choque en una de ellas.
+\end{leer}
+\begin{alerta}[Cómo se construyen y qué no dicen]
+La canasta y los pesos salen del fondo iShares MSCI COLCAP (aproximan los pesos oficiales de la BVC); los
+precios, de Yahoo Finance. Los índices aplican la canasta \emph{actual} hacia atrás, así que tienen
+\textbf{sesgo de supervivencia}: dejan fuera empresas que salieron del índice (por ejemplo, por una
+adquisición) y tienden a sobrestimar el retorno pasado. Sirven para comparar concentración, no como historia
+exacta de la bolsa.
+\end{alerta}
+
+\subsection{Sección 7 · Cuentas externas y fiscales}
+\captura[1]{sec_externo.png}{Sección 7: cuenta corriente y deuda bruta del Gobierno Nacional Central.}
 \begin{leer}
 Un déficit de cuenta corriente significa que el país gasta más de lo que produce y lo financia con capital
 externo; tiene rezago largo, así que conviene leer la tendencia. La deuda del Gobierno, como porcentaje del
 PIB, da el contexto fiscal de las primas en los TES largos.
 \end{leer}
 
-\subsection{Sección 7 · Todos los indicadores}
-\captura[1]{sec_indicadores.png}{Sección 7: tabla de todos los indicadores con su nivel frente a la historia.}
+\subsection{Sección 8 · Todos los indicadores}
+\captura[1]{sec_indicadores.png}{Sección 8: tabla de todos los indicadores con su nivel frente a la historia.}
 \begin{leer}
 Cada fila tiene el último dato, su período, el cambio (en pp para tasas y en \% para niveles como COLCAP o TRM)
 y una barra con su posición frente a su propia historia desde 2010 (percentil), traducida a palabras:
@@ -645,8 +820,8 @@ y una barra con su posición frente a su propia historia desde 2010 (percentil),
 alejan de su normalidad histórica y merecen atención.
 \end{leer}
 
-\subsection{Sección 8 · Fuentes}
-\captura[1]{sec_fuentes.png}{Sección 8: estado de cada fuente, descargas CSV, documentación y glosario.}
+\subsection{Sección 9 · Fuentes}
+\captura[1]{sec_fuentes.png}{Sección 9: estado de cada fuente, descargas CSV, documentación y glosario.}
 \begin{leer}
 Cada fuente aparece con su último período y un estado: \emph{Al día}, \emph{Retrasado} (supera el umbral de
 días esperado para su frecuencia) o \emph{Pendiente} (aún no descargada). Desde aquí se descargan todos los
@@ -697,10 +872,15 @@ automáticamente; las pruebas verifican que las frases citen las cifras correcta
 \item Saltos aislados listados en \archivo{alertas\_datos.csv}.
 \item Cada serie de BanRep se valida por separado: si una no pasa (identidad, rango o historia), se excluye y
 se conserva su versión anterior, sin bloquear las demás.
-\item 32 pruebas en tres grupos: fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de
-información futura en el HP en tiempo real, Hamilton en una caminata con deriva), datos (cliente BanRep,
-lectores DANE, rangos y fechas) y sitio (construcción completa en ambos idiomas, franjas de cambios, datos de
-la curva TES, enlaces de descarga).
+\item Canasta del COLCAP y precios de acciones: sin tickers duplicados y pesos que suman cerca de 100\%; sin
+pares ticker/fecha duplicados, precios no positivos ni fechas futuras; rezago máximo de 10 días para ambas tablas.
+\item 47 pruebas en tres grupos: fórmulas (Fisher, 5y5y, HP frente a una serie lineal, ausencia de
+información futura en el HP en tiempo real, Hamilton en una caminata con deriva, índice equiponderado,
+selección de las 7 Magníficas con clases sumadas, descarte de saltos semanales), datos (cliente BanRep,
+lectores DANE, canasta iShares, precios de Yahoo con fechas en viernes, empalme de tickers, rangos y fechas) y sitio (construcción completa en ambos
+idiomas, franjas y paneles de cambios, escalas de 2020, datos del reloj del ciclo iguales a los del modelo y
+fase coherente con su cuadrante, datos de la curva TES, sección de empresas, enlaces de
+descarga).
 \end{itemize}
 
 \subsection{Robustez de la brecha del producto}
@@ -741,7 +921,9 @@ El workflow \archivo{.github/workflows/actualizar-y-publicar.yml} (\emph{Actuali
 corre todos los días a las 00:30 UTC (19:30 Colombia) y también a demanda (\emph{Run workflow}):
 \begin{enumerate}
 \item instala dependencias y corre las pruebas;
-\item descarga las fuentes con \archivo{python -m colombiamacro.actualizar}. Como el paso usa
+\item descarga las fuentes con \archivo{python -m colombiamacro.actualizar}: IPC, curvas TES, PIB, COLCAP,
+series BanRep, ISE y GEIH y, como último paso, \emph{Canasta COLCAP (iShares) y acciones (Yahoo Finance)}
+(\archivo{colombiamacro.fuentes.acciones}). Como el paso usa
 \texttt{continue-on-error}, si una fuente falla las demás continúan y el sitio se publica igual;
 \item emite un aviso (\emph{warning}) visible en el resumen del run por cada fuente con falla, tomado de
 \archivo{data/registro\_actualizacion.log}; los avisos \textbf{no} detienen la publicación;
@@ -764,7 +946,7 @@ complementarias. Hoy el rango es $(-1000,\ 500000)$ y una serie inválida ya no 
 
 \subsection{Estado de las fuentes}
 \archivo{estado\_fuentes.csv} lista cada fuente con su último período y uno de tres estados, que el sitio
-muestra en la sección~8: \emph{Al día}, \emph{Retrasado} (supera el umbral de días esperado) o
+muestra en la sección~9: \emph{Al día}, \emph{Retrasado} (supera el umbral de días esperado) o
 \emph{Pendiente} (aún no descargada). Umbrales de rezago:
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
@@ -775,6 +957,8 @@ IPC (mensual) & 45\\
 ISE (mensual) & 110\\
 GEIH (mensual) & 100\\
 Series diarias (TES, COLCAP, TRM, TPM) & 7\\
+Canasta COLCAP (iShares, diaria) & 10\\
+Acciones del COLCAP (Yahoo Finance, semanal) & 10\\
 Deuda del Gobierno (anual) & 800\\
 \bottomrule
 \end{tabular}
@@ -861,6 +1045,21 @@ python -m colombiamacro.sitio.construir
 \end{lstlisting}
 \end{enumerate}
 
+\subsection{Canasta del COLCAP: tickers y nombres}
+\begin{itemize}
+\item \textbf{Cambio de nemotécnico.} Si una acción de la canasta cambia de ticker, agregar la equivalencia en
+\texttt{ALIAS} de \archivo{colombiamacro/fuentes/acciones.py} (ticker nuevo $\rightarrow$ lista de tickers
+anteriores); la descarga empalma ambas series en la primera semana común:
+\begin{lstlisting}[language=Python]
+ALIAS = {"PFDAVIGRP": ["PFDAVVNDA"]}
+\end{lstlisting}
+\item \textbf{Empresa nueva en la canasta.} El sitio muestra el nombre del emisor tal como lo publica iShares,
+en formato título. Para un nombre corto legible, agregarlo en \texttt{NOMBRES\_CORTOS} de
+\archivo{colombiamacro/modelo.py} (por ejemplo \texttt{"INTERCONEXION ELECTRICA": "ISA"}).
+\item \textbf{Número de empresas o umbral de saltos.} \texttt{N\_MAGNIFICAS} (7) y \texttt{SALTO\_MAX} (0,6)
+en \archivo{colombiamacro/modelo.py}.
+\end{itemize}
+
 \subsection{Cambiar parámetros metodológicos}
 \begin{itemize}
 \item \archivo{colombiamacro/modelo.py}: \archivo{NEUTRAL\_REAL}, \archivo{UMBRAL\_BRECHA}, \archivo{UMBRAL\_POSTURA}
@@ -884,7 +1083,13 @@ cada fecha. La brecha en tiempo real elimina la información futura del filtro, 
 \item \textbf{La fase depende del método} (coincidencia de fase de 43\% entre HP en tiempo real y Hamilton).
 \item \textbf{La tasa neutral es externa} y tiene incertidumbre amplia.
 \item \textbf{Las implícitas contienen primas} variables en el tiempo.
-\item \textbf{COLCAP no mide retorno total} (sin dividendos).
+\item \textbf{COLCAP no mide retorno total} (sin dividendos); los índices equiponderado y de las 7 Magníficas
+tampoco.
+\item \textbf{Sesgo de supervivencia en la bolsa por dentro}: la canasta actual se aplica hacia atrás; las
+empresas que salieron del índice no están en la historia, lo que tiende a sobrestimar los retornos pasados.
+\item \textbf{Pesos del fondo, no oficiales}: los pesos provienen del fondo iShares MSCI COLCAP (sin efectivo),
+una aproximación cercana pero no idéntica a los pesos oficiales de la BVC; los precios de Yahoo Finance pueden
+traer errores puntuales (se descartan retornos semanales mayores a $\pm60\%$).
 \end{enumerate}
 
 \subsection*{Trabajo futuro}
@@ -933,6 +1138,9 @@ UVR & Real value unit & Unidad indexada a la inflación.\\
 ISE & Economic activity index & Indicador mensual de actividad del DANE.\\
 GEIH & Household survey & Gran Encuesta Integrada de Hogares (mercado laboral).\\
 Percentil & Percentile & Posición del dato actual dentro de su historia.\\
+Equiponderado & Equal-weighted & Índice en el que todas las acciones pesan igual.\\
+7 Magníficas & Magnificent 7 & Las siete empresas de mayor peso en el COLCAP.\\
+Sesgo de supervivencia & Survivorship bias & Distorsión por usar solo las empresas que siguen en el índice.\\
 Vintage & Vintage & Versión de una serie según la fecha de publicación.\\
 \bottomrule
 \end{longtable}

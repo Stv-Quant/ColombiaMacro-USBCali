@@ -21,13 +21,16 @@ Un `push` a `main` reconstruye y publica el sitio sin descargar datos.
    su versión anterior; las demás se escriben normalmente.
 4. Si BanRep cambia su certificado, actualizar `certs/GeoTrustEVRSACAG2.pem`.
 5. Si el DANE cambia la estructura de un anexo, ajustar el módulo en `colombiamacro/fuentes/`.
+6. Acciones: si una acción cambia de ticker, agregar el anterior en `ALIAS` de
+   `colombiamacro/fuentes/acciones.py`; si una empresa nueva no tiene nombre corto, agregarlo en
+   `NOMBRES_CORTOS` de `colombiamacro/modelo.py`.
 
 ## Estados de las fuentes
 
 | Estado | Regla |
 |--------|-------|
 | Al día | Último dato dentro del rezago normal de publicación |
-| Retrasado | Supera el rezago: PIB 150 días, IPC 45, ISE 110, GEIH 100, diarias 7, deuda anual 800 |
+| Retrasado | Supera el rezago: PIB 150 días, IPC 45, ISE 110, GEIH 100, diarias 7–10, canasta y acciones 10, deuda anual 800 |
 | Pendiente | Aún no hay archivo (primera descarga pendiente) |
 
 ## En local

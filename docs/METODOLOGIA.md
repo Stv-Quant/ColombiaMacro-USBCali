@@ -157,6 +157,31 @@ por ningún método. La implícita se presenta como **lo que el mercado descuent
 * Retorno a 12 meses: último dato frente al último dato disponible 365 días antes.
 * ITCR-IPC (2010 = 100): aumentos = depreciación real del peso.
 
+### 6.1 La bolsa por dentro: equiponderado y 7 Magníficas
+
+* **Canasta y pesos**: composición diaria del fondo iShares MSCI COLCAP (BlackRock), que replica el
+  índice. Los pesos son los del fondo (efectivo excluido), una aproximación cercana a los oficiales
+  de la BVC. Las acciones ordinaria y preferencial de una misma empresa se agrupan por emisor.
+* **7 Magníficas**: las siete empresas de mayor peso agregado en la canasta vigente; se recalculan
+  solas con cada cambio de canasta. En cada índice se usa la clase de acción de mayor peso.
+* **Precios**: cierres semanales de Yahoo Finance (`<TICKER>.CL`), sin dividendos, igual que el COLCAP.
+  Un ticker que cambió (p. ej. Davivienda: PFDAVVNDA → PFDAVIGRP) se empalma en la primera semana
+  común para no crear saltos.
+* **Índices**: equiponderado $I_t = I_{t-1}\,(1 + \bar r_t)$ con $\bar r_t$ el promedio simple de los
+  retornos semanales disponibles (rebalanceo semanal); las 7 Magníficas usan la misma regla con sus
+  siete acciones. Retornos semanales mayores a ±60 % se tratan como errores de la fuente.
+  En el tablero las tres series se re-basan a 100 al inicio del horizonte elegido.
+* **Lectura**: si el COLCAP (ponderado por capitalización) supera al equiponderado, el avance se
+  concentra en las empresas grandes; si ocurre lo contrario, el avance es amplio.
+* **Limitación**: aplicar la canasta actual hacia atrás introduce sesgo de supervivencia.
+
+### 6.2 Paneles de cambio
+
+Cada gráfico principal incluye debajo un panel con el cambio de su serie principal: frente a hace
+un año (tasas en puntos porcentuales, niveles en %), frente al trimestre anterior para el PIB y la
+brecha. Las escalas se ajustan a los datos visibles del horizonte elegido, de modo que 2020 se ve
+completo cuando está dentro del periodo.
+
 ## 7. Reglas del veredicto automático
 
 | Concepto | Regla | Parámetro |
