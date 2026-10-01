@@ -1,34 +1,4 @@
-Actualizacion ColombiaMacro — 2026-10-01 06:23 UTC
-
-============================================================
-  IPC — DANE y BanRep
-============================================================
-=======================================================
-  Actualizador Inflacion Colombia - BanRep
-=======================================================
-CSV actual: 248 meses, ultimo: 2026-08-01
-Descargando IPC de BanRep...
-OK - 866 meses descargados (1954-07-01 -> 2026-08-01)
-Sin cambios de IPC
-
-=======================================================
-  Estado actual Inflacion Colombia
-=======================================================
-  Total meses    : 248
-  Primer dato    : 2006-01-01
-  Ultimo dato    : 2026-08-01
-  Inf. mensual   : 0.39%
-  Inf. anual     : 6.24%
-=======================================================
-
-Ultimos 6 meses:
-     fecha  inflacion_mensual  inflacion_anual
-2026-03-01               0.78             5.56
-2026-04-01               0.78             5.69
-2026-05-01               0.47             5.84
-2026-06-01               0.39             6.14
-2026-07-01               0.17             6.02
-2026-08-01               0.39             6.24
+Actualizacion ColombiaMacro — 2026-10-01 18:23 UTC (rapida: series diarias de BanRep y mercado)
 
 ============================================================
   Curvas TES — BanRep
@@ -64,12 +34,6 @@ Ultimos 5 dias:
 2026-09-25         12.42         12.90          13.06        4.99        6.48         6.64
 
 ============================================================
-  PIB real y nominal — DANE
-============================================================
-PIB por sectores: 12 agrupaciones hasta 2026-04-01
-PIB: sin cambios
-
-============================================================
   COLCAP — BanRep
 ============================================================
 COLCAP: sin cambios
@@ -78,7 +42,7 @@ COLCAP: sin cambios
   Politica, TRM, inflacion basica, externo — BanRep
 ============================================================
 tpm                        id 59      10457 obs hasta 2026-10-01
-  ibr_overnight              id 15324    4571 obs hasta 2026-09-30
+  ibr_overnight              id 15324    4572 obs hasta 2026-10-01
   trm                        id 1       12728 obs hasta 2026-10-01
   inflacion_sin_alimentos    id 15388     522 obs hasta 2026-08-31
   inflacion_basica_sar       id 15390     522 obs hasta 2026-08-31
@@ -87,7 +51,7 @@ tpm                        id 59      10457 obs hasta 2026-10-01
   inflacion_alimentos        id 15404      81 obs hasta 2026-08-31
   meta_inflacion             id 853       432 obs hasta 2026-12-31
   itcr_ipc                   id 235       477 obs hasta 2026-08-31
-  terminos_intercambio       id 15360     378 obs hasta 2026-06-30
+  terminos_intercambio       id 15360     379 obs hasta 2026-07-31
   reservas_netas_musd        id 15051     800 obs hasta 2026-08-31
   cuenta_corriente_pct_pib   id 15290     122 obs hasta 2026-06-30
   ied_musd                   id 15133     106 obs hasta 2026-06-30
@@ -95,52 +59,7 @@ tpm                        id 59      10457 obs hasta 2026-10-01
   salario_minimo_var         id 15418      42 obs hasta 2026-12-31
 series_banrep.csv: actualizado (16 de 16 series)
 
-============================================================
-  ISE y mercado laboral — DANE
-============================================================
-ISE: 259 meses hasta 2026-07-01 (sin cambios)
-Mercado laboral: 308 meses hasta 2026-08-01 (actualizado)
-
-============================================================
-  Informalidad laboral — DANE
-============================================================
-informalidad: 65 trimestres moviles hasta 2026-07 (nacional 54.6%); 13 ramas — https://www.dane.gov.co/files/operaciones/GEIH/anex-GEIHEISS-may-jul2026.xlsx
-
-============================================================
-  Canasta COLCAP (iShares) y acciones (Yahoo Finance)
-============================================================
-canasta COLCAP: 23 acciones al 2026-09-29 (sin cambios)
-  PFCIBEST     875 semanas hasta 2026-10-01
-  CIBEST       875 semanas hasta 2026-10-01
-  ECOPETROL    875 semanas hasta 2026-10-01
-  ISA          875 semanas hasta 2026-10-01
-  PFGRUPSURA   774 semanas hasta 2026-10-01
-  GRUPOSURA    875 semanas hasta 2026-10-01
-  GEB          875 semanas hasta 2026-10-01
-  GRUPOARGOS   875 semanas hasta 2026-10-01
-  CEMARGOS     875 semanas hasta 2026-10-01
-  PFGRUPOARG   748 semanas hasta 2026-10-01
-  PFDAVIGRP    835 semanas hasta 2026-10-01
-  PFAVAL       804 semanas hasta 2026-10-01
-  CELSIA       875 semanas hasta 2026-10-01
-  PEI          113 semanas hasta 2026-10-01
-  MINEROS      875 semanas hasta 2026-10-01
-  CORFICOLCF   875 semanas hasta 2026-10-01
-  GRUBOLIVAR   875 semanas hasta 2026-10-01
-  BOGOTA       875 semanas hasta 2026-10-01
-  TERPEL       633 semanas hasta 2026-10-01
-  EXITO        875 semanas hasta 2026-10-01
-  PROMIGAS     875 semanas hasta 2026-10-01
-  PFCORFICOL   875 semanas hasta 2026-10-01
-  CNEC         846 semanas hasta 2026-10-01
-  acciones actualizadas: 23 de 23
-
 RESUMEN
-  [OK] IPC — DANE y BanRep
   [OK] Curvas TES — BanRep
-  [OK] PIB real y nominal — DANE
   [OK] COLCAP — BanRep
   [OK] Politica, TRM, inflacion basica, externo — BanRep
-  [OK] ISE y mercado laboral — DANE
-  [OK] Informalidad laboral — DANE
-  [OK] Canasta COLCAP (iShares) y acciones (Yahoo Finance)
