@@ -12,20 +12,21 @@ Proyecto académico · Universidad de San Buenaventura Cali.
 | # | Pregunta | Gráficos principales |
 |---|----------|----------------------|
 | ◷ | ¿En qué parte del ciclo está la economía? | **Reloj del ciclo interactivo** (fase, nivel y dirección; recorrido por trimestre desde 2014) |
-| 1 | ¿Está creciendo la economía? | PIB trimestral e ISE mensual, desempleo, **producción frente a su capacidad** (frontera de producción) y **tamaño de la economía en pesos y dólares** |
-| 2 | ¿Qué sectores impulsan la economía? | Crecimiento de los 12 sectores del PIB (cualquier trimestre desde 2010 vs. un año antes) y mapa de calor |
-| 3 | ¿Cuánto del empleo es informal? | Informalidad nacional y 13 ciudades, por sector y por cada una de las 23 ciudades (selector de ciudad) |
-| 4 | ¿Qué pasa con los precios? | Inflación vs. meta 2–4 %, inflación esperada y **trayectoria que descuenta el mercado para los próximos 10 años** (1 año, años 1–5 y 5y5y) |
-| 5 | ¿Qué hace el Banco de la República? | Tasa de política vs. inflación |
-| 6 | ¿Cuánto cobra el mercado por prestarle al Gobierno? | **Curva cero cupón TES** interactiva (cualquier día desde 2003, comparación por años) |
-| 7 | ¿Cómo están el dólar y la bolsa? | TRM, COLCAP |
-| 8 | ¿Qué empresas mueven la bolsa? | COLCAP vs. equiponderado vs. **7 Magníficas** (base 100), pesos de la canasta, tabla de las 7 |
-| 9 | ¿Cómo están las cuentas externas y fiscales? | Cuenta corriente, deuda del Gobierno |
-| 10 | Todos los indicadores | Último dato, cambio y nivel frente a su historia |
+| 1 | ¿Está creciendo la economía? | PIB trimestral e ISE mensual y **crecimiento real por año** (con el año en curso como últimos 12 meses) |
+| 2 | ¿Qué sectores impulsan la economía? | Crecimiento de los 12 sectores del PIB (cualquier trimestre desde 2010 vs. un año antes) y mapa de calor (clic = ver ese trimestre) |
+| 3 | ¿Produce por encima o por debajo de su capacidad? | **Producción frente a su capacidad** (frontera de producción en el tiempo) |
+| 4 | ¿Cómo está el empleo y cuánto es informal? | Desempleo, informalidad nacional y 13 ciudades, por sector y por cada una de las 23 ciudades |
+| 5 | ¿Qué pasa con los precios? | Inflación vs. meta 2–4 %, inflación esperada y **trayectoria que descuenta el mercado para los próximos 10 años** (1 año, años 1–5 y 5y5y) |
+| 6 | ¿Qué hace el Banco de la República? | Tasa de política vs. inflación |
+| 7 | ¿Cuánto cobra el mercado por prestarle al Gobierno? | **Curva cero cupón TES** interactiva (cualquier día desde 2003, comparación por años) |
+| 8 | ¿Cómo están el dólar y la bolsa? | TRM, COLCAP |
+| 9 | ¿Qué empresas mueven la bolsa? | COLCAP vs. equiponderado vs. **7 Magníficas** (base 100), pesos de la canasta, tabla de las 7 |
+| 10 | ¿Cómo están las cuentas externas y fiscales? | Cuenta corriente, deuda del Gobierno |
+| 11 | Todos los indicadores | Último dato, cambio y nivel frente a su historia |
 | — | Nota: últimas publicaciones oficiales | Último dato de DANE, BanRep y BVC en una línea, con enlace oficial (discreta, al final) |
-| 11 | Fuentes | Estado de cada fuente, descargas CSV, metodología |
+| 12 | Fuentes | Estado de cada fuente, descargas CSV, metodología |
 
-Cada gráfico lleva al pie su **fuente** y un **?** que muestra la metodología. Muestra arriba el **último dato y su cambio** (frente a hace un año, al trimestre
+Cada gráfico lleva al pie su **fuente** y un **?** que muestra la metodología, y un botón **⤢** que lo amplía sobre la página sin moverla. Muestra arriba el **último dato y su cambio** (frente a hace un año, al trimestre
 o al mes anterior), abajo un **panel de barras con ese cambio a lo largo del tiempo**, y el
 recuadro flotante indica el cambio de cada punto. Las escalas se ajustan al periodo visible
 (2020 incluido). Los métodos técnicos

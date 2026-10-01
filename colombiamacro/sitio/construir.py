@@ -231,12 +231,8 @@ class Graficos:
         yq = [round(float(v), 2) for v in c["pib_real_yoy"]]
         ch = serie_cambio(xq, yq, "pp", "t")
         fig.add_trace(go.Bar(x=list(xq), y=yq, name=t("pib_trim", L), marker=dict(color=C1, line=dict(width=0)),
-                             customdata=[[f"{txt_cambio(v, 'pp', L)} {t('vs_trim', L)}" if pd.notna(v) else "",
-                                          "$" + num(n_ / 1000, 0, L) if pd.notna(n_) else "—"]
-                                         for v, n_ in zip(ch, d.pib.set_index("fecha")["pib_real_miles_millones_ref2015"]
-                                                          .reindex(pd.to_datetime(c["fecha"])).values)],
-                             hovertemplate=f"%{{y:.1f}}%  <span style='color:{MUTED}'>%{{customdata[0]}}</span><br>"
-                             + t("crec_nivel", L) + ": %{customdata[1]} bill."))
+                             customdata=[f"{txt_cambio(v, 'pp', L)} {t('vs_trim', L)}" if pd.notna(v) else "" for v in ch],
+                             hovertemplate=f"%{{y:.1f}}%  <span style='color:{MUTED}'>%{{customdata}}</span>"))
         items = [(t("pib_trim", L), xq, yq, "pp", "t", "q", 1, "%")]
         if d.ise is not None:
             i = d.ise.dropna(subset=["ise_sa_yoy"])
@@ -400,40 +396,55 @@ class Graficos:
         u = df.iloc[-1]
         return fig, {"franja": franja(L, [(t("cap_dif", L), x, df["gap"], "pp", "a", "q", 1, "%")])}, u
 
-    def pib_pesos(self):
-        """Tamano de la economia: PIB de los ultimos 4 trimestres en billones de pesos (corrientes y de 2015) y en dolares."""
+    def crecimiento_anual(self):
+        """Crecimiento real por ano: PIB real (datos originales) de cada ano frente al anterior, mas los ultimos 12 meses."""
         L, d = self.lang, self.d
         p = d.pib.set_index("fecha").sort_index()
-        nom = p["pib_nominal_billones_cop"].astype(float).rolling(4).sum()
-        real = (p["pib_real_miles_millones_ref2015"].astype(float) / 1000).rolling(4).sum()
-        x = list(qend(pd.Series(p.index)))
-        fig = base(L, suffix="", height=360)
-        fig.add_trace(go.Bar(x=x, y=[None if pd.isna(v) else round(v, 1) for v in nom], name=t("pp_nom", L),
-                             marker=dict(color=C1, line=dict(width=0)),
-                             customdata=[num(v, 1, L, True, "%") if pd.notna(v) else "" for v in (nom / nom.shift(4) - 1) * 100],
-                             hovertemplate="COP $%{y:,.0f} bill.  <span style='color:" + MUTED + "'>%{customdata} " + t("vs_ano", L) + "</span>"))
-        fig.add_trace(go.Scatter(x=x, y=[None if pd.isna(v) else round(v, 1) for v in real], name=t("pp_real", L), mode="lines",
-                                 line=dict(color=C2, width=2.2), hovertemplate="COP $%{y:,.0f} bill."))
-        usd = None
-        trm = d.extra.get("trm")
-        if trm is not None and not trm.empty:
-            tq = trm.set_index("fecha")["trm"].resample("QS").mean()
-            tq4 = tq.rolling(4).mean().reindex(p.index)
-            usd = nom * 1e12 / tq4 / 1e9  # miles de millones de dolares
-            fig.add_trace(go.Scatter(x=x, y=[None if pd.isna(v) else round(v, 1) for v in usd], name=t("pp_usd", L),
-                                     mode="lines", yaxis="y3", line=dict(color=C3, width=2, dash="dot"),
-                                     hovertemplate="US$%{y:,.0f} mil M"))
-            fig.update_layout(yaxis3=dict(overlaying="y", side="right", tickprefix="US$", tickformat=",.0f", showgrid=False,
-                                          fixedrange=True, tickfont=dict(size=11, color=C3), automargin=True,
-                                          title=dict(text=t("pp_eje_usd", L), font=dict(size=11, color=C3))))
-        fig.update_layout(yaxis=dict(tickprefix="$", tickformat=",.0f", ticksuffix="",
-                                     title=dict(text=t("pp_eje", L), font=dict(size=12))))
-        fig.update_layout(bargap=0.25)
-        fig.update_xaxes(range=rango_inicial(max(x)))
-        u = {"nom": nom.dropna().iloc[-1], "real": real.dropna().iloc[-1], "q": p.index[-1],
-             "usd": None if usd is None or usd.dropna().empty else usd.dropna().iloc[-1]}
-        items = [(t("pp_nom", L), x, nom, "pct", "a", "q", 0, "$ bill. COP")]
-        return fig, {"franja": franja(L, items), "noy": True}, u
+        real4 = p["pib_real_miles_millones_ref2015"].astype(float).rolling(4).sum()
+        r12 = (real4 / real4.shift(4) - 1) * 100            # crecimiento real de los ultimos 12 meses, trimestral
+        r12 = r12.dropna()
+        anual = r12[r12.index.month == 10]                    # T4: ano calendario completo
+        ult = r12.index[-1]
+        fig = base(L, suffix="%", height=380)
+        xa = [pd.Timestamp(f.year, 7, 1) for f in anual.index]      # barra centrada en el ano
+        prev = anual.shift(1)
+        fig.add_trace(go.Bar(
+            x=xa, y=[round(float(v), 2) for v in anual], name=t("pa_anual", L),
+            marker=dict(color=[C1 if v >= 0 else C2 for v in anual], line=dict(width=0)),
+            text=[num(v, 1, L) + "%" for v in anual], textposition="outside", cliponaxis=False,
+            textfont=dict(size=10.5, color=INK2),
+            customdata=[[str(f.year), txt_cambio(v - pv, "pp", L) + " " + t("pa_vs", L) if pd.notna(pv) else ""]
+                        for f, v, pv in zip(anual.index, anual, prev)],
+            hovertemplate="<b>%{customdata[0]}</b>: %{y:.1f}%  <span style='color:" + MUTED + "'>%{customdata[1]}</span><extra></extra>"))
+        if ult.month != 10:  # ano en curso: ultimos 12 meses
+            v12 = float(r12.iloc[-1])
+            q12 = fecha(ult, "q", L)
+            fig.add_trace(go.Bar(
+                x=[qend(pd.Series([ult])).iloc[0]], y=[round(v12, 2)], name=t("pa_12m", L).format(q=q12),
+                marker=dict(color="rgba(42,120,214,0.35)", line=dict(color=C1, width=1.5)),
+                text=[num(v12, 1, L) + "%"], textposition="outside", cliponaxis=False, textfont=dict(size=10.5, color=INK2),
+                hovertemplate=t("pa_12m", L).format(q=q12) + ": %{y:.1f}%<extra></extra>"))
+        prom = float(anual[(anual.index.year >= 2010) & (anual.index.year <= 2019)].mean())
+        pot = d.ciclo.set_index("fecha")["crecimiento_potencial_hp"].dropna()
+        if not pot.empty:
+            pa = pot.groupby(pot.index.year).mean()
+            pa = pa[pa.index.isin([f.year for f in anual.index])]
+            self._l(fig, [pd.Timestamp(y, 7, 1) for y in pa.index], pa.values, t("ritmo_normal", L), C3, width=1.8, dash="dot")
+        # margen invisible para que la primera y la ultima barra no queden cortadas con cualquier horizonte
+        x_ini, x_fin = xa[0] - pd.DateOffset(months=7), qend(pd.Series([ult])).iloc[0] + pd.DateOffset(months=7)
+        fig.add_trace(go.Scatter(x=[x_ini, x_fin], y=[None, None], mode="markers", marker=dict(opacity=0),
+                                 showlegend=False, hoverinfo="skip"))
+        fig.add_trace(go.Scatter(x=[x_ini, x_fin], y=[prom, prom], mode="lines", name=t("pa_prom", L).format(v=num(prom, 1, L)),
+                                 line=dict(color=INK2, width=1.2, dash="dash"), hoverinfo="skip"))
+        fig.add_hline(y=0, line=dict(color=INK2, width=1))
+        fig.update_layout(bargap=0.3, uniformtext=dict(minsize=10, mode="show"),
+                          yaxis=dict(title=dict(text=t("pa_eje", L), font=dict(size=11.5))))
+        fig.update_xaxes(range=rango_inicial(x_fin))
+        xr = list(qend(pd.Series(r12.index)))
+        items = [(t("pa_franja", L), xr, list(r12.values), "pp", "a", "q", 1, "%")]
+        u = {"r12": float(r12.iloc[-1]), "q": ult, "ultimo_ano": int(anual.index[-1].year), "v_ano": float(anual.iloc[-1]),
+             "prom": prom}
+        return fig, {"franja": franja(L, items)}, u
 
     # --- sectores (PIB por actividad)
     def sectores_barras(self):
@@ -1022,22 +1033,27 @@ def pagina(d, s, lang, generado):
     fc, mc = g.crecimiento()
     fd, md = g.desempleo()
     fcap, mcap, ucap = g.capacidad()
-    fpp, mpp, upp = g.pib_pesos()
-    usd_txt = t("pp_resp_usd", L).format(u=num(upp["usd"], 0, L)) if upp.get("usd") else ""
+    fpa, mpa, upa = g.crecimiento_anual()
     s1_det = (f'<p>{t("x_crec", L).format(g=num(ucap["gap"], 1, L, True), pot=num(ucap["pot"], 0, L), y=num(ucap["y"], 0, L))}</p>'
               f'<p>{t("x_crec2", L)}</p>')
     ise_txt = ""
     if s.get("ise"):
         ise_txt = t("resp_ise", L).format(v=num(s["ise"]["yoy"], 1, L), f=fecha(s["ise"]["fecha"], "m", L))
-    tam_txt = t("pp_resp", L).format(n=num(upp["nom"], 0, L), q=fecha(upp["q"], "q", L)) + usd_txt
+    tam_txt = t("pa_resp", L).format(v=num(upa["r12"], 1, L), q=fecha(upa["q"], "q", L),
+                                     a=upa["ultimo_ano"], va=num(upa["v_ano"], 1, L), p=num(upa["prom"], 1, L))
     s1 = seccion("crecimiento", "1", t("q_crec", L),
                  t("resp_crec", L).format(v=num(c["pib_real_yoy"], 1, L), q=fecha(c["fecha"], "q", L),
                                           p=num(c["crecimiento_potencial_hp"], 1, L)) + " " + ise_txt + " " + tam_txt,
                  [bloque_grafico(t("g_crec", L), fig_html(fc, mc, "g-crec"), t("h_crec", L)),
-                  bloque_grafico(t("g_desempleo", L), fig_html(fd, md, "g-desempleo"), t("h_desempleo", L)),
-                  bloque_grafico(t("g_cap", L), fig_html(fcap, mcap, "g-capacidad"), t("h_cap", L)),
-                  bloque_grafico(t("g_pp", L), fig_html(fpp, mpp, "g-pib-pesos"), t("h_pp", L))],
-                 s1_det, L)
+                  bloque_grafico(t("g_pa", L), fig_html(fpa, mpa, "g-pib-anual"), t("h_pa", L))],
+                 f'<p>{t("x_crec_pa", L)}</p>', L)
+
+    # --- capacidad (despues de los sectores: primero cuanto y quien crece, luego si sobra o falta capacidad)
+    s_cap = seccion("capacidad", "0", t("q_cap", L),
+                    t("resp_cap", L).format(q=fecha(c["fecha"], "q", L), g=num(ucap["gap"], 1, L, True),
+                                            e=t("cap_encima" if ucap["gap"] >= 0 else "cap_debajo", L)),
+                    [bloque_grafico(t("g_cap", L), fig_html(fcap, mcap, "g-capacidad"), t("h_cap", L), ancho=True)],
+                    s1_det, L)
 
     # --- sectores
     s_sec = ""
@@ -1072,7 +1088,9 @@ def pagina(d, s, lang, generado):
             uu = ir[ir["fecha"] == ir["fecha"].max()]
             millones = num(uu["informales"].sum() / 1000, 1, L)
         ventana = t("mov_" + str(ult["fecha"].month), L)
-        resp_inf = t("resp_informal", L).format(
+        resp_inf = t("resp_desempleo", L).format(v=num(s["laboral"]["td"], 1, L), f=fecha(s["laboral"]["fecha"], "m", L),
+                                                 a=num(s["laboral"]["td_hace_12m"], 1, L)) + " " if s.get("laboral") and s["laboral"].get("td_hace_12m") is not None else ""
+        resp_inf += t("resp_informal", L).format(
             v=num(ult["nacional"], 1, L), p=ventana + " " + str(ult["fecha"].year), m=millones,
             a=num(ant.iloc[-1]["nacional"], 1, L) if not ant.empty else "—",
             c=num(ult["ciudades_13"], 1, L), i=num(inf.iloc[0]["nacional"], 1, L))
@@ -1081,7 +1099,8 @@ def pagina(d, s, lang, generado):
         fic, mic = g.informalidad_ciudades()
         trece_txt = ", ".join(inf_13_lista(d))
         s_inf = seccion("informalidad", "0", t("q_informal", L), resp_inf,
-                        [bloque_grafico(t("g_informal", L), fig_html(fin_, min_, "g-informal"), t("h_informal", L)),
+                        [bloque_grafico(t("g_desempleo", L), fig_html(fd, md, "g-desempleo"), t("h_desempleo", L)),
+                         bloque_grafico(t("g_informal", L), fig_html(fin_, min_, "g-informal"), t("h_informal", L)),
                          bloque_grafico(t("g_inf_ramas", L).format(p=ventana + " " + str(ult["fecha"].year)),
                                         fig_html(fir, mir, "g-inf-ramas"), t("h_inf_ramas", L)),
                          bloque_grafico(t("g_inf_ciudades", L).format(p=ventana + " " + str(ult["fecha"].year)),
@@ -1201,7 +1220,7 @@ def pagina(d, s, lang, generado):
 </head><body>
 <header class="top"><div class="wrap top-in">
   <a class="brand" href="#inicio"><img src="{raiz}assets/logo_usb.png" alt="USB Cali"><span><b>ColombiaMacro</b><small>{t("sub_marca", L)}</small></span></a>
-  <nav class="menu" id="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a></nav>
+  <nav class="menu" id="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#capacidad">{t("nav_cap", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a></nav>
   <button class="menu-toggle" id="menu-toggle" aria-controls="menu" aria-expanded="true" title="{t("menu_ocultar", L)}" data-ocultar="{t("menu_btn_ocultar", L)}" data-mostrar="{t("menu_btn_mostrar", L)}"><span class="mt-ico" aria-hidden="true">☰</span><span class="mt-txt">{t("menu_btn_ocultar", L)}</span></button>
   <a class="lang" href="{otro}">{t("otro_idioma", L)}</a>
 </div></header>
@@ -1216,7 +1235,7 @@ def pagina(d, s, lang, generado):
 {explorador_ciclo(d, L)}
 <div class="horizon" role="group" aria-label="{t('horizonte', L)}"><span>{t("horizonte", L)}:</span>
   <button data-years="3">{t("h3", L)}</button><button data-years="5">{t("h5", L)}</button><button data-years="10" class="on">{t("h10", L)}</button><button data-years="0">{t("htodo", L)}</button></div>
-{s1}{s_sec}{s_inf}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
+{s1}{s_sec}{s_cap}{s_inf}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
 <section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">8</span><h2>{t("q_todos", L)}</h2></div>
 <p class="answer">{t("resp_todos", L)}</p>{tabla}</section>
 {bloque_noticias(d, s, L)}

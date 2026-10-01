@@ -1,616 +1,553 @@
 \documentclass[11pt]{article}
 \usepackage{../latex/colombiamacro}
+\usepackage{needspace}
 \graphicspath{{../figuras/}{../img/}{../presentacion/}}
 \setlength{\emergencystretch}{2.5em}
-\fancyhead[L]{\sffamily\footnotesize\color{cmmuted}ColombiaMacro · Guía de presentación}
+\fancyhead[L]{\sffamily\footnotesize\color{cmmuted}ColombiaMacro · Guía de presentación académica}
 
-\newcommand{\slide}[3]{\subsection*{\color{cmblue}#1\ \ \color{cmink}#2 \hfill{\normalfont\small\color{cmmuted}#3}}}
-\newtcolorbox{guion}{enhanced,breakable,colback=white,colframe=cmrule,boxrule=0.6pt,arc=2pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+% Ficha de un grafico. \grafico: imagen a la izquierda y texto a la derecha; \graficoancho: imagen arriba.
+\newcommand{\lab}[1]{\raggedright{\sffamily\bfseries\footnotesize\color{cmblue}\MakeUppercase{#1}}\\[1pt]}
+\newcommand{\fichatexto}[3]{\lab{Construcción}#1\par\smallskip\lab{Lectura}#2\par\smallskip\lab{Para el inversionista}#3}
+\newcommand{\grafico}[5]{\par\noindent
+\begin{minipage}[c]{0.44\linewidth}\includegraphics[width=\linewidth]{#1}\end{minipage}\hfill
+\begin{minipage}[c]{0.53\linewidth}\small\setlength{\parskip}{0pt}\fichatexto{#3}{#4}{#5}\end{minipage}\par\bigskip}
+\newcommand{\graficoancho}[5]{\par\noindent
+\begin{minipage}{\linewidth}\centering\includegraphics[width=#2\linewidth]{#1}\par\medskip
+\raggedright\small\setlength{\parskip}{0pt}
+\begin{minipage}[t]{0.32\linewidth}\lab{Construcción}#3\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\lab{Lectura}#4\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\lab{Para el inversionista}#5\end{minipage}\end{minipage}\par\bigskip}
 \newcommand{\di}[1]{\textit{“#1”}}
 
 \begin{document}
 
+% ================================================================
 \begin{titlepage}
 \thispagestyle{empty}
 \begin{tikzpicture}[remember picture,overlay]
   \fill[cmink] (current page.north west) rectangle ([yshift=-9mm]current page.north east);
 \end{tikzpicture}
-\vspace*{18mm}
+\vspace*{16mm}
 {\sffamily\small\color{cmmuted}UNIVERSIDAD DE SAN BUENAVENTURA CALI · FINANZAS Y NEGOCIOS INTERNACIONALES\par}
-\vspace{16mm}
-{\sffamily\bfseries\fontsize{34}{40}\selectfont Guía para la presentación\\académica de ColombiaMacro\par}
-\vspace{8mm}
-{\large Ante directivos del Banco de la República, el Rector,\\ altos cargos de la Universidad y profesores economistas\par}
-\vspace{12mm}
+\vspace{14mm}
+{\sffamily\bfseries\fontsize{32}{38}\selectfont ColombiaMacro\\[2mm]\fontsize{20}{26}\selectfont Guía para la presentación académica\par}
+\vspace{6mm}
+{\large Datos, construcción de los gráficos, interpretación y lectura para inversionistas\par}
+\vspace{10mm}
 \begin{tcolorbox}[colback=cmsoft,colframe=cmsoft,arc=2pt,left=10pt,right=10pt,top=8pt,bottom=8pt]
-\sffamily\large\textbf{Mensaje central en una frase}\\[4pt]
-\normalfont\normalsize ColombiaMacro convierte datos oficiales en una lectura del ciclo económico que
-cualquiera puede verificar: hoy Colombia está en expansión, con inflación fuera de la meta, política
-monetaria restrictiva y expectativas de mercado desancladas.
+\sffamily\textbf{Pregunta de la presentación}\\[3pt]
+\normalfont ¿En qué fase del ciclo está la economía colombiana y qué implica para la inflación, la política
+monetaria y los precios de los activos?\\[6pt]
+\sffamily\textbf{Respuesta (datos al 30 de septiembre de 2026)}\\[3pt]
+\normalfont Expansión moderada (brecha +0,3\%, positiva con los tres métodos), inflación de 6,24\% en
+aumento, expectativas de largo plazo desancladas (5y5y 6,0\%) y política monetaria restrictiva
+(tasa de 12,25\% desde el 1 de octubre; tasa real ex ante $\approx$4,8\% frente a una neutral de 2,7–3,0\%).
 \end{tcolorbox}
 \vfill
-\centering\includegraphics[width=0.55\linewidth]{reloj_ciclo.pdf}
+\centering\includegraphics[width=0.48\linewidth]{fig_ciclo-reloj.png}
 \vfill
-{\sffamily\small Complemento de: \textit{ColombiaMacro\_Beamer.pdf} (diapositivas) y \textit{Manual\_ColombiaMacro.pdf} (documentación técnica).}
+{\sffamily\small Sitio: \url{https://stv-quant.github.io/ColombiaMacro-USBCali/} · Complementos: \textit{ColombiaMacro\_Beamer.pdf} y \textit{Manual\_ColombiaMacro.pdf}.}
 \end{titlepage}
 
 \tableofcontents
 \newpage
 
 % ================================================================
-\section{Propósito y resultado esperado}
+\needspace{14\baselineskip}
+\section{Estructura de la exposición}
 
-\subsection{Qué debe lograr la presentación}
-En orden de prioridad:
+Formato: 20 minutos de exposición, 3 de demostración y 15 de preguntas. La secuencia sigue la de un
+informe de política monetaria (actividad $\rightarrow$ precios $\rightarrow$ política $\rightarrow$ activos) y
+termina en la lectura para el inversionista.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}rXr@{}}
+\toprule
+\textbf{Bloque} & \textbf{Contenido y mensaje} & \textbf{Min.}\\\midrule
+1 & Pregunta y respuesta en una frase (portada de esta guía). & 1\\
+2 & Obtención de datos: fuentes oficiales, descarga automática, controles (sección~\ref{sec:datos}). & 3\\
+3 & Del dato al gráfico: transformación, convenciones, publicación (sección~\ref{sec:construccion}). & 3\\
+4 & Actividad y mercado laboral: reloj, capacidad, sectores, empleo, informalidad (sección~\ref{sec:actividad}). & 4\\
+5 & Precios, expectativas y política: inflación, implícitas, 5y5y, tasa real, curva TES (sección~\ref{sec:precios}). & 4\\
+6 & Mercados y sector externo: dólar, ITCR, COLCAP por dentro, cuenta corriente, deuda (sección~\ref{sec:mercados}). & 2\\
+7 & Lectura para el inversionista y señales a vigilar (sección~\ref{sec:inversion}). & 2\\
+8 & Limitaciones y cierre (sección~\ref{sec:limites}). & 1\\
+\midrule
+ & Demostración en vivo (sección~\ref{sec:demo}). & 3\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Regla para cada gráfico durante la exposición: \textbf{dato $\rightarrow$ cómo se construyó $\rightarrow$
+qué dice hoy $\rightarrow$ qué implica}. Máximo 40 segundos por gráfico.
+
+% ================================================================
+\needspace{14\baselineskip}
+\section{Obtención de los datos}
+\label{sec:datos}
+
+\needspace{8\baselineskip}
+\subsection{Principios}
 \begin{enumerate}
-\item \textbf{Credibilidad metodológica} ante el equipo técnico de BanRep y los profesores: que
-reconozcan que los métodos son estándar, explícitos y que las limitaciones están declaradas.
-\item \textbf{Una lectura clara del ciclo} que cualquier asistente pueda repetir al salir.
-\item \textbf{Respaldo institucional} del Rector y la dirección: que vean un producto que proyecta a la
-Universidad en la conversación macroeconómica nacional.
-\item \textbf{Un siguiente paso concreto}: revisión técnica con BanRep, alojamiento institucional, uso docente.
+\item \textbf{Solo fuentes oficiales} (DANE, Banco de la República, Superfinanciera, MinHacienda vía BanRep, BVC).
+Las dos excepciones de mercado (canasta del COLCAP y precios por acción) están declaradas.
+\item \textbf{Sin intervención manual}: cada serie se descarga por programa, con su identidad verificada
+(número de serie \emph{y} nombre). Si la fuente cambia la variable, el proceso falla en lugar de publicar otra.
+\item \textbf{Trazabilidad}: cada actualización queda como un \emph{commit} en el repositorio con fecha y hora;
+cualquier cifra se puede rastrear hasta su descarga.
 \end{enumerate}
 
-\subsection{Qué no debe pasar}
-\begin{itemize}
-\item Que se perciba como una crítica a las decisiones de la Junta Directiva del BanRep.
-\item Que se confunda con una recomendación de inversión o con un pronóstico.
-\item Que la demostración en vivo falle sin respaldo.
-\item Que una pregunta técnica (filtro HP, primas en la inflación implícita) quede sin respuesta preparada.
-\end{itemize}
-
-\subsection{El mensaje en tres niveles}
-\begin{center}\small
-\begin{tabularx}{\linewidth}{@{}lX@{}}
-\toprule
-\textbf{Para} & \textbf{Mensaje}\\\midrule
-Todos (10 segundos) & Un tablero abierto que lee el ciclo colombiano con datos oficiales y cuyas cifras cualquiera puede verificar.\\
-Directivos (1 minuto) & Lo construyó un estudiante de la USB Cali; es reproducible, se actualiza solo cada día y está listo para alojarse institucionalmente y usarse en docencia.\\
-Economistas (5 minutos) & Brecha del producto en tiempo real con tres métodos y banda de incertidumbre; inflación implícita y 5y5y con Fisher exacto; tasa real ex ante contra la neutral estimada por BanRep; validación fuera de muestra y limitaciones declaradas.\\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-% ================================================================
-\section{Conocer a la audiencia}
-
-\begin{center}\small
-\begin{tabularx}{\linewidth}{@{}p{0.19\linewidth}XXX@{}}
-\toprule
-\textbf{Audiencia} & \textbf{Qué valora} & \textbf{Qué le preocupa} & \textbf{Cómo ganarla}\\\midrule
-Directivos y equipo técnico de BanRep & Rigor, precisión en el lenguaje, uso correcto de sus series y conceptos & Interpretaciones que parezcan juicios sobre la política; errores de datos; confusión entre expectativas e implícitas & Citar sus series por número; usar su propia estimación de la tasa neutral; declarar primas y limitaciones antes de que las pregunten\\
-Rector & Impacto institucional, visibilidad, pertinencia para la región & Riesgo reputacional; sostenibilidad del proyecto & Mostrar el producto terminado, el aval académico y un plan concreto (alojamiento, docencia, alianzas)\\
-Vicerrectores y decanos & Articulación con currículo, investigación y extensión & Recursos requeridos & Proponer usos: cursos, semilleros, observatorio; costos bajos (servidor pequeño)\\
-Profesores economistas & Métodos, supuestos, robustez, literatura & El filtro HP; datos revisados; sobreinterpretación & Mostrar HP en tiempo real + Hamilton, la banda, la tabla de robustez y la validación fuera de muestra\\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-\subsection{Protocolo y lenguaje}
-\begin{itemize}
-\item \textbf{Saludo por jerarquía}: \di{Señor Rector [nombre], doctores y doctoras del Banco de la República,
-señores vicerrectores y decanos, profesores, compañeros.} Confirmar nombres y cargos con la secretaría
-del evento el día anterior.
-\item \textbf{Tratamiento}: “doctor/doctora” para directivos del BanRep y del Rector hacia abajo según la costumbre
-institucional; nunca tutear.
-\item \textbf{Verbos descriptivos, no normativos}: decir \di{la tasa real ex ante está por encima del rango
-neutral estimado por el propio Banco}, no \di{la política es excesiva}. Decir \di{las medidas de mercado
-sugieren expectativas desancladas}, no \di{el Banco perdió credibilidad}.
-\item \textbf{Cifras siempre con fecha y fuente}: \di{6,24\% en agosto, según el DANE}.
-\item \textbf{Vestimenta}: formal (traje oscuro). Llegar 45 minutos antes.
-\end{itemize}
-
-% ================================================================
-\section{Formato y estructura}
-
-\subsection{Formato recomendado}
-\begin{itemize}
-\item \textbf{20 minutos} de exposición + \textbf{3 minutos} de demostración + \textbf{15–20 minutos} de preguntas.
-\item 23 diapositivas principales y 5 de apéndice técnico (solo para preguntas).
-\item Un moderador (idealmente el profesor tutor o el director del programa) que presente al expositor
-y administre el tiempo de preguntas.
-\end{itemize}
-
-\subsection{Arco narrativo}
+\needspace{8\baselineskip}
+\subsection{Arquitectura}
 \begin{center}
-\begin{tikzpicture}[b/.style={draw=cmrule,fill=cmsoft,rounded corners=2pt,align=center,font=\sffamily\scriptsize,text width=22mm,minimum height=13mm},
+\begin{tikzpicture}[b/.style={draw=cmrule,fill=cmsoft,rounded corners=2pt,align=center,font=\sffamily\scriptsize,text width=22mm,minimum height=15mm},
   a/.style={-{Stealth[length=2mm]},color=cmmuted,thick}]
-\node[b] (1) {Problema\\(3 min)};
-\node[b,right=3mm of 1] (2) {Solución\\(3 min)};
-\node[b,right=3mm of 2] (3) {Hallazgos\\(9 min)};
-\node[b,right=3mm of 3] (4) {Confiabilidad\\(3 min)};
-\node[b,right=3mm of 4] (5) {Demo y\\propuesta (5 min)};
-\draw[a] (1)--(2); \draw[a] (2)--(3); \draw[a] (3)--(4); \draw[a] (4)--(5);
+\node[b] (f) {\textbf{Fuentes}\\API BanRep\\Anexos DANE\\iShares, Yahoo};
+\node[b,right=4mm of f] (d) {\textbf{Descarga}\\\texttt{fuentes/*.py}\\identidad + rangos};
+\node[b,right=4mm of d] (c) {\textbf{Datos}\\CSV versionados\\en \texttt{data/}};
+\node[b,right=4mm of c] (m) {\textbf{Modelo}\\fórmulas y\\veredicto};
+\node[b,right=4mm of m] (s) {\textbf{Sitio}\\HTML estático\\+ Plotly};
+\draw[a] (f)--(d); \draw[a] (d)--(c); \draw[a] (c)--(m); \draw[a] (m)--(s);
+\node[font=\sffamily\scriptsize,color=cmmuted,below=2mm of c] {GitHub Actions: cada hora en días hábiles + corrida completa nocturna};
 \end{tikzpicture}
 \end{center}
-La lógica es la de un informe de política monetaria: primero la actividad, luego los precios, después la
-reacción de política y finalmente los precios de activos. Esa secuencia es familiar para el equipo del
-BanRep y pedagógica para el resto de la audiencia.
 
-\subsection{Distribución del tiempo}
+\needspace{8\baselineskip}
+\subsection{Fuentes y método de descarga}
 \begin{center}\small
-\begin{tabular}{@{}rlr@{}}
+\begin{tabularx}{\linewidth}{@{}p{0.27\linewidth}p{0.2\linewidth}Xp{0.1\linewidth}@{}}
 \toprule
-\textbf{Diap.} & \textbf{Bloque} & \textbf{Minutos}\\\midrule
-1–2 & Apertura y pregunta & 1,5\\
-3–5 & Problema, solución, reglas de diseño & 3,5\\
-6–16 & Hallazgos: actividad, sectores, precios, política, mercados & 9\\
-17–20 & Validación, robustez y limitaciones & 3\\
-21 & Demostración en vivo & 3\\
-22–23 & Próximos pasos y cierre & 2\\
-\midrule
- & Total & 22\\
+\textbf{Variable} & \textbf{Fuente} & \textbf{Método} & \textbf{Frec.}\\\midrule
+PIB real (orig. y desest.), PIB nominal, 12 sectores & DANE & Anexos \texttt{anex-Produccion*} (Cuadros 1 y 4); se localiza el enlace vigente en la página técnica y se valida estructura y trimestre & Trim.\\
+ISE & DANE & Anexo \texttt{anex-ISE-9actividades} & Mens.\\
+Desempleo, ocupación, participación & DANE, GEIH & Anexo desestacionalizado & Mens.\\
+Informalidad (nacional, 23 ciudades, 13 ramas) & DANE, GEIH & Anexo \texttt{anex-GEIHEISS} (hojas de proporción y ramas) & Mens.\\
+IPC, inflación básica, meta & DANE / BanRep & API estadística BanRep (series 15000, 15390, 853) & Mens.\\
+Tasa de política & BanRep & Serie 59 + registro del anuncio de la Junta & Diaria\\
+Curvas cero cupón TES pesos y UVR (1, 5, 10 años) & BanRep & Series 15272–15277 & Diaria\\
+TRM & Superfinanciera vía BanRep & Serie 1 & Diaria\\
+COLCAP & BVC vía BanRep & Serie oficial del índice & Diaria\\
+Canasta y pesos del COLCAP & iShares MSCI COLCAP & Archivo diario de tenencias del fondo & Diaria\\
+Precios por acción & Yahoo Finance & Cierres semanales \texttt{TICKER.CL} & Semanal\\
+ITCR, cuenta corriente, IED, reservas & BanRep & Series 235, 15290, 15133, 15051 & Mens./Trim.\\
+Deuda bruta GNC & MinHacienda vía BanRep & Serie 15328 & Anual\\
 \bottomrule
-\end{tabular}
+\end{tabularx}
+\end{center}
+
+\textbf{Decisiones de la Junta.} La serie oficial registra la nueva tasa el día en que \emph{rige}, no el día del
+anuncio. Para no mostrar un dato viejo el día de la decisión, el anuncio se registra en
+\archivo{data/decisiones\_banrep.csv} y el tablero lo muestra como “anunciada” hasta que entra a la serie
+(caso actual: 30-sep-2026, 12,00\% $\rightarrow$ 12,25\%, rige el 1-oct).
+
+\needspace{8\baselineskip}
+\subsection{Calendario de actualización}
+\begin{itemize}
+\item \textbf{Cada hora, lunes a viernes, 7:07–18:07 (hora de Colombia)}: series diarias (tasa de política, TES,
+TRM, COLCAP). Se publica solo si llegó un dato nuevo.
+\item \textbf{Todos los días, 19:30}: corrida completa (DANE, BanRep, canasta y precios de acciones).
+\item Una fuente que falla conserva su último dato válido y queda registrada en el estado de fuentes; no detiene
+la publicación.
+\end{itemize}
+
+\needspace{8\baselineskip}
+\subsection{Controles de calidad}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}p{0.28\linewidth}X@{}}
+\toprule
+\textbf{Control} & \textbf{Regla}\\\midrule
+Identidad & Número de serie y nombre deben coincidir con el catálogo.\\
+Fechas & Sin duplicados, sin fechas futuras, sin meses o trimestres faltantes; el último trimestre del anexo
+debe coincidir con su nombre de archivo.\\
+Rangos & Límites plausibles por serie (p.\,ej. crecimiento anual del PIB $|x|<40\%$).\\
+Saltos aislados & Valor que se aleja $>2$\,pp de ambos vecinos que difieren $<1$\,pp: se conserva en el CSV,
+se lista en \archivo{alertas\_datos.csv} y se excluye de los cálculos.\\
+Identidades contables & $TD = 1 - TO/TGP$; inflación mensual compuesta a 12 meses = anual ($\pm0{,}04$\,pp);
+la suma de informales por rama reproduce la tasa nacional.\\
+Pruebas & 63 pruebas automáticas corren antes y después de cada descarga.\\
+\bottomrule
+\end{tabularx}
 \end{center}
 
 % ================================================================
-\section{Guion diapositiva por diapositiva}
+\needspace{14\baselineskip}
+\section{Construcción de los gráficos}
+\label{sec:construccion}
 
-Los textos entre comillas son una propuesta; conviene decirlos con palabras propias tras varios ensayos.
-Las cifras corresponden al corte del 30 de septiembre de 2026: \textbf{regenere las figuras y actualice las
-cifras el día anterior} (sección~\ref{sec:actualizar}).
+\needspace{8\baselineskip}
+\subsection{Proceso común}
+\begin{enumerate}
+\item \textbf{Carga}: los CSV de \archivo{data/} se leen en un objeto único (\texttt{modelo.cargar}).
+\item \textbf{Transformación}: las fórmulas (variaciones, filtro HP, Fisher, forwards, índices) están en
+\texttt{analitica.py} y \texttt{modelo.py} y se recalculan en cada corrida; nada se guarda precalculado.
+\item \textbf{Figura}: cada gráfico se arma en Python con Plotly (\texttt{sitio/construir.py}): panel principal +
+panel inferior de cambio + franja de cifras clave + pie con fuente y metodología.
+\item \textbf{Publicación}: la figura se serializa en JSON dentro de un HTML estático (español e inglés). En el
+navegador, \texttt{app.js} la dibuja y aplica el horizonte elegido (3, 5, 10 años o todo), recalculando los
+ejes con los datos visibles.
+\item \textbf{Descarga}: cada tabla usada se ofrece en CSV para replicar el cálculo.
+\end{enumerate}
 
-\slide{1}{Título}{0:30}
-\begin{guion}
-\di{Buenos días. Señor Rector, doctores del Banco de la República, directivos y profesores: gracias por su
-tiempo. Voy a presentar ColombiaMacro, un monitor abierto del ciclo económico colombiano que desarrollé
-en el programa de Finanzas y Negocios Internacionales.}
-\end{guion}
-
-\slide{2}{La pregunta}{1:00}
-\begin{guion}
-\di{Todo el tablero responde una sola pregunta: en qué fase del ciclo está Colombia y qué implica para
-precios, política monetaria y activos. La dividimos en cinco preguntas, en el orden en que un banco
-central lee la economía.} Pausa de dos segundos. Mirar a la audiencia, no a la pantalla.
-\end{guion}
-
-\slide{3}{El problema}{1:30}
-\begin{guion}
-\di{Cuando auditamos la versión anterior encontramos cuatro problemas que son frecuentes en tableros
-económicos: el PIB nominal aparecía como crecimiento real —por eso 2021 mostraba 61\%—, se mezclaban
-frecuencias en un mismo eje, había series sintéticas con apariencia oficial y la actualización automática
-fallaba sin avisar. Lo que un inversionista necesita no es más datos, sino una lectura con respaldo.}
-
-\textbf{Por qué funciona}: reconocer errores propios genera credibilidad inmediata con economistas.
-\end{guion}
-
-\slide{4}{Qué es ColombiaMacro}{1:00}
-\begin{guion}
-\di{Más de veinte series oficiales del DANE y del Banco de la República se descargan cada día, se
-verifican por número y por nombre, pasan 61 pruebas y se convierten en una lectura en español e inglés.
-Es abierto, reproducible y auditable: cada frase del tablero cita el dato que la sustenta.}
-\end{guion}
-
-\slide{5}{Cuatro reglas de diseño}{1:00}
-\begin{guion}
-Leer los cuatro títulos y detenerse en el tercero: \di{sin información futura. El filtro de
-Hodrick-Prescott tradicional usa datos que en su momento no existían; nosotros lo estimamos en tiempo
-real.} Esto anticipa la objeción más probable de los profesores.
-\end{guion}
-
-\slide{6}{Separador: Hallazgos}{0:10}
-
-\slide{7}{Actividad: cerca del potencial}{1:15}
-\begin{guion}
-\di{Al segundo trimestre, la economía produce 0,3\% por encima de su capacidad —la brecha del producto—.
-La línea azul es la estimación principal; la banda es el rango entre tres métodos: de +0,3 a +2,3. Los tres
-coinciden en que produce por encima. El PIB crece 3,5\% y el potencial estimado es 2,4\%.}
-Señalar con el puntero la banda en 2022–2023: \di{cuando la banda es ancha, los métodos no coinciden y
-lo decimos.} Si preguntan por el sitio: \di{allí lo mostramos en pesos, como lo que produce la economía frente
-a su capacidad, y el rango entre métodos está en la ficha del gráfico.}
-\end{guion}
-
-\slide{8}{Sectores e informalidad}{0:45}
-\begin{guion}
-\di{¿Quién impulsa el crecimiento? En el segundo trimestre, Gobierno, educación y salud creció 10\% y aportó
-1,8 de los 3,9 puntos de crecimiento del valor agregado; Agro y pesca e Información y comunicaciones se
-contrajeron. Y en el mercado laboral, el 54,6\% de los ocupados es informal: 13,4 millones de personas, casi
-medio punto menos que hace un año y seis puntos menos que en 2021.} Una frase de cierre: \di{el crecimiento
-depende mucho del gasto público y la informalidad baja, pero despacio.}
-\end{guion}
-
-\slide{9}{Reloj del ciclo}{0:45}
-\begin{guion}
-\di{El reloj combina el nivel de la brecha con su dirección. Después de dos años entre contracción y
-recuperación, el segundo trimestre de 2026 cruza al cuadrante de expansión.} Añadir: \di{en el sitio el
-reloj es interactivo y es lo primero que se ve; lo mostraré en la demostración.}
-\end{guion}
-
-\slide{10}{Precios}{1:00}
-\begin{guion}
-\di{La inflación anual fue 6,24\% en agosto y subió 0,4 puntos en tres meses. La básica, sin alimentos
-ni regulados, está en 6,12\%: la presión no es solo de alimentos, es generalizada.}
-\end{guion}
-
-\slide{11}{Expectativas de mercado}{1:15}
-\begin{guion}
-\di{Los TES en pesos y en UVR permiten extraer la inflación que descuenta el mercado. A un año es 7,1\%
-y en el tramo de cinco a diez años, 6,0\%. Ese tramo, el 5y5y, es el indicador internacional de anclaje:
-está por encima del techo del rango meta.}
-
-\textbf{Matiz obligatorio} (decirlo antes de que lo pregunten): \di{esta medida incluye primas por riesgo
-inflacionario y por liquidez de los TES UVR; no es una expectativa pura, es lo que el mercado cobra.}
-\end{guion}
-
-\slide{12}{Política monetaria}{0:45}
-\begin{guion}
-\di{La tasa de política es 12\% tras tres alzas en 2026. Deflactada con la inflación que descuenta el
-mercado, la tasa real ex ante es 4,6\%, por encima del rango neutral de 2,7 a 3,0\% que estima el
-equipo técnico del propio Banco. En términos descriptivos, la postura es restrictiva.}
-Evitar adjetivos adicionales.
-\end{guion}
-
-\slide{13}{Curva TES}{0:45}
-\begin{guion}
-\di{Toda la curva subió en el último año. El TES a diez años está en 13,06\%, en el percentil 96 de su
-historia desde 2010, y la pendiente es casi plana.}
-\end{guion}
-
-\slide{14}{Mercados}{0:45}
-\begin{guion}
-\di{La bolsa sube 38,7\% en doce meses en pesos, y más en dólares porque el peso se apreció. Para el
-inversionista extranjero el retorno relevante es en dólares; por eso mostramos las dos líneas.}
-\end{guion}
-
-\slide{15}{La bolsa por dentro: 7 Magníficas}{0:45}
-\begin{guion}
-\di{¿La bolsa sube en general o solo por unas pocas empresas? Siete empresas —Grupo Cibest, Grupo Sura,
-Ecopetrol, ISA, Grupo Argos, Grupo Energía Bogotá y Cementos Argos— pesan cerca del 85\% del COLCAP. En doce
-meses el COLCAP sube 38,1\%, esas siete 35,2\% y un índice en el que todas las acciones pesan igual, 28,8\%.
-Como el COLCAP le gana al promedio por más de dos puntos, las ganancias se concentran en las grandes.}
-Mencionar en una frase el método (pesos del fondo iShares, precios de Yahoo) solo si hay tiempo; el sesgo de
-supervivencia se deja para preguntas. Si alguien nota que el COLCAP marca 38,1\% aquí y 38,7\% en la
-diapositiva anterior: \di{aquí usamos cierres semanales, para compararlo con las acciones; allá, el dato diario}.
-\end{guion}
-
-\slide{16}{Lectura integrada}{0:45}
-\begin{guion}
-Leer la tabla de arriba abajo, una fila por respiración. Cerrar con: \di{esta tabla no la escribí yo:
-la generan reglas explícitas que están documentadas y probadas.}
-\end{guion}
-
-\slide{17}{Separador: ¿Qué tan confiable es?}{0:10}
-
-\slide{18}{Validación de la inflación implícita}{1:15}
-\begin{guion}
-\di{¿Sirve la inflación implícita? Entre 2006 y 2019 pronosticó la inflación de doce meses después con
-un error de 1,70 puntos, frente a 2,08 de suponer que la inflación no cambia. Después de 2020 ningún
-método anticipó el choque.} Mostrar honestidad sobre el segundo período.
-\end{guion}
-
-\slide{19}{Robustez}{1:00}
-\begin{guion}
-\di{El signo de la brecha es robusto; la fase exacta, no tanto: coincide 43\% entre dos métodos. Por eso
-el tablero nunca muestra una sola cifra de brecha.}
-\end{guion}
-
-\slide{20}{Limitaciones}{0:45}
-\begin{guion}
-Leerlas sin disculparse. \di{Estas son las limitaciones que declaramos; las tres primeras son comunes a
-cualquier análisis en tiempo real.}
-\end{guion}
-
-\slide{21}{Demostración}{3:00}
-Ver sección~\ref{sec:demo}.
-
-\slide{22}{Próximos pasos}{1:00}
-\begin{guion}
-\di{Proponemos tres líneas: construir una base de vintages del PIB, un nowcast con indicadores mensuales
-y descomponer la inflación implícita en expectativa y prima. Y tres colaboraciones: una revisión
-metodológica con el equipo técnico del Banco, el alojamiento institucional en la Universidad y su uso
-en los cursos de macroeconomía y finanzas.}
-\end{guion}
-
-\slide{23}{Cierre}{0:45}
-\begin{guion}
-Leer la diapositiva completa, despacio. Luego: \di{Cada afirmación es verificable con datos oficiales.
-Muchas gracias. Con gusto respondo sus preguntas.} Dejar la diapositiva de cierre en pantalla durante
-las preguntas (no una diapositiva de “¿Preguntas?”).
-\end{guion}
+\needspace{8\baselineskip}
+\subsection{Convenciones}
+\begin{itemize}
+\item \textbf{Un eje, una unidad} por panel. La única excepción es el PIB en dólares (eje derecho, marcado como referencia).
+\item \textbf{Panel de cambio}: debajo de cada serie, su variación frente a hace un año (tasas en puntos
+porcentuales, niveles en \%); el PIB y la brecha, frente al trimestre anterior.
+\item \textbf{Franja de cifras}: último dato, fecha y variación, con flecha y color según el signo.
+\item \textbf{Referencias normativas} dibujadas en el gráfico: meta 3\% $\pm$1\,pp, tasa neutral 2,7–3,0\%,
+capacidad de la economía.
+\item \textbf{Unidades}: pesos colombianos (COP); “billón” = $10^{12}$. Fechas al cierre del periodo.
+\item \textbf{Pie de cada gráfico}: fuente; el signo “?” despliega la metodología exacta.
+\end{itemize}
 
 % ================================================================
-\section{Protocolo de la demostración en vivo}
-\label{sec:demo}
+\clearpage
+\needspace{14\baselineskip}
+\section{Actividad y mercado laboral}
+\label{sec:actividad}
 
-\subsection{Ruta de clics (3 minutos)}
-\begin{enumerate}
-\item \textbf{Reloj del ciclo} (30 s) --- \emph{el golpe de apertura}: abrir el sitio en \texttt{\#ciclo} (menú
-\emph{Ciclo}). Hoy: \di{la economía está en expansión: produce 0,3\% por encima de su capacidad y esa diferencia
-aumentó 0,8 puntos en dos trimestres; es su primer trimestre en esta fase.} Luego arrastrar la barra de
-trimestres a T4 2020: los ejes se reescalan, el recorrido se hunde en Contracción (brecha cerca de $-20\%$) y
-salta a Recuperación con $+15{,}3$~pp: \di{eso fue el COVID.} Cerrar con \emph{Volver al último dato}.
-\item \textbf{Resumen y tarjetas} (15 s): subir al párrafo; señalar la fecha “datos al…” y las etiquetas de estado.
-\item \textbf{Cambiar a EN} (5 s): \di{el mismo sitio en inglés para inversionistas extranjeros}. Volver a ES.
-\item \textbf{Sección 1} (15 s): con el horizonte en \emph{Todo}, pasar el cursor sobre una barra del PIB (la caja
-muestra el valor, el PIB en pesos de 2015 y, en el \emph{panel de cambios}, su variación). Bajar a \emph{Lo que
-produce la economía frente a su capacidad}: \di{la línea azul es lo que producimos; la discontinua, lo que
-podemos producir sin generar inflación; en 2020 el hueco naranja, hoy apenas por encima.} Tocar el botón
-\emph{?} para mostrar la ficha metodológica.
-\item \textbf{Secciones 2 y 3, sectores e informalidad} (20 s, opcional: si el tiempo va justo, se omite y se
-devuelven los segundos a la curva TES): en el mapa de calor, señalar la columna naranja de 2020 (\di{en T2 2020 casi
-todos los sectores cayeron —construcción 43\%, comercio 32\%—; solo finanzas e inmobiliarias crecieron}) y la raya negra \emph{hace un año} en las barras;
-bajar a la informalidad: \di{54,6\% de los ocupados, 13,4 millones de personas}.
-\item \textbf{Sección 4} (10 s + 15 s opcionales): inflación frente a la franja de la meta; señalar la franja de
-cambios arriba y el panel de cambios abajo: \di{aquí se ve cuándo la inflación empezó a acelerar}. Opcional
-(15 s): bajar al gráfico \emph{La inflación que el mercado espera para los próximos 10 años}: \di{a la izquierda,
-lo que ya pasó; a la derecha, lo que hoy descuentan los bonos: 7,1\% el próximo año, 5,8\% hasta el quinto y
-6,0\% entre el quinto y el décimo. La línea gris punteada es lo que se esperaba hace un año: el tramo de uno a
-cinco años subió; el de cinco a diez bajó un poco, y ningún escalón vuelve a la franja de la meta.}
-\item \textbf{Sección 6, curva TES} (30 s) --- \emph{el momento fuerte de la demo}: mover la barra de fechas a
-finales de 2021 y luego de 2022, o marcar las fichas 2021 y 2022: \di{en un año la tasa a 1 año pasó de 5,4\%
-a 11,9\% y la de 10 años de 8,5\% a 13,2\%; la curva subió entera y se aplanó: es el ciclo de alzas del
-Banco}. Pasar el cursor por la historia para que la curva se mueva sola; clic para fijar una fecha;
-alternar TES en pesos / UVR. Cerrar con \emph{Volver al último dato}.
-\item \textbf{Sección 8, ¿Qué empresas mueven la bolsa?} (20 s): \di{¿sube toda la bolsa o solo unas pocas
-empresas?} Señalar las tres líneas (COLCAP azul, equiponderado verde, 7 Magníficas naranja) y las barras de
-peso: \di{siete empresas son el 85\% del índice; el COLCAP sube 38\% en un año y el promedio de las acciones
-29\%: las ganancias están concentradas en las grandes.} Cambiar el horizonte a 3 años para mostrar que las
-líneas se rebasan a 100.
-\item \textbf{Todos los indicadores} (10 s): \di{cada fila dice si el dato está muy bajo, bajo, normal, alto o
-muy alto frente a su historia desde 2010.}
-\item \textbf{Fuentes} (10 s): \di{cada fuente dice si está al día y todos los datos se descargan en CSV.}
-\end{enumerate}
+\needspace{8\baselineskip}
+\subsection{Reloj del ciclo}
+\grafico{fig_ciclo-reloj.png}{0.55}
+{Brecha del producto $g_t = 100(\ln Y_t - \ln Y^*_t)$ con $Y$ el PIB real desestacionalizado y $Y^*$ la
+tendencia de un filtro Hodrick-Prescott \emph{en tiempo real} ($\lambda=1600$; cada trimestre usa solo datos
+disponibles a esa fecha; 2020T2–2021T2 interpolados solo para estimar la tendencia). Eje vertical:
+$\Delta_2 g_t = g_t - g_{t-2}$. Fase = cuadrante (metodología OCDE).}
+{Derecha: produce por encima de su capacidad. Arriba: la distancia aumenta. El ciclo gira en sentido horario:
+expansión $\rightarrow$ desaceleración $\rightarrow$ contracción $\rightarrow$ recuperación. Hoy: T2 2026 en
+expansión ($g=+0{,}3\%$, $\Delta_2 g=+0{,}77$\,pp), tras dos años alrededor de cero.}
+{La fase resume el entorno para todos los activos (sección~\ref{sec:inversion}). Una brecha positiva y creciente
+anticipa presión inflacionaria y tasas altas por más tiempo. Cerca del origen la fase es frágil: un trimestre
+basta para cambiar de cuadrante.}
 
-\subsection{Tres niveles de respaldo}
-\begin{enumerate}
-\item \textbf{Principal}: el sitio publicado en GitHub Pages
-(\url{https://stv-quant.github.io/ColombiaMacro-USBCali/}). Es estático y siempre está activo: no hay arranque
-en frío. Abrirlo 10 minutos antes y dejarlo cargado.
-\item \textbf{Local}: \texttt{Iniciar ColombiaMacro.bat} (o \texttt{python scripts/lanzar\_local.py}) en el
-portátil del expositor, ya abierto en otra pestaña. Funciona sin internet con los últimos datos descargados.
-\item \textbf{Sin computador}: las capturas del manual en una carpeta y las diapositivas en PDF en una memoria USB.
-\end{enumerate}
-\begin{alerta}[Regla]
-Si algo falla, no depurar en público: pasar al siguiente nivel de respaldo en menos de diez segundos y decir
-\di{les muestro la versión local}.
+\needspace{8\baselineskip}
+\subsection{Producción frente a su capacidad}
+\grafico{fig_capacidad.png}{0.6}
+{Capacidad $Y^*_t = Y_t\,e^{-g_t/100}$, en billones de COP de 2015 por trimestre. Área verde: producción
+sobre la capacidad; naranja: holgura. Contrastes: HP de dos colas y Hamilton (2018); hoy los tres métodos dan
+brecha positiva (rango +0,3\% a +2,3\%).}
+{Es la frontera de posibilidades de producción en el tiempo: la línea punteada es lo máximo sostenible sin
+generar inflación. 2020 muestra la caída de $\approx$18\% bajo la capacidad; 2022 el sobrecalentamiento; desde
+2023 holgura leve; hoy, levemente por encima.}
+{Holgura $\Rightarrow$ espacio para bajar tasas. Sobrecalentamiento $\Rightarrow$ alzas y presión sobre bonos
+largos. El crecimiento potencial estimado ($\approx$2,4\% anual) es la referencia para juzgar si un dato de PIB
+es “alto”.}
+
+\needspace{8\baselineskip}
+\subsection{Crecimiento del PIB y del ISE}
+\grafico{fig_crec.png}{0.6}
+{Barras: $100(Y_t/Y_{t-4}-1)$ con PIB real original. Línea: ISE desestacionalizado, variación anual.
+Punteada: crecimiento de la tendencia HP. Panel inferior: cambio frente al trimestre anterior.}
+{T2 2026: +3,5\% anual, sobre el potencial (2,4\%). El ISE de julio (+1,1\% anual; +5,8\% anualizado en 3
+meses) es el primer dato del T3.}
+{El ISE adelanta el PIB dos meses: es el dato a seguir entre publicaciones trimestrales.}
+
+\needspace{8\baselineskip}
+\subsection{Crecimiento real por año}
+\grafico{fig_pib-anual.png}{0.6}
+{Barras: $100(\sum_q Y_{a,q}/\sum_q Y_{a-1,q}-1)$ con el PIB real original de los cuatro trimestres de cada año; barra
+clara: últimos 12 meses frente a los 12 previos. Punteada verde: ritmo habitual (tendencia HP); discontinua: promedio
+2010–2019.}
+{Últimos 12 meses al T2 2026: +2,9\% real; 2025: +2,6\%; promedio 2010–2019: 3,7\%. Desde 2023 la economía crece por
+debajo de su promedio histórico, aunque el último trimestre (3,5\%) muestra aceleración.}
+{La versión anual filtra el ruido trimestral: es la referencia para comparar con proyecciones de crecimiento y con el
+potencial. Crecer por debajo del promedio histórico implica menor expansión de ventas y de recaudo.}
+
+\needspace{8\baselineskip}
+\subsection{Crecimiento por sector}
+\grafico{fig_sec-barras.png}{0.6}
+{12 agrupaciones CIIU Rev.\,4 (volúmenes encadenados, datos originales). Crecimiento anual; raya negra = un año
+antes. Aporte $c_{i,t}=(Y_{i,t}-Y_{i,t-4})/VA_{t-4}$. El selector y el clic en el mapa permiten ver cualquier
+trimestre desde 2009.}
+{T2 2026: lidera Gobierno, educación y salud (+10,0\%, aporte 1,8\,pp de los 3,5\% del PIB). Caen agro
+(--2,1\%) e información y comunicaciones (--0,1\%). Industria y construcción, alrededor de 2\%.}
+{Crecimiento concentrado en gasto público: menor calidad y sostenibilidad (depende de la caja fiscal). Los
+sectores cíclicos privados (industria, construcción, comercio) crecen por debajo del total.}
+
+\grafico{fig_sec-mapa.png}{0.6}
+{Mapa de calor del crecimiento anual por sector y trimestre; escala recortada en $\pm12\%$ para que 2020 no oculte
+el resto; sectores ordenados por peso.}
+{Muestra de un vistazo la amplitud del ciclo: columnas azules completas = expansión generalizada; columnas mixtas
+= crecimiento concentrado.}
+{Permite identificar sectores con impulso persistente (varios trimestres azules) frente a rebotes de un trimestre.}
+
+\needspace{8\baselineskip}
+\subsection{Desempleo}
+\grafico{fig_desempleo.png}{0.6}
+{Tasa de desempleo desestacionalizada (DANE, GEIH); promedio móvil de 3 meses. Panel: cambio frente a un año antes.}
+{Julio 2026: 8,3\% (9,0\% un año antes): mercado laboral más estrecho, coherente con la brecha positiva.}
+{Desempleo a la baja sostiene el consumo y los salarios, pero alimenta la inflación de servicios: argumento a
+favor de una política restrictiva prolongada.}
+
+\needspace{8\baselineskip}
+\subsection{Informalidad}
+\grafico{fig_informal.png}{0.6}
+{Proporción de ocupados informales (definición DANE 2023, alineada con la OIT), trimestres móviles desde 2021:
+nacional, 13 y 23 ciudades.}
+{Julio 2026: 54,6\% nacional, 40,6\% en las 13 ciudades. La brecha entre ambas refleja el peso del empleo rural y
+por cuenta propia.}
+{Alta informalidad reduce la base tributaria y la transmisión de la política monetaria (menos crédito formal):
+limita el efecto de las tasas sobre la demanda.}
+
+\grafico{fig_inf-ramas.png}{0.6}
+{Informales / ocupados por rama, total nacional; raya = un año antes.}
+{Mayor informalidad: agro (85\%), alojamiento y comida (73\%), construcción y transporte (69\%). Menor: finanzas (12\%) y gobierno, educación y salud (12\%).}
+{Sectores con alta informalidad tienen menor productividad y acceso a crédito; su crecimiento se traduce menos en recaudo.}
+
+\graficoancho{fig_inf-ciudades.png}{0.8}
+{Informalidad en las 23 ciudades y áreas metropolitanas; en azul las 13 principales (Bogotá, Medellín A.M., Cali A.M.,
+Barranquilla A.M., Bucaramanga A.M., Manizales A.M., Pasto, Pereira A.M., Cúcuta A.M., Ibagué, Montería, Cartagena,
+Villavicencio).}
+{Dispersión amplia: de 33\% en Bogotá a 65\% en Sincelejo. Por encima de 60\%: Sincelejo, Riohacha, Cúcuta, Montería y
+Valledupar; por debajo de 40\%: Bogotá, Manizales, Tunja y Medellín.}
+{Útil para decisiones regionales (consumo formal, crédito, inmobiliario): la formalidad local aproxima el mercado
+bancarizable.}
+
+% ================================================================
+\needspace{14\baselineskip}
+\section{Precios, expectativas y política monetaria}
+\label{sec:precios}
+
+\needspace{8\baselineskip}
+\subsection{Inflación}
+\grafico{fig_inf.png}{0.6}
+{Inflación anual $100(IPC_t/IPC_{t-12}-1)$ (último dato = cifra publicada por el DANE); inflación sin alimentos ni
+regulados (BanRep). Franja: meta 3\% $\pm$1\,pp.}
+{Agosto 2026: 6,24\% (5,1\% un año antes), básica 6,12\%; acelera 0,4\,pp en 3 meses. Fuera del rango meta y
+con la básica casi igual a la total: presión generalizada, no solo choques de alimentos.}
+{Inflación alta y acelerando $\Rightarrow$ tasas nominales altas; los activos indexados (TES UVR) protegen frente a sorpresas.}
+
+\needspace{8\baselineskip}
+\subsection{Inflación que descuenta el mercado}
+\grafico{fig_espera.png}{0.6}
+{Inflación implícita (\emph{breakeven}) por plazo $h$: $\pi^{BE}_h = 100\left[\frac{1+i^{COP}_h}{1+r^{UVR}_h}-1\right]$ con
+las curvas cero cupón de los TES (Fisher exacto).}
+{Hoy: 7,1\% a 1 año, 6,0\% a 5 y a 10 años. Contiene primas por riesgo inflacionario y liquidez: se lee como cota
+superior de la expectativa pura. Validación: antes de 2020 pronosticó mejor que la caminata aleatoria (RMSE 1,70
+vs 2,08\,pp).}
+{Si se espera una inflación mayor que el \emph{breakeven}, el TES UVR rinde más que el TES en pesos; si menor, al revés.}
+
+\needspace{8\baselineskip}
+\subsection{Trayectoria esperada a 10 años}
+\graficoancho{fig_tray.png}{0.95}
+{Tramos que encadenan el \emph{breakeven} a 10 años: año 1 $=b_1$; años 1–5 $=[(1+b_5)^5/(1+b_1)]^{1/4}-1$;
+años 5–10 $=[(1+b_{10})^{10}/(1+b_5)^5]^{1/5}-1$ (la 5y5y). Se dibujan hacia el futuro junto a la lectura de hace un año.}
+{El mercado descuenta 7,1\% el próximo año, 5,8\% entre el año 1 y el 5 y 6,0\% entre el 5 y el 10. Ningún tramo
+regresa al rango meta y todos están por encima de lo esperado hace un año.}
+{Pérdida de credibilidad de la meta $\Rightarrow$ prima de riesgo inflacionario en los bonos largos en pesos.
+Un descenso de los tramos hacia la franja verde sería la señal de reanclaje.}
+
+\needspace{8\baselineskip}
+\subsection{Anclaje de las expectativas (5y5y)}
+\graficoancho{fig_anclaje.png}{0.8}
+{Forward 5y5y: $[(1+b_{10})^{10}/(1+b_5)^5]^{1/5}-1$, promedio semanal. Regla: desanclada si supera 4\% (techo del rango meta).}
+{6,0\%: desanclada. No es un pronóstico de su propia serie: cada punto es lo que el mercado esperaba ese día para
+la inflación promedio entre 5 y 10 años adelante.}
+{Es el termómetro de credibilidad del banco central y el principal determinante de la prima a plazo de los TES largos.}
+
+\needspace{8\baselineskip}
+\subsection{Tasa de política e inflación}
+\graficoancho{fig_politica.png}{0.8}
+{Tasa de intervención (escalones en cada decisión de la Junta) frente a la inflación anual. La estrella marca la
+decisión anunciada que aún no rige.}
+{12,00\% $\rightarrow$ 12,25\% (anuncio 30-sep-2026, rige 1-oct). Hace un año: 9,25\%. Ciclo de alzas en curso.}
+{La dirección de la tasa domina el retorno de los bonos cortos y el costo de financiación de las empresas.}
+
+\needspace{8\baselineskip}
+\subsection{Tasa real ex ante}
+\graficoancho{fig_real.png}{0.8}
+{$r^{ea} = 100\,[(1+TPM)/(1+\pi^{BE}_1)-1]$: tasa del Banco descontada la inflación \emph{esperada}
+(“ex ante” = antes de que ocurra). Franja gris: neutral 2,7–3,0\% (equipo técnico de BanRep). Postura: restrictiva
+si $r^{ea}>3{,}5\%$, expansiva si $<2{,}2\%$.}
+{Con la nueva tasa: $1{,}1225/1{,}0708-1\approx4{,}8\%$, por encima de la neutral: política restrictiva.}
+{Tasa real alta = rendimiento real atractivo en renta fija corta y freno al crédito y a la valoración de acciones.}
+
+\needspace{8\baselineskip}
+\subsection{Curva de los TES}
+\grafico{fig_curva-tes.png}{0.6}
+{Tasas cero cupón a 1, 5 y 10 años del día elegido (BanRep); líneas finas: cierres de año. Pendiente = 10a $-$ 1a.}
+{Hoy 12,42\% / 12,90\% / 13,06\%: curva casi plana (pendiente 0,64\,pp). El TES a 10 años supera la tasa de política
+en 1,06\,pp.}
+{Una curva plana con tasa alta indica que el mercado no descuenta recortes pronto. Rendimiento real a 10
+años (TES UVR cero cupón): 6,6\%.}
+
+\grafico{fig_curva-hist.png}{0.6}
+{Serie diaria de las tasas cero cupón a 1, 5 y 10 años desde 2003.}
+{Ubica el nivel actual frente a la historia: el TES a 10 años (13,1\%) solo fue superado en 2022–2023 (máximo 15,4\% en octubre de 2022).}
+{Inversión de la curva (1a > 10a) ha precedido desaceleraciones; su normalización suele acompañar el inicio de recortes.}
+
+% ================================================================
+\needspace{14\baselineskip}
+\section{Mercados y sector externo}
+\label{sec:mercados}
+
+\needspace{8\baselineskip}
+\subsection{Dólar (TRM) y tasa de cambio real}
+\grafico{fig_dolar.png}{0.6}
+{TRM (pesos por dólar), promedio semanal; panel: variación anual.}
+{3.341 pesos por dólar: el peso se apreció 14,4\% en 12 meses.}
+{Para el inversionista extranjero el tipo de cambio domina el retorno: el COLCAP subió 36\% en pesos y 65\% en dólares.}
+
+\graficoancho{fig_itcr.png}{0.8}
+{ITCR-IPC (2010 = 100): tipo de cambio ajustado por la inflación de Colombia frente a la de sus socios comerciales.}
+{95,7 (agosto): el peso está más caro en términos reales que en el año base. Valores bajos restan competitividad a
+las exportaciones no minero-energéticas.}
+{Un peso real fuerte reduce el margen de seguridad para nuevas entradas en pesos: el riesgo de reversión cambiaria es mayor.}
+
+\needspace{8\baselineskip}
+\subsection{COLCAP}
+\grafico{fig_bolsa.png}{0.6}
+{Índice COLCAP oficial (BVC vía BanRep), índice de precios sin dividendos, cierre semanal; en dólares = puntos / TRM.}
+{2.559 puntos (29-sep), +36,5\% en 12 meses en pesos, $-$2,6\% desde su máximo.}
+{Rentabilidad sin dividendos; el retorno total es mayor. Ver la composición antes de concluir que “la bolsa” sube.}
+
+\needspace{8\baselineskip}
+\subsection{La bolsa por dentro: equiponderado y 7 Magníficas}
+\grafico{fig_indices.png}{0.6}
+{Canasta y pesos: tenencias diarias del fondo iShares MSCI COLCAP (agrupadas por emisor). Precios: cierres semanales.
+Equiponderado: $I_t=I_{t-1}(1+\bar r_t)$, promedio simple de retornos semanales; 7 Magníficas: igual, con las 7
+empresas de mayor peso. Base 100 al inicio del horizonte. Usa la canasta actual hacia atrás (sesgo de supervivencia).}
+{12 meses: COLCAP +38,1\%, 7 Magníficas +35,2\%, equiponderado +28,8\%. COLCAP > equiponderado: el alza se concentra
+en las empresas grandes; no es generalizada.}
+{Comprar el índice es, en la práctica, comprar las grandes. La amplitud (equiponderado) confirma o niega la solidez del alza.}
+
+\grafico{fig_pesos.png}{0.6}
+{Peso de cada emisor en el fondo que replica el COLCAP (sin efectivo).}
+{Las 7 Magníficas suman 85,1\%: Grupo Cibest 37,8\%, Grupo Sura 12,0\%, Ecopetrol 8,9\%, ISA 8,8\%, Grupo Argos
+7,8\%, GEB 5,3\%, Cementos Argos 4,4\%.}
+{Riesgo de concentración: el índice es mayoritariamente financiero; su sensibilidad a tasas y crédito es mayor que la de una canasta diversificada.}
+
+\needspace{8\baselineskip}
+\subsection{Cuenta corriente y deuda pública}
+\grafico{fig_cc.png}{0.6}
+{Saldo de la cuenta corriente (\% del PIB), balanza de pagos BanRep.}
+{T2 2026: $-$3,5\% del PIB: el país necesita financiación externa equivalente.}
+{Déficit externo + peso fuerte = dependencia de flujos de capital; un cambio en el apetito global por riesgo se transmite al peso y a los TES.}
+
+\grafico{fig_deuda.png}{0.6}
+{Deuda bruta del Gobierno Nacional Central (\% del PIB), cierre anual (MinHacienda vía BanRep).}
+{62,9\% del PIB en 2025, en la parte alta de su historia.}
+{La deuda alta sostiene la prima de riesgo soberano y limita el espacio fiscal; junto con el crecimiento liderado por
+gasto público, es el principal riesgo para los TES largos.}
+
+% ================================================================
+\needspace{14\baselineskip}
+\section{Lectura para el inversionista}
+\label{sec:inversion}
+
+\begin{alerta}[Alcance]
+El tablero describe el estado de la economía con datos oficiales; no es una recomendación de inversión ni un
+pronóstico. Las relaciones siguientes son regularidades históricas, no reglas.
 \end{alerta}
 
-% ================================================================
-\section{Preguntas difíciles y respuestas preparadas}
-
-\subsection{Metodología}
-\begin{description}[style=nextline,leftmargin=0pt]
-\item[“El filtro HP está desacreditado (Hamilton, 2018). ¿Por qué lo usan?”]
-\di{Por eso no lo usamos solo. Usamos el HP en tiempo real, que elimina la información futura, y lo
-contrastamos con Hamilton y con el HP de dos colas. El tablero muestra el rango entre los tres. Cuando
-Hamilton y el HP discrepan —como en 2022 y 2023— la banda se ensancha y lo decimos.}
-
-\item[“¿Por qué la fase cambia tanto de un trimestre a otro?”]
-\di{Porque la brecha lleva dos años cerca de cero: con un nivel entre $-1$ y $+0{,}5\%$, un movimiento pequeño
-basta para cruzar un eje y cambiar de cuadrante. Por eso el reloj muestra el recorrido de varios trimestres y
-la dirección, no solo el último punto; y la ficha del gráfico de capacidad de la sección~1 describe el rango
-entre métodos —HP y Hamilton—, que muestra cuánta incertidumbre hay en ese nivel.}
-
-\item[“¿Por qué $\lambda = 1600$?”]
-\di{Es el valor estándar para datos trimestrales desde Hodrick y Prescott; el parámetro es configurable y
-la banda con Hamilton, que no depende de $\lambda$, acota la sensibilidad.}
-
-\item[“¿Por qué no usar la brecha que estima el propio BanRep?”]
-\di{Es la referencia natural y sería un excelente contraste; hoy se publica en el Informe de Política
-Monetaria en formato de gráfico, no como serie descargable. Proponemos precisamente integrarla si el Banco
-la pone a disposición.}
-
-\item[“El tratamiento del COVID es arbitrario.”]
-\di{Interpolamos 2020-T2 a 2021-T2 solo para estimar la tendencia; la brecha se mide contra el dato
-observado. Sin ese tratamiento, una caída de 17,6\% en un trimestre deforma la tendencia de 2019 a 2023.
-La ventana es un parámetro explícito y el resultado es visible en el código.}
-
-\item[“Los datos del PIB se revisan. ¿No es engañoso llamarlo ‘tiempo real’?”]
-\di{Tiene razón en el matiz: eliminamos la información futura del filtro, no las revisiones del DANE,
-porque usamos una sola vintage. Está declarado como limitación y construir la base de vintages es el
-primer paso de trabajo futuro.}
-
-\item[“La inflación implícita no es expectativa: tiene primas.”]
-\di{Completamente de acuerdo, y así lo presentamos: ‘lo que el mercado descuenta’. Incluye prima por
-riesgo inflacionario y por liquidez de los TES UVR. Aun así, antes de 2020 pronosticó mejor que la
-caminata aleatoria. Descomponerla con un modelo afín es trabajo futuro.}
-
-\item[“¿La 5y5y es una proyección? ¿Cómo la leo?”]
-\di{Es una proyección del mercado, no del Banco ni nuestra: la inflación promedio que los bonos del Gobierno
-descuentan para los años cinco a diez. Hoy es 6,0\%, el doble de la meta de 3\%. Para ver el futuro completo, el
-tablero dibuja tres escalones hacia 2036 —7,1\% el próximo año, 5,8\% hasta el quinto, 6,0\% después— y los
-compara con lo que se esperaba hace un año. Su historia termina hoy porque cada punto es lo que se esperaba ese
-día. Como incluye primas por riesgo y liquidez, conviene leerla como un techo de la expectativa.}
-
-\item[“¿Y el rezago de indexación de la UVR?”]
-\di{La UVR se ajusta con la inflación del mes anterior; en plazos de uno a diez años el efecto es pequeño
-frente a las primas, y lo documentamos.}
-
-\item[“¿Por qué 4\% como umbral de desanclaje?”]
-\di{Es el techo del rango meta del Banco. Es una regla simple y transparente; el parámetro es editable y
-el número exacto se muestra siempre.}
-
-\item[“¿Qué es la tasa real ex ante?”]
-\di{Es la tasa del Banco menos la inflación que se espera para el próximo año: lo que de verdad cuesta
-endeudarse. Hoy, 12\% menos 7,1\% da cerca de 4,6\%. ‘Ex ante’ quiere decir ‘antes de que ocurra’: usamos la
-inflación esperada y no la pasada, porque quien pide un crédito hoy decide pensando en la inflación futura.
-Como está por encima de la neutral, 2,7 a 3,0\%, la política frena la economía.}
-
-\item[“¿De dónde sale la tasa neutral de 2,7–3,0\%?”]
-\di{De la estimación del equipo técnico del Banco de la República para 2025 y su ajuste para 2026. Es un
-parámetro externo con incertidumbre; con cualquier valor en el rango de estimaciones recientes la tasa
-real de 4,6\% seguiría por encima.}
-
-\item[“¿Por qué no un modelo DSGE o de equilibrio general?”]
-\di{El objetivo es monitorear con datos observables y métodos transparentes, no estimar estructura. Un
-DSGE requiere supuestos que no se pueden auditar en un tablero diario; sería un complemento natural.}
-
-\item[“¿Pronostica?”]
-\di{No. Describe el estado actual con la mejor información disponible. Las medidas de mercado reflejan
-lo que descuentan los inversionistas, no nuestro pronóstico.}
-\end{description}
-
-\subsection{Datos y operación}
-\begin{description}[style=nextline,leftmargin=0pt]
-\item[“¿De dónde salen las noticias?”]
-\di{Están en una nota al final de la página, antes de las fuentes. No son titulares de prensa: el tablero las genera cada día a partir de los mismos datos oficiales que
-descarga —PIB, IPC, tasa del Banco, TES, dólar, bolsa— y cada tarjeta enlaza a la fuente. No copiamos titulares
-porque el sitio del Banco bloquea los lectores automáticos con un captcha y los agregadores como Google News
-prohíben republicar. Así todo es verificable; para los comunicados completos dejamos los enlaces a las salas de
-prensa oficiales y, en el caso del Banco, a las fichas verificadas de su portal de estadísticas.}
-\item[“¿Quién garantiza que los datos son correctos?”]
-\di{Cada serie se identifica por número y nombre; si la fuente cambia, el proceso falla en lugar de
-publicar otra variable. Recalculamos las fórmulas cada día, hay 61 pruebas automáticas y cada archivo
-se puede descargar y contrastar con el DANE o el Banco.}
-\item[“¿Por qué la informalidad solo desde 2021?”]
-\di{Porque el DANE cambió la medición: desde la resolución 0203 de 2023, alineada con la OIT, publica la serie
-con la nueva definición a partir de 2021. Las cifras anteriores usan otra definición y no son comparables;
-preferimos una serie corta y homogénea a un empalme que invente un cambio.}
-\item[“¿Por qué los aportes de los sectores no suman exactamente el crecimiento?”]
-\di{Porque el PIB en volumen se calcula con índices encadenados, que no son aditivos: la suma de los doce
-sectores no es exactamente el total —los pesos suman cerca de 100,6\%—. La diferencia es de décimas; además los
-aportes suman al valor agregado (3,9\%), no al PIB (3,5\%), que incluye impuestos netos.}
-\item[“¿El COLCAP incluye dividendos?”]
-\di{No, es un índice de precios; lo decimos en el tablero.}
-\item[“¿Hay problemas de licencia con MSCI?”]
-\di{El nivel del índice lo tomamos del Banco de la República. Los pesos por acción son los que el fondo
-iShares publica de sus propias tenencias; no redistribuimos archivos de MSCI y el tablero cita la fuente.}
-\item[“¿Por qué los pesos de iShares y no los de la BVC?”]
-\di{Porque el fondo iShares MSCI COLCAP publica su composición cada día hábil en un archivo descargable y
-estable, y la BVC no ofrece una fuente equivalente para automatizar. Como el fondo replica el índice, sus pesos
-—sin el efectivo— son una aproximación muy cercana a los oficiales; la diferencia es de décimas y no cambia
-quiénes son las siete más grandes.}
-\item[“¿No tienen sesgo de supervivencia los índices de la bolsa por dentro?”]
-\di{Sí, y lo declaramos: aplicamos la canasta actual hacia atrás, así que las empresas que salieron del índice
-no aparecen y el retorno pasado tiende a verse mejor. Por eso usamos esos índices para comparar concentración
-en el último año, donde el sesgo es pequeño, y no como historia de largo plazo de la bolsa.}
-\item[“¿Quién lo mantiene cuando usted se gradúe?”]
-\di{La actualización es automática; el mantenimiento se reduce a revisar alertas. Proponemos que un
-semillero de investigación lo adopte, con el manual técnico como base.}
-\end{description}
-
-\subsection{Institucional}
-\begin{description}[style=nextline,leftmargin=0pt]
-\item[“¿Qué necesita la Universidad para alojarlo?”]
-\di{Un servidor pequeño o un contenedor Docker y un subdominio. El costo es bajo y el código ya está listo.}
-\item[“¿Cómo se usaría en docencia?”]
-\di{Como laboratorio en macroeconomía, finanzas internacionales y econometría: cada gráfico tiene su
-fórmula y los estudiantes pueden reproducirla.}
-\end{description}
-
-\subsection{Técnicas para las preguntas}
-\begin{enumerate}
-\item Escuchar la pregunta completa sin interrumpir; agradecerla brevemente.
-\item Repetirla en una frase si la sala es grande.
-\item Responder en 30–60 segundos: primero la conclusión, después el fundamento.
-\item Si no sabe: \di{No lo tengo calculado; lo reviso y le envío la respuesta esta semana.} Anotar
-nombre y correo.
-\item Si la pregunta es una crítica válida: \di{Tiene razón; está entre las limitaciones y es parte del
-trabajo futuro.}
-\item Tener a mano las diapositivas A1–A5 del apéndice.
-\end{enumerate}
-
-% ================================================================
-\section{Preparación}
-
-\subsection{Actualizar cifras el día anterior}
-\label{sec:actualizar}
-\begin{lstlisting}
-python scripts/lanzar_local.py --actualizar  # descarga, valida y construye el sitio
-python scripts/generar_figuras.py           # figuras + docs/figuras/resumen.json
-cd docs/presentacion && latexmk -xelatex ColombiaMacro_Beamer.tex
-\end{lstlisting}
-Contrastar las cifras de las diapositivas con \texttt{resumen.json} y corregir los textos si cambiaron
-(p. ej. si se publica un nuevo IPC).
-
-\subsection{Plan de ensayo}
+\needspace{8\baselineskip}
+\subsection{Fase del ciclo y comportamiento típico de los activos}
 \begin{center}\small
-\begin{tabularx}{\linewidth}{@{}lX@{}}
+\begin{tabularx}{\linewidth}{@{}p{0.15\linewidth}XXX@{}}
 \toprule
-\textbf{Cuándo} & \textbf{Qué}\\\midrule
-14 días antes & Confirmar fecha, sala, duración, asistentes y moderador. Enviar resumen ejecutivo (anexo~\ref{sec:resumen}).\\
-10 días antes & Primer ensayo completo cronometrado. Grabarse en video.\\
-7 días antes & Ensayo con un profesor economista como “abogado del diablo” usando la sección de preguntas.\\
-3 días antes & Ensayo en la sala o equivalente con el proyector real. Probar la demostración.\\
-1 día antes & Actualizar datos y figuras; verificar que el último run del workflow esté en verde y el sitio publicado muestre la fecha del día; imprimir el resumen de una página.\\
-Día D, $-45$ min & Llegar, conectar, abrir tablero en línea y local, probar puntero y micrófono.\\
+\textbf{Fase} & \textbf{Tasas y curva} & \textbf{Renta fija} & \textbf{Acciones y peso}\\\midrule
+Expansión & Tasas al alza; curva se aplana & Bonos largos bajo presión & Cíclicas y financieras favorecidas\\
+Desaceleración & Tasa cerca del máximo & Duración empieza a ganar & Defensivas (servicios públicos) relativamente mejor\\
+Contracción & Recortes; curva se empina & Bonos largos ganan & Acciones caen; peso tiende a depreciarse\\
+Recuperación & Tasas bajas, curva empinada & Ganancias de los recortes ya realizadas & Cíclicas lideran el rebote\\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-\subsection{Lista de verificación técnica}
-\begin{itemize}
-\item[$\square$] Portátil cargado y cargador; adaptador HDMI/USB-C.
-\item[$\square$] Diapositivas en PDF (no depender de software de presentación).
-\item[$\square$] Tablero abierto en la nube y en local; navegador en pantalla completa, zoom 110\%.
-\item[$\square$] Notificaciones desactivadas; modo no molestar.
-\item[$\square$] Memoria USB con PDF, manual y capturas.
-\item[$\square$] Puntero láser con pilas nuevas.
-\item[$\square$] Agua.
-\end{itemize}
-
-\subsection{Expresión oral}
-\begin{itemize}
-\item Una idea por diapositiva; no leer la pantalla.
-\item Hablar de pie, frente a la audiencia; señalar el gráfico y volver a mirar a la sala.
-\item Pausas de dos segundos después de cada cifra importante.
-\item Evitar muletillas y anglicismos innecesarios (decir “inflación implícita” antes de “breakeven”).
-\item Cerrar a tiempo: terminar un minuto antes es una cortesía hacia la audiencia.
-\end{itemize}
-
-% ================================================================
-\section{Después del evento}
-\begin{enumerate}
-\item Enviar en 48 horas un correo de agradecimiento con el enlace al tablero, el manual y las diapositivas.
-\item Responder por escrito las preguntas pendientes.
-\item Proponer una reunión técnica breve con el equipo de BanRep para revisar la metodología.
-\item Presentar a la dirección del programa una propuesta de alojamiento institucional y uso docente.
-\end{enumerate}
-
-\subsection*{Plantilla de correo}
-\begin{guion}
-\small
-Asunto: ColombiaMacro — material de la presentación\\[4pt]
-Estimado(a) [tratamiento y nombre]:\\[4pt]
-Muchas gracias por su asistencia y sus comentarios en la presentación de ColombiaMacro. Comparto el
-tablero en línea ([enlace]), el manual técnico y las diapositivas. Sobre su pregunta acerca de [tema],
-[respuesta breve].\\[4pt]
-Quedo atento a la posibilidad de una revisión metodológica con su equipo.\\[4pt]
-Cordialmente,\\ Steven [apellidos]\\ Finanzas y Negocios Internacionales — Universidad de San Buenaventura Cali
-\end{guion}
-
-% ================================================================
-\appendix
-\section{Resumen ejecutivo (para enviar antes)}
-\label{sec:resumen}
-\begin{guion}
-\textbf{ColombiaMacro: un monitor abierto y reproducible del ciclo económico colombiano.}
-ColombiaMacro integra más de veinte series oficiales del DANE y del Banco de la República, actualizadas
-cada día y verificadas automáticamente, para responder en qué fase del ciclo está Colombia y qué implica
-para precios, política monetaria y activos. Estima la brecha del producto en tiempo real con tres métodos
-y muestra su rango; extrae la inflación implícita en las curvas TES y la tasa real ex ante frente a la
-neutral estimada por el Banco. Todas las fórmulas son explícitas y reproducibles, y las limitaciones están
-declaradas. Al corte de septiembre de 2026, la lectura es: expansión, inflación fuera del rango meta,
-política restrictiva y expectativas de mercado desancladas.
-\end{guion}
-
-\begin{english}
-\begin{guion}
-\textbf{ColombiaMacro: an open, reproducible monitor of Colombia's business cycle.}
-ColombiaMacro combines more than twenty official DANE and Banco de la República series, updated and
-verified daily, to answer where Colombia stands in the cycle and what it implies for prices, monetary
-policy and assets. It estimates a real-time output gap with three methods and shows their range, extracts
-breakeven inflation from TES curves, and compares the ex-ante real policy rate with BanRep's neutral
-estimate. All formulas are explicit and reproducible, and limitations are disclosed. As of September 2026:
-expansion, inflation above the target range, restrictive policy and de-anchored market expectations.
-\end{guion}
-\end{english}
-
-\section{Hoja de una página para entregar impresa}
+\needspace{8\baselineskip}
+\subsection{Lectura actual (30 de septiembre de 2026)}
 \begin{center}\small
-\begin{tabularx}{\linewidth}{@{}lX@{}}
+\begin{tabularx}{\linewidth}{@{}p{0.22\linewidth}p{0.25\linewidth}X@{}}
 \toprule
-\multicolumn{2}{@{}l}{\sffamily\bfseries ColombiaMacro · Monitor del ciclo económico colombiano}\\\midrule
-Qué es & Tablero abierto con datos oficiales (DANE, BanRep) actualizados cada día, en español e inglés.\\
-Pregunta & ¿En qué fase del ciclo está Colombia y qué implica para precios, política y activos?\\
-Lectura (sep-2026) & Expansión (brecha +0,3\%; rango +0,3 a +2,3) · IPC 6,24\%, básica 6,12\% · TPM 12\%, real ex ante 4,6\% (restrictiva) · implícita 1 año 7,1\%, 5y5y 6,0\% (desancladas) · TES 10A 13,06\% · COLCAP +38,7\% en 12 meses; 7 empresas $\approx$85\% del índice.\\
-Métodos & HP en tiempo real, HP dos colas y Hamilton (2018); reloj del ciclo OCDE; Fisher exacto; percentiles desde 2010.\\
-Validación & Implícita a 1 año: RMSE 1,70 vs 2,08 de la caminata aleatoria (2006–2019).\\
-Código & github.com/Stv-Quant/ColombiaMacro-USBCali\\
-Contacto & Steven · Finanzas y Negocios Internacionales · USB Cali\\
+\textbf{Dimensión} & \textbf{Dato} & \textbf{Implicación}\\\midrule
+Ciclo & Expansión; brecha +0,3\% (3/3 métodos) & Crecimiento sobre el potencial, pero cerca del origen: fase frágil.\\
+Composición & Gobierno aporta 1,8 de 3,5\,pp & Crecimiento dependiente de gasto público.\\
+Inflación & 6,24\% y acelerando & Fuera de la meta; presión generalizada (básica 6,12\%).\\
+Expectativas & 5y5y 6,0\% & Desancladas: prima inflacionaria en bonos largos.\\
+Política & 12,25\%; real ex ante $\approx$4,8\% & Restrictiva y en ciclo de alzas.\\
+Curva TES & 12,4 / 12,9 / 13,1\%; pendiente 0,64\,pp & Mercado no descuenta recortes cercanos; rendimiento real alto.\\
+Peso & 3.341; $-$14,4\% en 12 meses; ITCR 95,7 & Peso fuerte en términos reales: riesgo de reversión.\\
+Bolsa & COLCAP +38\%; equiponderado +29\% & Alza concentrada en emisores grandes (85\% en 7 empresas).\\
+Externo y fiscal & CC $-$3,5\% PIB; deuda 62,9\% PIB & Dependencia de flujos externos y prima soberana.\\
 \bottomrule
 \end{tabularx}
 \end{center}
+
+\textbf{Síntesis.} Economía en expansión con inflación desanclada y política restrictiva: el entorno favorece
+rendimientos reales altos en renta fija y exige cautela con la duración mientras las expectativas no bajen. El
+retorno en dólares de los activos colombianos depende críticamente de un peso que ya se apreció. La bolsa sube,
+pero concentrada en pocos emisores.
+
+\needspace{8\baselineskip}
+\subsection{Señales a vigilar}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}p{0.3\linewidth}p{0.2\linewidth}X@{}}
+\toprule
+\textbf{Indicador} & \textbf{Umbral} & \textbf{Qué cambiaría}\\\midrule
+Brecha (reloj) & $\Delta_2 g<0$ & Paso a desaceleración: fin probable del ciclo de alzas.\\
+Inflación anual y básica & 3 meses cediendo & Espacio para recortes; favorece duración.\\
+5y5y & $<4\%$ & Reanclaje: compresión de la prima en TES largos.\\
+Tasa real ex ante & $<3{,}5\%$ & Fin de la postura restrictiva.\\
+Pendiente 10a $-$ 1a & $<0$ & Curva invertida: señal de desaceleración.\\
+COLCAP vs. equiponderado & equiponderado > COLCAP & Alza más amplia y sólida.\\
+TRM y cuenta corriente & depreciación $>10\%$ anual & Salida de capitales; presión inflacionaria importada.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ================================================================
+\needspace{14\baselineskip}
+\section{Limitaciones}
+\label{sec:limites}
+\begin{enumerate}
+\item \textbf{Vintage única}: la historia corresponde a la última publicación del DANE; el HP en tiempo real elimina
+la información futura del filtro, no las revisiones.
+\item \textbf{La fase depende del método}: coincidencia de fase HP en tiempo real vs. Hamilton, 43\%; de signo, 65–78\%.
+Por eso se muestra el rango entre métodos.
+\item \textbf{Implícitas con primas} (riesgo inflacionario, liquidez del TES UVR, rezago de indexación): cota superior de la expectativa.
+\item \textbf{Neutral externa}: estimación de BanRep con incertidumbre; la conclusión (restrictiva) se mantiene en todo su rango.
+\item \textbf{COLCAP sin dividendos}; índices equiponderado y 7 Magníficas con canasta actual hacia atrás (sesgo de supervivencia).
+\item \textbf{Informalidad desde 2021}: cambio de definición del DANE; no se empalma con la serie anterior.
+\end{enumerate}
+
+% ================================================================
+\needspace{14\baselineskip}
+\section{Preguntas técnicas previsibles}
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[¿Por qué el filtro HP si Hamilton (2018) lo critica?]
+Se usa en tiempo real (sin información futura) y se contrasta con HP de dos colas y Hamilton; el tablero muestra
+el rango. Hoy los tres coinciden en el signo.
+\item[¿Por qué $\lambda=1600$ y por qué interpolar 2020–2021?]
+1600 es el estándar trimestral. La interpolación solo afecta la estimación de la tendencia; la brecha se mide contra
+el dato observado. Sin ella, una caída de 17,6\% en un trimestre deforma la tendencia de 2019 a 2023.
+\item[¿La 5y5y es un pronóstico?]
+Es lo que descuentan los bonos para la inflación promedio entre los años 5 y 10, incluidas primas. No es pronóstico
+del tablero ni del Banco.
+\item[¿Por qué la tasa anunciada aparece antes que en la serie oficial?]
+La serie registra la tasa cuando rige; el anuncio se registra aparte y se marca como “anunciada”.
+\item[¿Por qué los aportes sectoriales no suman el PIB?]
+Los volúmenes encadenados no son aditivos y los aportes suman al valor agregado, no al PIB (que incluye impuestos netos).
+\item[¿Por qué pesos de iShares y no de la BVC?]
+El fondo replica el índice y publica su composición diaria en un archivo estable; la BVC no ofrece una fuente
+automatizable equivalente. La diferencia es de décimas.
+\item[¿Se puede verificar una cifra?]
+Sí: cada gráfico cita su fuente y método, cada tabla se descarga en CSV y cada actualización es un \emph{commit} con fecha.
+\end{description}
+
+% ================================================================
+\needspace{14\baselineskip}
+\section{Demostración en vivo}
+\label{sec:demo}
+\begin{enumerate}
+\item Portada: resumen automático y tarjetas (fecha de los datos y hora de construcción).
+\item Reloj del ciclo: mover el selector de trimestre y mostrar el recorrido 2020–2026.
+\item Horizonte “Todo” en la barra superior: 2020 completo en los gráficos.
+\item Sectores: clic en una columna del mapa $\rightarrow$ las barras muestran ese trimestre.
+\item Curva TES: clic en la historia para fijar una fecha y comparar con hoy.
+\item Signo “?” al pie de un gráfico: metodología; descargar un CSV.
+\end{enumerate}
+\textbf{Respaldo}: capturas de esta guía y el PDF de diapositivas, por si falla la conexión. Abrir el sitio una vez antes
+de la sesión (Ctrl+F5) para cargar la última versión.
 
 \end{document}

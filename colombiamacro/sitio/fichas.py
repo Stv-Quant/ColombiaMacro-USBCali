@@ -36,13 +36,15 @@ FICHAS = {
                      "quarter only uses data available then), excluding the 2020Q2–2021Q2 shock. Gap = 100 × (ln GDP − ln "
                      "capacity). A two-sided HP and Hamilton's (2018) method are computed as checks; the three usually agree on "
                      "the sign. Values in COP (Colombian peso) trillions at 2015 prices per quarter.")),
-    "g-pib-pesos": (("DANE, PIB a precios corrientes y constantes; Banco de la República, TRM",
-                     "DANE, GDP at current and constant prices; Banco de la República, exchange rate (TRM)"),
-                    ("Suma de los últimos 4 trimestres. A precios corrientes = valor en pesos de cada momento (incluye "
-                     "inflación); a precios de 2015 = volumen real. En dólares = PIB corriente / TRM promedio de los mismos "
-                     "4 trimestres.",
-                     "Sum of the last 4 quarters. Current prices = value in pesos of each moment (includes inflation); 2015 "
-                     "prices = real volume. In dollars = current GDP / average TRM over the same 4 quarters.")),
+    "g-pib-anual": (("DANE, PIB trimestral a precios constantes (datos originales, base 2015)",
+                     "DANE, quarterly GDP at constant prices (original data, base 2015)"),
+                    ("Crecimiento real anual = 100 × (PIB real del año / PIB real del año anterior − 1), sumando los cuatro "
+                     "trimestres de cada año (volúmenes encadenados, sin efecto de la inflación). Barra clara: últimos 12 meses "
+                     "frente a los 12 meses previos. Ritmo habitual: promedio anual del crecimiento de la tendencia (HP). "
+                     "Referencia: promedio simple 2010–2019.",
+                     "Annual real growth = 100 × (real GDP of the year / real GDP of the previous year − 1), summing the four "
+                     "quarters of each year (chain-linked volumes, net of inflation). Light bar: last 12 months versus the "
+                     "previous 12 months. Usual pace: annual average of trend (HP) growth. Reference: simple 2010–2019 average.")),
     "g-sec-barras": (DANE_PIB,
                      ("12 agrupaciones CIIU Rev. 4 (volúmenes encadenados, año base 2015, datos originales). Crecimiento anual "
                       "frente al mismo trimestre del año anterior; la raya negra es el dato de un año antes. Aporte = cambio del "

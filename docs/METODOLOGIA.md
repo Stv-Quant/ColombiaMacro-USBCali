@@ -119,8 +119,11 @@ La capacidad (PIB potencial) se obtiene del mismo filtro HP en tiempo real: $Y^*
 con $g_t$ la brecha en log×100 y $Y_t$ el PIB real desestacionalizado. El gráfico muestra ambos niveles
 (billones de pesos de 2015 por trimestre) y colorea la distancia: verde por encima (sobrecalentamiento),
 naranja por debajo (holgura). Es la lectura de "frontera de posibilidades de producción" en el tiempo.
-El tamaño de la economía suma los últimos 4 trimestres a precios corrientes y constantes y lo convierte
-a dólares con la TRM promedio del mismo periodo.
+El **crecimiento real por año** suma los cuatro trimestres del PIB real (datos originales) de cada año
+calendario y lo compara con el año anterior: $100\,(\sum_{q} Y_{a,q}/\sum_{q} Y_{a-1,q}-1)$. La barra del año en
+curso usa los últimos 12 meses frente a los 12 previos. Se acompaña del ritmo habitual (promedio anual del
+crecimiento de la tendencia HP) y del promedio simple 2010–2019. El tablero no muestra el PIB en niveles de
+dinero (pesos o dólares); el gráfico de capacidad usa niveles reales solo para dibujar la frontera.
 
 ### 3.6 Sectores y mercado laboral
 
