@@ -2,7 +2,7 @@ fuente,archivo,frecuencia,ultima_observacion,ultima_publicacion_o_corte,estado
 PIB real (DANE),pib_colombia.csv,trimestral,2026-04-01,2026-08-18,vigente
 Inflación – IPC (DANE),inflacion_clean.csv,mensual,2026-08-01,2026-09-07,vigente
 Tasas de los TES (BanRep),tasas_interes_clean.csv,diaria_mercado,2026-09-25,2026-09-25,vigente
-Bolsa – COLCAP (BanRep),colcap_oficial.csv,diaria_mercado,2026-09-30,2026-09-30,vigente
+Bolsa – COLCAP (BanRep),colcap_oficial.csv,diaria_mercado,2026-10-01,2026-10-01,vigente
 Actividad mensual – ISE (DANE),ise_mensual.csv,mensual,2026-07-01,2026-07-01,vigente
 Desempleo – GEIH (DANE),mercado_laboral.csv,mensual,2026-08-01,2026-08-01,vigente
 Informalidad – GEIH (DANE),informalidad.csv,mensual,2026-07-01,2026-07-01,vigente
