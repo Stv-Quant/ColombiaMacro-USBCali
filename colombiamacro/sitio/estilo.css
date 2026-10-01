@@ -157,3 +157,19 @@ body.top-oculta .horizon{top:0}
 .info:hover .tip,.info:focus .tip,.info:focus-within .tip{display:block}
 .picker{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:2px 0 8px;font-size:13.5px;color:var(--ink2)}
 .picker select{font:inherit;font-size:13.5px;padding:5px 8px;border:1px solid var(--rule);border-radius:8px;background:var(--panel);color:var(--ink)}
+
+/* Ampliar un grafico: se superpone sin mover la pagina */
+figure.chart{position:relative}
+.exp-btn{position:absolute;top:10px;right:10px;z-index:3;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:16px;line-height:1;border:1px solid var(--rule);border-radius:8px;background:var(--panel);color:var(--ink2);cursor:pointer;opacity:.75;transition:opacity .15s,border-color .15s,color .15s}
+.exp-btn:hover,.exp-btn:focus-visible{opacity:1;border-color:var(--accent);color:var(--accent)}
+figure.chart figcaption{padding-right:40px}
+.exp-hueco{min-width:0}.grid>.exp-hueco.wide{grid-column:1/-1}
+.exp-fondo{display:none;position:fixed;inset:0;z-index:1000;background:rgba(20,20,18,.55);backdrop-filter:blur(2px)}
+body.con-expandida{overflow:hidden}
+body.con-expandida .exp-fondo{display:block}
+figure.chart.expandida{position:fixed;top:4vh;left:max(3vw,calc(50vw - 640px));right:max(3vw,calc(50vw - 640px));max-height:92vh;overflow:auto;z-index:1001;margin:0;padding:22px 24px 16px;box-shadow:0 18px 60px rgba(0,0,0,.28);animation:exp-in .18s ease-out}
+figure.chart.expandida figcaption{font-size:18px}
+figure.chart.expandida .exp-btn{opacity:1;top:14px;right:14px}
+@keyframes exp-in{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+@media (max-width:560px){figure.chart.expandida{top:0;left:0;right:0;bottom:0;max-height:none;border-radius:0;padding:14px 10px}}
+@media (prefers-reduced-motion:reduce){figure.chart.expandida{animation:none}}

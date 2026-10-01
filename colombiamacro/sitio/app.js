@@ -474,6 +474,89 @@
   }
 
 
+  // ---------------------------------------------------------------- ampliar un grafico sin mover la pagina
+  // La figura se saca del flujo (position:fixed) y un hueco del mismo tamano ocupa su lugar;
+  // es el mismo elemento, asi que conserva selectores, clics y hover.
+  function ampliar() {
+    var es = (document.documentElement.lang || 'es') !== 'en';
+    var T = es ? { abrir: 'Ampliar gráfico', cerrar: 'Cerrar (Esc)' } : { abrir: 'Expand chart', cerrar: 'Close (Esc)' };
+    var activo = null, fondo = document.createElement('div');
+    fondo.className = 'exp-fondo';
+    fondo.addEventListener('click', function () { cerrar(); });
+    document.body.appendChild(fondo);
+
+    function graficos(fig) { return Array.prototype.slice.call(fig.querySelectorAll('.js-plotly-plot')); }
+    function alto(el) {
+      var n = graficos(activo.fig).length, base = el._altoOrig || 360;
+      var max = window.innerHeight * (n > 1 ? 0.42 : 0.68);
+      return Math.round(Math.max(base, Math.min(base * 1.8, max)));
+    }
+    function ajustar() {
+      if (!activo) return;
+      graficos(activo.fig).forEach(function (el) {
+        if (el._altoOrig === undefined) el._altoOrig = (el.layout && el.layout.height) || el.offsetHeight;
+        var h = alto(el);
+        el.style.height = h + 'px';
+        var w = el.clientWidth;
+        if (el.layout && (el.layout.height !== h || el.layout.width !== w)) Plotly.relayout(el, { height: h, width: w });
+      });
+    }
+    function fijarScroll(y) {   // sin anclaje de scroll ni desplazamiento suave: la pagina no se mueve
+      if (Math.abs(window.scrollY - y) > 1) window.scrollTo({ top: y, left: 0, behavior: 'instant' });
+    }
+    function abrir(fig, btn) {
+      if (activo) cerrar();
+      var y = window.scrollY;
+      document.documentElement.style.overflowAnchor = 'none';
+      var hueco = document.createElement('div');
+      hueco.className = 'exp-hueco' + (fig.classList.contains('wide') ? ' wide' : '');
+      hueco.style.height = fig.offsetHeight + 'px';
+      fig.parentNode.insertBefore(hueco, fig);
+      activo = { fig: fig, hueco: hueco, btn: btn, y: y };
+      fig.classList.add('expandida');
+      document.body.classList.add('con-expandida');
+      btn.setAttribute('aria-label', T.cerrar); btn.title = T.cerrar; btn.textContent = '✕';
+      graficos(fig).forEach(function (el) {
+        el._altoOrig = (el.layout && el.layout.height) || el.offsetHeight;
+        el._estiloOrig = el.style.height;
+        el.on && el.on('plotly_afterplot', function () {   // un selector redibuja: mantener el tamano ampliado
+          if (activo && activo.fig === fig && el.layout && (el.layout.height !== alto(el) || el.layout.width !== el.clientWidth)) setTimeout(ajustar, 0);
+        });
+      });
+      fijarScroll(y);
+      requestAnimationFrame(function () { ajustar(); fijarScroll(y); });
+      btn.focus({ preventScroll: true });
+    }
+    function cerrar() {
+      if (!activo) return;
+      var a = activo; activo = null;
+      a.fig.classList.remove('expandida');
+      document.body.classList.remove('con-expandida');
+      a.btn.setAttribute('aria-label', T.abrir); a.btn.title = T.abrir; a.btn.textContent = '⤢';
+      graficos(a.fig).forEach(function (el) {
+        el.style.height = el._estiloOrig || '';
+        if (el._altoOrig) Plotly.relayout(el, { height: el._altoOrig, width: null }).then(function () { Plotly.Plots.resize(el); });
+        delete el._altoOrig; delete el._estiloOrig;
+      });
+      a.hueco.parentNode && a.hueco.parentNode.removeChild(a.hueco);
+      fijarScroll(a.y);
+      requestAnimationFrame(function () { fijarScroll(a.y); document.documentElement.style.overflowAnchor = ''; });
+    }
+    document.querySelectorAll('figure.chart').forEach(function (fig) {
+      if (!fig.querySelector('.js-plotly-plot, .plot')) return;
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'exp-btn'; btn.textContent = '⤢';
+      btn.setAttribute('aria-label', T.abrir); btn.title = T.abrir;
+      btn.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        if (activo && activo.fig === fig) cerrar(); else abrir(fig, btn);
+      });
+      fig.appendChild(btn);
+    });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrar(); });
+    window.addEventListener('resize', function () { if (activo) ajustar(); });
+  }
+
   function seguro(fn) { try { fn(); } catch (e) { if (window.console) console.error(e); } }
 
   function init() {
@@ -508,6 +591,7 @@
     seguro(curvaTES);
     seguro(relojCiclo);
     seguro(sectoresSelector);
+    seguro(ampliar);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

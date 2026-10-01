@@ -78,10 +78,6 @@ class TestInformalidad(unittest.TestCase):
         self.assertAlmostEqual(tasa, i.iloc[-1]["nacional"], delta=0.2)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestNoticias(unittest.TestCase):
     def test_publicaciones_oficiales(self):
         from colombiamacro import noticias as nt
@@ -181,3 +177,21 @@ class TestDecisionAnunciada(unittest.TestCase):
         self.assertIn("colombiamacro.fuentes.complementarias", rapidos)
         self.assertNotIn("colombiamacro.fuentes.pib", rapidos)
         self.assertEqual(len(ac.pasos(False)), len(ac.PASOS))
+
+
+class TestAmpliar(unittest.TestCase):
+    """v11.4: cada grafico se puede ampliar como superposicion sin mover la pagina."""
+
+    def test_js_y_css(self):
+        from pathlib import Path
+        base = Path(__file__).resolve().parents[1] / "colombiamacro" / "sitio"
+        js = (base / "app.js").read_text(encoding="utf-8")
+        css = (base / "estilo.css").read_text(encoding="utf-8")
+        for clave in ("function ampliar", "exp-hueco", "Escape", "overflowAnchor", "seguro(ampliar)"):
+            self.assertIn(clave, js)
+        for clave in ("figure.chart.expandida", ".exp-btn", ".exp-fondo", ".exp-hueco"):
+            self.assertIn(clave, css)
+
+
+if __name__ == "__main__":
+    unittest.main()
