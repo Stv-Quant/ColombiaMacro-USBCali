@@ -4722,6 +4722,7 @@ fecha,serie,valor,frecuencia,unidad,id_banrep
 2026-09-25,ibr_overnight,12.005,diaria,% e.a.,15324
 2026-09-28,ibr_overnight,12.008,diaria,% e.a.,15324
 2026-09-29,ibr_overnight,12.006,diaria,% e.a.,15324
+2026-09-30,ibr_overnight,12.015,diaria,% e.a.,15324
 2000-01-01,ied_musd,387.79,trimestral,millones USD,15133
 2000-04-01,ied_musd,601.36,trimestral,millones USD,15133
 2000-07-01,ied_musd,773.08,trimestral,millones USD,15133
@@ -31913,3 +31914,4 @@ fecha,serie,valor,frecuencia,unidad,id_banrep
 2026-09-28,trm,3306.86,diaria,COP por USD,1
 2026-09-29,trm,3349.63,diaria,COP por USD,1
 2026-09-30,trm,3341.23,diaria,COP por USD,1
+2026-10-01,trm,3312.84,diaria,COP por USD,1

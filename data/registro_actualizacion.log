@@ -1,34 +1,4 @@
-Actualizacion ColombiaMacro — 2026-09-30 13:10 UTC
-
-============================================================
-  IPC — DANE y BanRep
-============================================================
-=======================================================
-  Actualizador Inflacion Colombia - BanRep
-=======================================================
-CSV actual: 248 meses, ultimo: 2026-08-01
-Descargando IPC de BanRep...
-OK - 866 meses descargados (1954-07-01 -> 2026-08-01)
-Sin cambios de IPC
-
-=======================================================
-  Estado actual Inflacion Colombia
-=======================================================
-  Total meses    : 248
-  Primer dato    : 2006-01-01
-  Ultimo dato    : 2026-08-01
-  Inf. mensual   : 0.39%
-  Inf. anual     : 6.24%
-=======================================================
-
-Ultimos 6 meses:
-     fecha  inflacion_mensual  inflacion_anual
-2026-03-01               0.78             5.56
-2026-04-01               0.78             5.69
-2026-05-01               0.47             5.84
-2026-06-01               0.39             6.14
-2026-07-01               0.17             6.02
-2026-08-01               0.39             6.24
+Actualizacion ColombiaMacro — 2026-10-01 00:30 UTC (rapida: series diarias de BanRep y mercado)
 
 ============================================================
   Curvas TES — BanRep
@@ -64,21 +34,16 @@ Ultimos 5 dias:
 2026-09-25         12.42         12.90          13.06        4.99        6.48         6.64
 
 ============================================================
-  PIB real y nominal — DANE
-============================================================
-PIB: sin cambios
-
-============================================================
   COLCAP — BanRep
 ============================================================
-COLCAP: sin cambios
+COLCAP oficial: 4547 dias hasta 2026-09-30
 
 ============================================================
   Politica, TRM, inflacion basica, externo — BanRep
 ============================================================
 tpm                        id 59      10456 obs hasta 2026-09-30
-  ibr_overnight              id 15324    4570 obs hasta 2026-09-29
-  trm                        id 1       12727 obs hasta 2026-09-30
+  ibr_overnight              id 15324    4571 obs hasta 2026-09-30
+  trm                        id 1       12728 obs hasta 2026-10-01
   inflacion_sin_alimentos    id 15388     522 obs hasta 2026-08-31
   inflacion_basica_sar       id 15390     522 obs hasta 2026-08-31
   inflacion_nucleo15         id 15392     522 obs hasta 2026-08-31
@@ -94,16 +59,7 @@ tpm                        id 59      10456 obs hasta 2026-09-30
   salario_minimo_var         id 15418      42 obs hasta 2026-12-31
 series_banrep.csv: actualizado (16 de 16 series)
 
-============================================================
-  ISE y mercado laboral — DANE
-============================================================
-ISE: 259 meses hasta 2026-07-01 (sin cambios)
-Mercado laboral: 307 meses hasta 2026-07-01 (sin cambios)
-
 RESUMEN
-  [OK] IPC — DANE y BanRep
   [OK] Curvas TES — BanRep
-  [OK] PIB real y nominal — DANE
   [OK] COLCAP — BanRep
   [OK] Politica, TRM, inflacion basica, externo — BanRep
-  [OK] ISE y mercado laboral — DANE
