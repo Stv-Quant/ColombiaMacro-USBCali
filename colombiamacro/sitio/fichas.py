@@ -303,6 +303,38 @@ FICHAS = {
     "g-productividad": (("DANE: PIB real y GEIH desestacionalizada (población ocupada); cálculo propio", "DANE: real GDP and seasonally adjusted GEIH (employed population); own calculation"),
                         ("Productividad laboral aparente (OECD, 2001) = PIB real de 4 trimestres / promedio de ocupados de 12 meses; índices 2015 = 100. No corrige por horas trabajadas ni por informalidad.",
                          "Apparent labour productivity (OECD, 2001) = 4-quarter real GDP / 12-month average employment; indices 2015 = 100. Not adjusted for hours worked or informality.")),
+    # --- capacidad ampliada
+    "g-cap-sectores": (("DANE, PIB trimestral por actividad; cálculo propio", "DANE, quarterly GDP by activity; own calculation"),
+                       ("Brecha = 100 × (ln nivel real − ln tendencia), con tendencia Hodrick-Prescott de una cola (λ = 1.600) calculada sin 2020T2–2021T2: en cada trimestre solo usa datos disponibles hasta ese momento.",
+                        "Gap = 100 × (ln real level − ln trend), with a one-sided Hodrick-Prescott trend (λ = 1,600) computed excluding 2020Q2–2021Q2: each quarter uses only data available up to then.")),
+    "g-cap-sectores-hoy": (("DANE, PIB trimestral por actividad; cálculo propio", "DANE, quarterly GDP by activity; own calculation"),
+                           ("Último trimestre de la brecha de cada sector frente a su tendencia HP de una cola.",
+                            "Latest quarter of each sector's gap versus its one-sided HP trend.")),
+    "g-cap-subutilizacion": (("DANE, Gran Encuesta Integrada de Hogares (GEIH)", "DANE, Integrated Household Survey (GEIH)"),
+                             ("Indicadores de subutilización de la 19.ª CIET (OIT, 2013), total nacional, sin desestacionalizar, promedio móvil de 12 meses: TD = desocupados / fuerza de trabajo; "
+                              "TCSD = (desocupados + subocupados por horas) / fuerza de trabajo; MCSFT = (desocupados + subocupados + fuerza de trabajo potencial) / fuerza de trabajo ampliada.",
+                              "Underutilisation indicators from the 19th ICLS (ILO, 2013), national total, not seasonally adjusted, 12-month moving average: UR = unemployed / labour force; "
+                              "LU2 = (unemployed + time-related underemployed) / labour force; LU4 = (unemployed + underemployed + potential labour force) / extended labour force.")),
+    "g-cap-desempleo": (("DANE, GEIH desestacionalizada; cálculo propio", "DANE, seasonally adjusted GEIH; own calculation"),
+                        ("Promedio trimestral de la tasa de desempleo desestacionalizada y su tendencia Hodrick-Prescott (λ = 1.600) estimada sin 2020–2021 e interpolada en esos años.",
+                         "Quarterly average of the seasonally adjusted unemployment rate and its Hodrick-Prescott trend (λ = 1,600), estimated excluding 2020–2021 and interpolated over those years.")),
+    "g-cap-mapa": (("DANE: Cuentas departamentales y GEIH (32 ciudades, año móvil); cálculo propio", "DANE: departmental accounts and GEIH (32 cities, rolling year); own calculation"),
+                   ("Mapa esquemático (cartograma de casillas), no a escala. Crecimiento y tamaño frente a 2019: PIB real (volúmenes encadenados). PIB por persona: precios corrientes, Colombia = 100. "
+                    "Desempleo: ciudad capital del departamento (Bogotá para Cundinamarca no se asigna). El último año es preliminar.",
+                    "Schematic map (tile cartogram), not to scale. Growth and size versus 2019: real GDP (chain-linked volumes). GDP per person: current prices, Colombia = 100. "
+                    "Unemployment: the department's capital city (Bogotá is not assigned to Cundinamarca). The latest year is preliminary.")),
+    "g-cap-regiones": (("DANE, Cuentas nacionales departamentales, base 2015 (anexos de PIB por departamento y por actividad)", "DANE, departmental national accounts, base 2015 (GDP by department and by activity annexes)"),
+                       ("PIB real de cada departamento en el último año publicado frente a 2019 (volúmenes encadenados, base 2015). Último año preliminar.",
+                        "Real GDP of each department in the latest published year versus 2019 (chain-linked volumes, base 2015). Latest year preliminary.")),
+    "g-cap-estructura": (("DANE, Cuentas nacionales departamentales, base 2015 (anexos de PIB por departamento y por actividad)", "DANE, departmental national accounts, base 2015 (GDP by department and by activity annexes)"),
+                         ("Participación de cada una de las 12 agrupaciones CIIU en el valor agregado del departamento (sin impuestos), a precios corrientes del último año.",
+                          "Share of each of the 12 ISIC groupings in the department's value added (excluding taxes), at current prices in the latest year.")),
+    "g-cap-diversificacion": (("DANE, Cuentas nacionales departamentales, base 2015 (anexos de PIB por departamento y por actividad)", "DANE, departmental national accounts, base 2015 (GDP by department and by activity annexes)"),
+                              ("Número equivalente = 1 / Σ sᵢ², donde sᵢ es la participación de la rama i en el valor agregado del departamento (Herfindahl, 1950; Hirschman, 1964).",
+                               "Equivalent number = 1 / Σ sᵢ², where sᵢ is branch i's share of the department's value added (Herfindahl, 1950; Hirschman, 1964).")),
+    "g-cap-ciudades": (("DANE, Gran Encuesta Integrada de Hogares (GEIH)", "DANE, Integrated Household Survey (GEIH)"),
+                       ("Tasa de desocupación de cada una de las 32 ciudades capitales (13 con su área metropolitana), en año móvil de 12 meses, frente al año móvil terminado 12 meses antes.",
+                        "Unemployment rate of each of the 32 capital cities (13 with their metropolitan area), as a 12-month rolling year, versus the rolling year ending 12 months earlier.")),
 }
 
 

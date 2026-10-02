@@ -544,6 +544,25 @@
     return (v < 0 ? '-' : (signo ? '+' : '')) + s;
   }
 
+  // ---------------------------------------------------------------- mapa esquematico de las regiones
+  function mapaRegiones() {
+    document.querySelectorAll('.tmapa').forEach(function (box) {
+      function pintar(m) {
+        box.setAttribute('data-m', m);
+        box.querySelectorAll('.tm-btn button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-m') === m); });
+        box.querySelectorAll('.tm-c').forEach(function (c) {
+          var v = (c.getAttribute('data-' + m) || 'na|—').split('|');
+          c.className = 'tm-c tm-b' + v[0];
+          c.querySelector('.tm-v').textContent = v[1];
+        });
+      }
+      box.querySelectorAll('.tm-btn button').forEach(function (b) {
+        b.addEventListener('click', function () { pintar(b.getAttribute('data-m')); });
+      });
+      pintar(box.getAttribute('data-m') || 'v19');
+    });
+  }
+
   // ---------------------------------------------------------------- sectores: elegir trimestre
   function sectoresSelector() {
     var sel = document.getElementById('sec-q'), el = document.getElementById('g-sec-barras');
@@ -711,6 +730,7 @@
     seguro(curvaTES);
     seguro(relojCiclo);
     seguro(sectoresSelector);
+    seguro(mapaRegiones);
     seguro(ampliar);
   }
 

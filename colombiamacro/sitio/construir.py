@@ -59,12 +59,17 @@ DESCRIPCION_CSV = {
     "pib_inversion.csv": ("Inversión fija por tipo de activo (DANE)", "Fixed investment by asset (DANE)"),
     "pib_consumo_hogares.csv": ("Consumo de los hogares por finalidad y durabilidad (DANE)", "Household consumption by purpose and durability (DANE)"),
     "poblacion.csv": ("Población total nacional (DANE)", "Total national population (DANE)"),
+    "pib_departamentos.csv": ("PIB por departamento (DANE)", "GDP by department (DANE)"),
+    "pib_departamentos_ramas.csv": ("Valor agregado por departamento y sector (DANE)", "Value added by department and sector (DANE)"),
+    "laboral_ciudades.csv": ("Mercado laboral de 32 capitales (DANE)", "Labour market in 32 capital cities (DANE)"),
+    "laboral_subutilizacion.csv": ("Subutilización de la fuerza de trabajo (DANE)", "Labour underutilisation (DANE)"),
     "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
 }
 DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "exportaciones_mensuales.csv", "exportaciones_destinos.csv",
              "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "pib_gasto.csv", "pib_inversion.csv",
-             "pib_consumo_hogares.csv", "poblacion.csv", "estado_fuentes.csv"]
+             "pib_consumo_hogares.csv", "poblacion.csv", "pib_departamentos.csv", "pib_departamentos_ramas.csv", "laboral_ciudades.csv",
+             "laboral_subutilizacion.csv", "estado_fuentes.csv"]
 
 
 # ------------------------------------------------------------------ formato
@@ -1460,6 +1465,9 @@ def pagina(d, s, lang, generado):
     from colombiamacro.sitio.crecimiento_extra import construir_crecimiento
     crec_antes, crec_oferta, crec_resto, _ = construir_crecimiento(d_es, s, L)
     LANG_ACTUAL[0] = L
+    from colombiamacro.sitio.capacidad_extra import construir_capacidad
+    cap_antes, cap_despues = construir_capacidad(d_es, s, L)
+    LANG_ACTUAL[0] = L
     from colombiamacro.sitio import comercio_extra as cx
     datos_com = cx.cargar()
     s_com, R_com = "", None
@@ -1499,7 +1507,7 @@ def pagina(d, s, lang, generado):
     P = {
         "ciclo": (t("nav_ciclo", L), t("pg_ciclo", L), t("pl_ciclo", L), [ciclo_antes, explorador_ciclo(d, L), ciclo_despues], True),
         "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [crec_antes, s1, crec_oferta, s_sec, crec_resto], True),
-        "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [s_cap], True),
+        "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [cap_antes, s_cap, cap_despues], True),
         "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [s_inf], True),
         "inflacion": (t("nav_inflacion", L), t("pg_inflacion", L), t("pl_inflacion", L), [s2], True),
         "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [s3], True),

@@ -374,8 +374,10 @@ def ciclo_mensual(ise: pd.DataFrame) -> pd.DataFrame:
 
 
 def brecha_sectores(sectores: pd.DataFrame) -> pd.DataFrame:
-    """Brecha de cada sector del PIB frente a su propia tendencia HP en tiempo real."""
-    niv = sectores.pivot(index="fecha", columns="sector", values="nivel").sort_index()
+    """Brecha de cada sector del PIB frente a su propia tendencia HP en tiempo real.
+    Los niveles sectoriales del DANE vienen en datos originales (con estacionalidad): se usa la suma
+    movil de 4 trimestres, que la elimina sin modelos, antes de filtrar."""
+    niv = sectores.pivot(index="fecha", columns="sector", values="nivel").sort_index().rolling(4).sum().dropna(how="all")
     out = {}
     for s_ in niv:
         y = 100 * np.log(niv[s_].astype(float))

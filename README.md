@@ -21,7 +21,7 @@ Páginas de análisis (menú agrupado):
 | Actividad | `/ciclo/` | Reloj del ciclo interactivo y recorrido trimestral desde 2014 |
 | | `/crecimiento/` | Ocho medidas (incl. PIB por persona y tasa de inversión); PIB por el gasto (hogares, Gobierno, inversión, comercio neto), inversión por activo, consumo por durabilidad y finalidad, PIB por persona en pesos y dólares, productividad por ocupado; los 12 sectores (selector y mapa de calor); seis medidas (anual, trimestre anualizado, año corrido, sin Gobierno, deflactor, tamaño vs 2019), PIB e ISE, crecimiento por año y por periodo, real vs nominal, deflactor vs IPC, aportes por grandes grupos, economía sin Gobierno y sin minería, difusión sectorial, sectores vs su historia, nivel vs camino 2015–2019 y literatura |
 | | `/sectores/` | Redirige a `/crecimiento/#sectores` (los 12 sectores ahora viven dentro de Crecimiento) |
-| | `/capacidad/` | Producción frente a su capacidad (brecha del producto) |
+| | `/capacidad/` | Seis medidas de holgura; PIB frente a su capacidad; brecha de los 12 sectores (mapa de calor y hoy); holgura laboral (desempleo, subempleo y subutilización OIT; desempleo vs tendencia); mapa esquemático de los 33 departamentos (crecimiento, tamaño vs 2019, PIB por persona, desempleo de la capital); ranking regional; estructura productiva y diversificación (Herfindahl); desempleo en 32 capitales; literatura |
 | | `/empleo/` | Desempleo e informalidad nacional, por sector y por ciudad |
 | Precios y tasas | `/inflacion/` | Inflación vs. meta, qué precios suben más, inflación esperada y trayectoria a 10 años |
 | | `/tasas/` | Tasa del Banco de la República y tasa real |

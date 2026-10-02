@@ -43,7 +43,7 @@ class TestSitio(unittest.TestCase):
         cls.tmp.cleanup()
 
     PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento", "crec-medidas", "crec-velocidad", "crec-precios", "crec-quien", "crec-demanda", "crec-inversion", "crec-hogares", "crec-persona", "crec-amplitud", "crec-nivel", "crec-literatura", "sectores"),
-               "capacidad": ("capacidad",), "empleo": ("informalidad",), "inflacion": ("precios",), "tasas": ("banco",),
+               "capacidad": ("capacidad", "cap-medidas", "cap-sectores", "cap-laboral", "cap-regiones", "cap-estructura", "cap-ciudades", "cap-literatura"), "empleo": ("informalidad",), "inflacion": ("precios",), "tasas": ("banco",),
                "curva-tes": ("curva", "curva-app"), "mercados": ("mercados",), "empresas": ("empresas",),
                "externo": ("externo",), "comercio": ("comercio-cifras", "comercio-flujos", "comercio-vende", "comercio-compra", "comercio-socios"), "indicadores": ("indicadores", "fuentes", "noticias")}
 
