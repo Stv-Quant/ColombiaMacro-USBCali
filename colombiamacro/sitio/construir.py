@@ -71,6 +71,7 @@ DESCRIPCION_CSV = {
     "empleo_fuera_ft.csv": ("Población fuera de la fuerza de trabajo (DANE)", "Population outside the labour force (DANE)"),
     "ipc_divisiones.csv": ("IPC por divisiones: variación y aporte (DANE)", "CPI by division: change and contribution (DANE)"),
     "ipc_subclases.csv": ("IPC por 188 subclases (DANE)", "CPI by 188 subclasses (DANE)"),
+    "ipc_ponderaciones.csv": ("Ponderaciones oficiales de las 188 subclases por nivel de ingreso (DANE, canasta 2018)", "Official weights of the 188 subclasses by income level (DANE, 2018 basket)"),
     "ipc_ciudades.csv": ("IPC por ciudad y división (DANE)", "CPI by city and division (DANE)"),
     "ipc_ingresos.csv": ("IPC por nivel de ingreso (DANE)", "CPI by income level (DANE)"),
     "ipc_clasificaciones.csv": ("IPC de servicios, bienes y energéticos (DANE)", "CPI for services, goods and energy (DANE)"),
@@ -81,7 +82,7 @@ DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "inform
              "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "pib_gasto.csv", "pib_inversion.csv",
              "pib_consumo_hogares.csv", "poblacion.csv", "pib_departamentos.csv", "pib_departamentos_ramas.csv", "laboral_ciudades.csv",
              "laboral_subutilizacion.csv", "empleo_ramas.csv", "empleo_posicion.csv", "empleo_sexo.csv", "empleo_jovenes.csv",
-             "empleo_area.csv", "empleo_fuera_ft.csv", "ipc_divisiones.csv", "ipc_subclases.csv", "ipc_ciudades.csv", "ipc_ingresos.csv",
+             "empleo_area.csv", "empleo_fuera_ft.csv", "ipc_divisiones.csv", "ipc_subclases.csv", "ipc_ponderaciones.csv", "ipc_ciudades.csv", "ipc_ingresos.csv",
              "ipc_clasificaciones.csv", "estado_fuentes.csv"]
 
 

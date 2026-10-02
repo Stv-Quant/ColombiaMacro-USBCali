@@ -355,6 +355,45 @@ body.con-expandida .exp-fondo{display:block}
 figure.chart.expandida{position:fixed;top:4vh;left:max(3vw,calc(50vw - 660px));right:max(3vw,calc(50vw - 660px));max-height:92vh;overflow:auto;z-index:1001;margin:0;padding:24px 26px 18px;background:var(--glass-strong);box-shadow:0 40px 90px rgba(0,0,0,.35);animation:exp-in .22s var(--ease)}
 figure.chart.expandida figcaption{font-size:18px}
 figure.chart.expandida .exp-btn{opacity:1}
+/* ventana explicativa (?) */
+.ex-q{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-left:8px;vertical-align:2px;padding:0;font:600 12px/1 var(--f-data,inherit);border:1px solid var(--acc);border-radius:50%;background:transparent;color:var(--acc);cursor:pointer;transition:background .15s,color .15s,transform .15s}
+.ex-q:hover,.ex-q:focus-visible{background:var(--acc);color:var(--bg);transform:scale(1.08)}
+dialog.explica{width:min(860px,94vw);max-height:90vh;padding:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--glass-strong);color:var(--ink);box-shadow:0 40px 90px rgba(0,0,0,.35);overflow:hidden}
+dialog.explica[open]{display:flex;flex-direction:column;animation:exp-in .22s var(--ease)}
+dialog.explica::backdrop{background:rgba(40,36,26,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+[data-theme="dark"] dialog.explica::backdrop{background:rgba(4,8,15,.62)}
+[data-theme="dark"] dialog.explica{background:color-mix(in srgb,var(--bg) 94%,transparent)}
+.ex-cab{position:relative;padding:22px 64px 14px 28px;border-bottom:1px solid var(--line)}
+.ex-k{margin:0 0 6px;font-family:var(--f-data,inherit);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.ex-cab h2{margin:0;font-size:clamp(19px,2.3vw,25px);line-height:1.25}
+.ex-x{position:absolute;top:18px;right:18px;width:34px;height:34px;border:1px solid var(--line);border-radius:var(--radius);background:transparent;color:var(--ink2);font-size:15px;cursor:pointer}
+.ex-x:hover,.ex-x:focus-visible{border-color:var(--acc);color:var(--acc)}
+.ex-cuerpo{overflow:auto;padding:6px 28px 26px;line-height:1.65}
+.ex-cuerpo h3{margin:26px 0 8px;font-size:16px}
+.ex-lede{font-size:16.5px;margin-top:16px}
+.ex-nota{font-size:13.5px;color:var(--ink2);border-left:2px solid var(--acc);padding-left:12px}
+.ex-cuerpo .table-wrap.plano{margin:10px 0}
+.ex-cuerpo .tbl td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ex-escalera{list-style:none;margin:14px 0;padding:0;display:grid;gap:6px}
+.ex-escalera li{display:grid;grid-template-columns:62px 110px 1fr;align-items:center;gap:12px;margin-left:calc(var(--i)*22px);padding:8px 14px;border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:var(--radius);background:color-mix(in srgb,var(--acc) calc(4% + var(--i)*3%),transparent)}
+.ex-escalera b{font-family:var(--f-data,inherit);font-size:20px;color:var(--acc);font-variant-numeric:tabular-nums}
+.ex-escalera span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.ex-escalera em{font-style:normal}
+.ex-barras{list-style:none;margin:12px 0;padding:0;display:grid;gap:5px}
+.ex-barras li{display:grid;grid-template-columns:130px 1fr 52px;align-items:center;gap:8px;font-size:13.5px}
+.ex-barras li i{display:block;height:10px;justify-self:start;border-radius:2px;background:var(--acc);max-width:100%}
+.ex-barras li b{text-align:right;font-weight:600;font-size:12px;font-variant-numeric:tabular-nums}
+.ex-fuentes{font-size:13.5px;padding-left:18px}
+.ex-fuentes li{margin:4px 0}
+body.con-dialogo{overflow:hidden}
+@media (max-width:640px){
+  dialog.explica{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0}
+  .ex-cab{padding:16px 56px 12px 16px}.ex-cuerpo{padding:4px 16px 20px}
+  .ex-escalera li{grid-template-columns:48px 1fr;margin-left:calc(var(--i)*8px)}.ex-escalera em{grid-column:1/-1}
+  .ex-barras li{grid-template-columns:96px 1fr 46px}
+  .ex-cuerpo .tbl th,.ex-cuerpo .tbl td{padding:8px 6px;font-size:12.5px}
+}
+@media (prefers-reduced-motion:reduce){dialog.explica[open]{animation:none}}
 @keyframes exp-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 .rv{opacity:0;transform:translateY(10px);transition:opacity .6s var(--ease),transform .6s var(--ease)}

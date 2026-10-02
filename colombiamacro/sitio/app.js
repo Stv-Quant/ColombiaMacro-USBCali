@@ -694,6 +694,25 @@
     window.addEventListener('resize', function () { if (activo) ajustar(); });
   }
 
+  function dialogos() {
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-dialog]');
+      if (b) {
+        var d = document.getElementById(b.getAttribute('data-dialog'));
+        if (d && d.showModal) { d.showModal(); document.body.classList.add('con-dialogo'); var x = d.querySelector('[data-cerrar]'); if (x) x.focus(); }
+        return;
+      }
+      if (e.target.closest && e.target.closest('dialog [data-cerrar]')) { e.target.closest('dialog').close(); return; }
+      if (e.target.tagName === 'DIALOG' && e.target.open) {
+        var r = e.target.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close();
+      }
+    });
+    document.querySelectorAll('dialog').forEach(function (d) {
+      d.addEventListener('close', function () { document.body.classList.remove('con-dialogo'); });
+    });
+  }
+
   function seguro(fn) { try { fn(); } catch (e) { if (window.console) console.error(e); } }
 
   function init() {
@@ -732,6 +751,7 @@
     seguro(sectoresSelector);
     seguro(mapaRegiones);
     seguro(ampliar);
+    seguro(dialogos);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

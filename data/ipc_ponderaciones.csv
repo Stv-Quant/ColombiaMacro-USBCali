@@ -1,0 +1,189 @@
+subclase,pobres,vulnerables,media,altos,total
+Arroz,2.56,1.99,0.89,0.21,0.93
+Pastas Alimenticias,0.24,0.20,0.12,0.06,0.12
+Avena Y Sus Derivados,0.04,0.03,0.03,0.02,0.03
+Trigo Y Sus Derivados,0.04,0.03,0.02,0.01,0.02
+Maíz Y Sus Derivados,0.21,0.15,0.07,0.02,0.07
+Pan,1.21,1.06,0.71,0.31,0.68
+"Otras Harinas, Cereales Y Almidones",0.29,0.34,0.32,0.25,0.30
+Otros Productos De Panadería,0.33,0.32,0.30,0.19,0.27
+Carne De Res Y Derivados,2.77,2.88,2.05,0.82,1.88
+Carne De Cerdo Y Derivados,0.53,0.62,0.56,0.21,0.48
+Carne De Aves,2.04,1.91,1.32,0.56,1.24
+"Carnes Preparadas, Charcutería Y Otros Productos Conteniendo Carne",0.51,0.51,0.42,0.28,0.40
+Productos de rio y mar (incluye pescados y camarones frescos o congelados y pescado enlatado como sardinas y atún),0.89,0.78,0.60,0.46,0.60
+Leche,1.38,1.39,1.13,0.52,1.02
+Quesos Y Productos Afines,0.69,0.62,0.46,0.36,0.46
+Huevos,1.31,1.11,0.71,0.28,0.68
+Otros Derivados De La Leche,0.25,0.27,0.25,0.20,0.24
+Aceites Comestibles,0.76,0.66,0.48,0.25,0.45
+Mantequilla De Vaca,0.06,0.06,0.05,0.03,0.05
+Margarinas y grasas animales y vegetales,0.04,0.03,0.04,0.02,0.03
+Frutas Congeladas O En Pulpa,0.02,0.02,0.02,0.02,0.02
+"Frutos Secos Y Nueces, Cáscaras De Frutas Y Semillas Comestibles",0.01,0.01,0.02,0.04,0.02
+Naranjas,0.05,0.04,0.06,0.07,0.06
+Bananos,0.08,0.08,0.07,0.05,0.06
+Tomate de árbol,0.13,0.14,0.08,0.02,0.07
+Moras,0.09,0.11,0.07,0.03,0.07
+Frutas frescas,0.62,0.68,0.73,0.68,0.70
+Legumbres Secas,0.43,0.38,0.25,0.12,0.24
+Legumbres Y Hortalizas En Conserva Y Deshidratadas,0.06,0.04,0.06,0.07,0.06
+Plátanos,0.66,0.58,0.32,0.10,0.31
+Papas,0.56,0.52,0.31,0.10,0.30
+Yuca Para Consumo En El Hogar,0.22,0.19,0.11,0.03,0.11
+"Productos Derivados De Los Tubérculos, Raíces Y Plátanos",0.01,0.01,0.01,0.01,0.01
+"Arracacha, ñame y otros tubérculos",0.05,0.05,0.03,0.01,0.03
+Tomate,0.33,0.30,0.18,0.08,0.18
+Cebolla,0.41,0.38,0.20,0.08,0.20
+Zanahoria,0.06,0.06,0.05,0.02,0.04
+Hortalizas y legumbres frescas,0.41,0.44,0.36,0.23,0.34
+Azúcar Y Otros Endulzantes,0.49,0.44,0.26,0.11,0.26
+Panela Cruda Para Consumo En El Hogar,0.38,0.28,0.16,0.04,0.16
+"Jaleas, Mermeladas, Miel Y Similares",0.06,0.06,0.05,0.05,0.05
+"Dulces, Confites, Caramelos, Bombones, Chocolatinas, Chicles, Masmelos, Cocadas Para Consumo En El Hogar",0.10,0.09,0.06,0.04,0.06
+"Helados, Conos, Paletas, Vasitos, Refrescos Congelados Y Tortas Heladas Para Consumo En El Hogar",0.08,0.08,0.07,0.04,0.06
+"Gelatinas, Flanes Y Pudines En Polvo Para Preparar",0.01,0.02,0.01,0.01,0.01
+"Salsas, Pastas Y Aderezos",0.17,0.18,0.18,0.13,0.16
+Sal,0.04,0.03,0.02,0.01,0.02
+"Sopas, Cremas, Caldos Y Consomés",0.12,0.09,0.05,0.04,0.06
+"Frituras: Papas Fritas, Chitos, Maizitos, Patacones, Besitos, Etc, Para Consumo En El Hogar",0.16,0.15,0.12,0.09,0.11
+Condimentos y hierbas culinarias,0.11,0.09,0.07,0.04,0.06
+Leche En Polvo Para Lactantes,0.05,0.07,0.05,0.10,0.06
+"Otros Alimentos Precocidos Y Preparados: Ajiaco, Lenteja, Frijol, Lechona Enlatada Y Similares",0.02,0.01,0.01,0.01,0.01
+Café Y Productos A Base De Café,0.31,0.28,0.22,0.13,0.21
+Chocolate Y Productos A Base De Chocolate,0.25,0.22,0.20,0.11,0.18
+Té E Infusiones (Para Bebidas Calientes),0.01,0.01,0.01,0.02,0.01
+Agua Mineral (Con Y Sin Gas) Para Consumo En El Hogar,0.12,0.14,0.12,0.09,0.12
+"Refrescos Líquidos Empacados (Jugos, Té Fríos Y Bebidas Hidratantes)",0.17,0.17,0.14,0.10,0.14
+Concentrados Para Preparar Refrescos,0.11,0.08,0.03,0.01,0.03
+Gaseosas y maltas para consumo en el hogar,0.71,0.76,0.47,0.15,0.44
+"Bebidas energizantes y a base de arroz, soya, coco y similares",0.01,0.02,0.02,0.03,0.02
+Aguardiente,0.15,0.15,0.15,0.10,0.14
+"Whisky, ron, brandy, vodka, ginebra, cognac, tequila, cremas de licor y aperitivos",0.35,0.40,0.35,0.33,0.35
+"Vino, Champaña, Jerez Y Aperitivos A Base De Vino Para Consumo En El Hogar",0.07,0.06,0.07,0.11,0.08
+Cerveza Y Refajo,1.00,1.08,1.00,0.95,1.00
+"Cigarrillos, tabaco y derivados",0.25,0.19,0.15,0.04,0.13
+Prendas De Vestir Para Hombre,0.53,0.65,0.99,1.42,1.04
+Prendas De Vestir Para Mujer,0.78,0.80,1.07,1.34,1.09
+Prendas De Vestir Para Bebés,0.09,0.12,0.07,0.08,0.08
+Uniformes,0.44,0.43,0.24,0.11,0.24
+Prendas de vestir para niña y niño,0.68,0.66,0.47,0.30,0.46
+"Otros artículos y accesorios de vestir para hombre y mujer, incluyendo artículos de vestir para adulto y bebé y materiales",0.01,0.03,0.03,0.07,0.04
+Lavado Y Planchado De Ropa,0.04,0.01,0.09,0.20,0.10
+Calzado Para Hombre,0.22,0.28,0.43,0.47,0.41
+Calzado Para Mujer,0.25,0.24,0.35,0.42,0.35
+Calzado para niño y niña,0.26,0.28,0.18,0.10,0.18
+Arriendo efectivo,19.85,15.14,10.83,6.40,10.60
+Gasto en servicios de la vivienda ocupada por sus propietarios,11.78,12.73,14.54,15.97,14.56
+Materiales Para La Conservación Y La Reparación De La Vivienda,0.04,0.07,0.13,0.12,0.12
+Suministro De Agua,2.00,2.15,1.92,1.46,1.84
+Recogida De Basuras,0.57,0.50,0.43,0.24,0.40
+Alcantarillado,0.48,0.54,0.54,0.36,0.49
+Servicios Relacionados Con La Copropiedad,0.28,0.19,0.55,3.20,1.15
+Electricidad,3.56,3.53,3.13,2.11,2.94
+Gas,1.61,1.49,1.06,0.58,1.02
+Muebles,0.26,0.43,0.56,0.74,0.58
+Equipo De Iluminación,0.04,0.03,0.03,0.03,0.03
+Otros Artículos De Decoración,0.01,0.00,0.01,0.09,0.03
+Ropa confeccionada para cama,0.09,0.08,0.11,0.18,0.12
+Ropa de tocador y productos textiles del hogar,0.02,0.03,0.04,0.05,0.04
+"Neveras, Refrigeradores Y Congeladores",0.12,0.17,0.17,0.12,0.16
+"Lavadoras, Secadoras Y Lava-Vajillas",0.08,0.10,0.13,0.13,0.13
+"Estufas, Hornos Y Pipetas De Gas",0.05,0.05,0.04,0.04,0.04
+Aparatos Eléctricos Pequeños Para El Hogar,0.02,0.02,0.02,0.03,0.02
+"Cristalería y vajilla Artículos, vajillas y utensilios de vidrio, cristal, porcelana y cerámica para el hogar",0.07,0.07,0.06,0.06,0.06
+Utensilios de cocina y menaje no eléctricos,0.06,0.07,0.09,0.11,0.09
+Accesorios Eléctricos Pequeños,0.07,0.08,0.10,0.13,0.11
+Productos De Limpieza Y Mantenimiento,1.64,1.53,1.45,0.98,1.35
+Elementos De Aseo,0.18,0.16,0.17,0.13,0.16
+"Artículos De Ferretería: Puntillas, Clavos, Tornillos, Tuercas, Brocas, Brochas, Pinceles, Lijas Y Otros.",0.01,0.01,0.02,0.03,0.02
+Productos desechables y no duraderos para el hogar,0.17,0.17,0.21,0.19,0.20
+Servicio Doméstico,0.10,0.07,0.53,2.95,1.06
+Productos farmacéuticos y dermatológicos,1.13,0.96,0.93,1.29,1.03
+Elementos Implementos Médicos,0.04,0.04,0.03,0.02,0.03
+Artefactos Y Equipo Terapéutico Y Su Reparación,0.06,0.06,0.10,0.14,0.10
+Consulta Médica General Con Médico Particular,0.12,0.05,0.05,0.07,0.06
+"Consulta médica con médico especialista particular (incluye ortodoncia): pediatría, oftalmología, ginecología, siquiatría, traumatología, cardiología y otros especialistas",0.08,0.13,0.18,0.20,0.18
+"Servicios Odontológicos Con Odontólogos Particulares: Consultas, Profilaxis, Exodoncias (Extracción), Amalgamas, Sellantes, Fluorización.",0.02,0.05,0.10,0.39,0.17
+"Servicios Para Particulares En Centros De Rayos X: Radiografías (Incluyendo Las Dentales), Urografías, Mamografías, Electrocardiogramas Y Otras Imágenes Diagnósticas",0.00,0.01,0.03,0.02,0.02
+"Exámenes De Laboratorio Para Particulares: De Sangre, Bacteriológicos, Etc.",0.01,0.02,0.01,0.03,0.02
+Servicios Médicos Auxiliares No Hospitalarios,0.00,0.01,0.02,0.08,0.04
+"Servicios médicos menores (pequeña cirugía, cirugía ambulatoria, urgencias, etc.)",0.05,0.06,0.06,0.09,0.07
+Vehículo Particular Nuevo O Usado,0.02,0.43,2.23,5.21,2.65
+Motos Y Bicicletas Con Motor Nuevas O Usadas,0.13,0.18,0.30,0.13,0.23
+Compra De Bicicletas Nuevas O Usadas (Excepto Para Niños),0.03,0.02,0.04,0.07,0.05
+"Llantas Y Neumáticos, Rines Para Vehículo",0.04,0.03,0.08,0.11,0.08
+"Productos Para La Limpieza Y Conservación Del Vehículo: Pintura, Limpiadores, Selladores, Shampoo, Ceras, Ambientadores, Eliminador De Olores, Pañitos Húmedos Para Vehículos, Etc.",0.00,0.01,0.03,0.04,0.03
+"Piezas Para Bicicleta: Llantas, Neumáticos, Rines, Manzanas, Cadenas, Cambios, Piñones, Guallas, Sillines, Candados Y Cable Candado, Luces, Etc.",0.00,0.01,0.02,0.02,0.02
+Otras Piezas De Repuesto Para Vehículo,0.01,0.07,0.14,0.21,0.14
+"Aditivos, Valvulinas, Líquido Para Frenos, Refrigerantes, Agua Para Batería, Etc.",0.00,0.01,0.03,0.04,0.03
+Combustibles para vehículos,1.23,2.18,2.97,3.39,2.91
+"Mantenimiento Y Reparaciones Efectuadas En El Taller: Engrase, Sincronización, Revisiones Técnicas, Instalaciones De Partes Y Accesorios, Balanceo De Ruedas, Despinchada, Lavado Y Polichado, Servicios De Grúa, Etc.",0.13,0.23,0.45,0.73,0.48
+Compra Y Cambio De Aceite,0.06,0.10,0.17,0.24,0.18
+Servicios De Latonería Y Pintura,0.00,0.00,0.02,0.05,0.02
+Parqueaderos,0.10,0.11,0.29,0.53,0.32
+Peajes,0.03,0.03,0.10,0.36,0.15
+"Gastos Reglamentarios Relacionados Con La Propiedad, Manejo Y Alquiler De Vehículos",0.04,0.08,0.13,0.12,0.12
+Transporte De Pasajeros Y Equipaje En Avión (Incluye Pagos Por Exceso De Equipaje),0.00,0.00,0.11,0.69,0.23
+Transporte urbano (incluye tren y metro),4.82,6.05,5.18,2.47,4.62
+"Transporte intermunicipal, interveredal e internacional",0.30,0.29,0.38,0.23,0.33
+Transporte escolar,0.12,0.23,0.32,0.48,0.34
+"Equipos de telefonía móvil, similares y reparación",0.19,0.21,0.38,0.46,0.37
+Servicios de comunicación fija y móvil y provisión a internet,2.47,3.03,4.21,4.10,3.96
+"Equipo Para La Recepción, Grabación Y Reproducción De Sonido Únicamente",0.01,0.04,0.04,0.06,0.04
+"Equipo Para La Grabación, Recepción Y Reproducción De Imagen Y Sonido",0.06,0.14,0.22,0.26,0.21
+Aparatos De Procesamiento De Información Y Hardware,0.06,0.11,0.13,0.21,0.15
+Juegos Y Juguetes Infantiles,0.07,0.10,0.12,0.14,0.12
+"Artículos, Adornos Y Prendas De Vestir Para Fiestas",0.07,0.09,0.13,0.18,0.14
+"Plantas Naturales: Ramos De Flores, Matas, Arbustos",0.01,0.01,0.03,0.07,0.04
+Alimentos Para Animales Domésticos Y Mascotas,0.15,0.18,0.27,0.24,0.25
+"Productos Para Animales Domésticos Y Mascotas, Productos De Veterinaria, Artículos Para El Cuidado E Higiene (Shampoo, Jabón, Desodorantes) Y Accesorios Para Mascotas (Collares, Perrera, Jaula, Acuarios Y Otros)",0.02,0.02,0.06,0.07,0.05
+"Servicios De Veterinaria Y De Otro Tipo Para Animales Domésticos: Cuidado, Salón De Belleza, Alojamiento, Entrenamiento, Paseadores De Perros Y Colegios Para Mascotas Etc.",0.03,0.04,0.10,0.17,0.11
+Servicios Recreativos,0.09,0.12,0.18,0.43,0.23
+Servicios Prestados Por Escenarios Deportivos,0.02,0.02,0.04,0.52,0.16
+Cines Y Teatros,0.09,0.10,0.25,0.43,0.27
+Suscripción Y Servicio De Televisión Por Redes Y Cable,1.02,0.97,0.91,0.69,0.87
+Libros Y Lista De Útiles Escolares Completa,0.04,0.05,0.06,0.13,0.07
+"Libros De Texto: Textos Guías Para Clase (Incluye Libros De Literatura, Poesía, Etc, Requeridos En Clase)",0.17,0.18,0.15,0.08,0.14
+Compra de periódicos,0.06,0.09,0.10,0.09,0.09
+Material Impreso Diverso,0.00,0.00,0.00,0.03,0.01
+"Artículos De Papelería: Cuadernos, Agendas, Papel Suelto Y En Resmas",0.28,0.21,0.12,0.05,0.12
+Artículos Para Escribir,0.24,0.25,0.11,0.04,0.12
+Artículos Para Pintura Y Dibujo,0.04,0.07,0.03,0.01,0.04
+"Paquetes turísticos completos, incluye paquetes de viajes de excursión realizados durante un día (sin pernoctar)",0.06,0.09,0.42,1.26,0.57
+Educación preescolar y básica primaria,0.65,0.70,1.26,2.45,1.46
+Educación Secundaria,0.25,0.32,0.93,1.33,0.92
+"Inscripciones y matrículas en carreras técnicas, tecnológicas y universitarias",0.68,0.52,1.54,1.41,1.33
+"Inscripciones y matrículas en postgrados (especialización, maestría, doctorado)",0.01,0.01,0.16,0.65,0.26
+Otros gastos en educación superior,0.01,0.03,0.11,0.23,0.13
+Cursos de educación no formal,0.04,0.14,0.24,0.39,0.26
+"Diplomados, educación continuada, preicfes, preuniversitarios",0.00,0.00,0.02,0.03,0.02
+Pagos por asesorías de tareas y clases dictadas por particulares,0.00,0.01,0.03,0.06,0.04
+"Comidas En Establecimientos De Servicio A La Mesa Y Autoservicio, Medios De Transporte, Maquinas Expendedoras, Puestos Móviles, Y Lugares De Esparcimiento; Se Incluyen También Las Contratadas Por Encargo, Para Llevar Y Por Servicio A Domicilio",4.26,4.78,6.28,7.23,6.24
+"Bebidas Calientes: Tinto, Café Con Leche, Chocolate, Té, Bebida Achocolatada Caliente, Leche, Agua De Panela, Agua Aromática, Avena Caliente Y Similares Para Consumo Inmediato, En Establecimientos De Servicio A La Mesa Y Autoservicio, Medios De Transporte",0.20,0.23,0.23,0.17,0.22
+"Gaseosa Y Otros Refrescos En Establecimientos De Servicio A La Mesa Y Autoservicio, Medios De Transporte, Maquinas Expendedoras, Puestos Móviles, Y Lugares De Esparcimiento; Se Incluyen También Las Adquiridas Para Llevar Y Servicio A Domicilio",0.45,0.49,0.35,0.13,0.32
+"Comidas Preparadas Fuera Del Hogar Para Consumo Inmediato, En Establecimientos De Servicio A La Mesa Y Autoservicio, Puestos Móviles, Lugares De Esparcimiento, Para Llevar Y Por Servicio A Domicilio",2.06,2.32,2.07,1.35,1.92
+"Gastos en discotecas, bares, griles, tabernas, fondas y tiendas dentro y al aire libre (comida, bebidas, cover)",0.23,0.30,0.38,0.58,0.41
+Pago Por Alimentación En Comedores,0.02,0.01,0.04,0.22,0.08
+"Servicios de alojamiento en hoteles, pensiones, posadas, hostales y moteles; alojamiento en centros de vacaciones y por motivo de enseñanza: internados",0.01,0.03,0.12,0.61,0.23
+Servicios Prestados En Salones De Peluquería Y Establecimientos De Cuidado Personal,0.73,0.72,0.81,0.88,0.81
+Aparatos Eléctricos Para El Cuidado Personal Y Su Reparación,0.01,0.02,0.03,0.02,0.02
+Artículos Para El Cuidado Y La Atención Personal,0.09,0.10,0.10,0.06,0.09
+Artículos Para Higiene Corporal,1.72,1.81,1.62,1.12,1.52
+Artículos Para La Higiene Oral,0.47,0.45,0.41,0.26,0.38
+Productos De Belleza,0.27,0.29,0.38,0.39,0.36
+Otros Productos Para El Aseo Personal,1.44,1.46,1.01,0.51,0.96
+"Artículos En Oro, Plata Y Piedras Preciosas Y Su Reparación",0.02,0.03,0.06,0.14,0.08
+"Relojes, Cronómetros, Termómetros, Barómetros Y Su Reparación",0.00,0.01,0.02,0.07,0.03
+Artículos De Fantasía Y Su Reparación,0.01,0.01,0.02,0.04,0.03
+Artículos De Viaje Y Otros Artículos Para El Transporte De Efectos Personales,0.02,0.04,0.06,0.11,0.07
+Artículos Para Bebés Y Su Reparación,0.03,0.05,0.02,0.03,0.03
+"Artículos Personales Varios Como: Gafas De Sol, Lentes De Contacto Cosméticos, Bastones, Paraguas Y Sombrillas, Abanicos, Llaveros, Etc",0.00,0.01,0.02,0.05,0.02
+Servicios de protección social dentro y fuera del hogar,0.01,0.00,0.05,0.07,0.05
+"Guarderías, salacunas, cuidado de niños fuera del hogar y servicios de adopción",0.20,0.26,0.29,0.30,0.29
+Cuotas moderadoras a EPS,0.01,0.06,0.07,0.10,0.07
+"Seguros Médicos, De Accidentes Y Medicina Prepagada",0.02,0.01,0.05,0.35,0.12
+Seguros De Vehículos Y Otros Relacionados Con El Transporte,0.05,0.02,0.10,0.38,0.16
+Servicios auxiliares y financieros prestados a cambio de una comisión explicita,0.02,0.04,0.13,0.29,0.15
+"Certificados, documentos administrativos y pago de honorarios",0.02,0.01,0.05,0.10,0.06
+Otros pagos por servicios,0.07,0.06,0.05,0.04,0.05

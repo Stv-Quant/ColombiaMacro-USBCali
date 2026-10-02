@@ -7,6 +7,7 @@ Escribe:
   ipc_ciudades.csv        fecha, ciudad, division, var_anual          (23 ciudades + otras areas, 12 divisiones + total)
   ipc_subclases.csv       fecha, codigo, subclase, var_mensual, var_anual, contrib_anual
   ipc_clasificaciones.csv fecha, serie, indice                       (mensual desde 2009, dic 2018 = 100)
+  ipc_ponderaciones.csv   subclase, pobres, vulnerables, media, altos, total   (ponderaciones oficiales de la canasta 2018, %)
 
 El anexo principal (anex-IPC-<mes><ano>.xlsx) esta junto a los anexos enlazados en la pagina del IPC.
 Uso: python -m colombiamacro.fuentes.ipc_detalle [--local carpeta]
@@ -127,6 +128,29 @@ def leer_clasificaciones(cont: bytes) -> pd.DataFrame:
     return df.sort_values(["serie", "fecha"])
 
 
+DANE_POND = ("https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc/"
+             "ipc-actualizacion-metodologica-2019/ipc-ponderadores")
+
+
+def leer_ponderaciones(html: str) -> pd.DataFrame:
+    """Tabla de ponderaciones por subclase (la de 150 a 260 filas) de la pagina de actualizacion metodologica."""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+    num_ = lambda x: float(x.replace(".", "").replace(",", ".")) if re.fullmatch(r"-?[\d.]+,\d+|-?\d+", x.strip()) else None
+    for t in soup.find_all("table"):
+        filas = [[c.get_text(" ", strip=True) for c in tr.find_all(["td", "th"])] for tr in t.find_all("tr")]
+        if 150 <= len(filas) <= 260 and all(len(f) >= 6 for f in filas[1:]):
+            out = []
+            for f in filas[1:]:
+                v = [num_(x) for x in f[1:6]]
+                if None not in v:
+                    out.append({"subclase": re.sub(r"\s+", " ", f[0]).strip(), "pobres": v[0], "vulnerables": v[1], "media": v[2], "altos": v[3], "total": v[4]})
+            df = pd.DataFrame(out)
+            if len(df) >= 180 and abs(df["total"].sum() - 100) < 1.5:
+                return df
+    raise ValueError("Ponderaciones del IPC: no encuentro la tabla de subclases")
+
+
 def url_anexo(html: str) -> str:
     """El anexo principal no siempre esta enlazado: se deriva del anexo de indices del mismo mes."""
     try:
@@ -136,15 +160,32 @@ def url_anexo(html: str) -> str:
 
 
 def actualizar(local: Path | None = None) -> bool:
+    pond_html = None
     if local:
         hits = sorted(p for p in Path(local).iterdir() if re.fullmatch(r"anex-IPC-[a-z]{3}20\d{2}\.xlsx", p.name, re.I))
         cont = hits[-1].read_bytes()
+        ph = Path(local) / "ipc-ponderadores.html"
+        pond_html = ph.read_text(encoding="utf-8", errors="ignore") if ph.exists() else None
     else:
         s = requests.Session()
         r = s.get(DANE_IPC, timeout=40, headers=HEADERS)
         r.raise_for_status()
         cont = descargar(url_anexo(r.text), s)
+        try:
+            rp = s.get(DANE_POND, timeout=40, headers=HEADERS)
+            rp.raise_for_status()
+            pond_html = rp.text
+        except Exception as exc:
+            print(f"  ERROR descarga ponderaciones: {exc}")
     ok = True
+    if pond_html:
+        try:
+            pdf_ = leer_ponderaciones(pond_html)
+            ch = write_if_changed(pdf_, data("ipc_ponderaciones.csv"), float_format="%.2f")
+            print(f"ipc_ponderaciones.csv: {len(pdf_)} subclases ({'actualizado' if ch else 'sin cambios'})")
+        except Exception as exc:
+            ok = False
+            print(f"  ERROR ipc_ponderaciones.csv: {exc}")
     for nombre, fn, ff in (("ipc_divisiones.csv", leer_divisiones, "%.4f"), ("ipc_ingresos.csv", leer_ingresos, "%.4f"),
                            ("ipc_ciudades.csv", leer_ciudades, "%.4f"), ("ipc_subclases.csv", leer_subclases, "%.4f"),
                            ("ipc_clasificaciones.csv", leer_clasificaciones, "%.4f")):

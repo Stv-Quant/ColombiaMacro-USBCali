@@ -27,7 +27,7 @@ TX = {
     "l_serv": ("Servicios", "Services"), "l_serv_d": ("anual · hace un año {v}", "annual · a year ago {v}"),
     "l_bien": ("Bienes no durables", "Non-durable goods"), "l_dur": ("Bienes durables", "Durable goods"),
     "l_ener": ("Energéticos", "Energy"), "l_ener_d": ("gas, energía y combustibles · hace un año {v}", "gas, power and fuel · a year ago {v}"),
-    "l_dif": ("Difusión", "Diffusion"), "l_dif_d": ("de 188 subclases suben más de 4% anual", "of 188 subclasses rise more than 4% a year"),
+    "l_dif": ("Difusión", "Diffusion"), "l_dif_d": ("de 188 subclases suben más de 4% anual · {w} del gasto", "of 188 subclasses rise more than 4% a year · {w} of spending"),
     "l_ciu": ("Rango entre ciudades", "Range across cities"), "l_ciu_d": ("de {c1} ({v1}) a {c2} ({v2})", "from {c1} ({v1}) to {c2} ({v2})"),
     "l_ing": ("Hogares de ingresos altos − pobres", "High-income − poor households"), "l_ing_d": ("pobres {p} · ingresos altos {a}", "poor {p} · high income {a}"),
     # respuestas
@@ -45,9 +45,9 @@ TX = {
                  "Sin alimentos ni energéticos, la inflación es {c}: una medida de la presión de fondo que depende menos del clima y de los precios internacionales.",
                  "Services are up {s} over a year and non-durable goods {b}; durables change {d}. "
                  "Excluding food and energy, inflation is {c}: a measure of underlying pressure that depends less on weather and international prices."),
-    "r_difusion": ("{dif} de las subclases suben más de 4% al año y {dif6} más de 6%. "
+    "r_difusion": ("{dif} de las subclases suben más de 4% al año ({dw} del gasto de los hogares) y {dif6} más de 6%. "
                    "Las que más aportan a la inflación son {top}. Las que más la frenan: {bot}.",
-                   "{dif} of subclasses rise more than 4% a year and {dif6} more than 6%. "
+                   "{dif} of subclasses rise more than 4% a year ({dw} of household spending) and {dif6} more than 6%. "
                    "The largest contributors to inflation are {top}. The biggest drags: {bot}."),
     "r_ingresos": ("La inflación de los hogares pobres es {p} y la de los hogares de ingresos altos {a}. "
                    "{txt}",
@@ -142,6 +142,10 @@ def construir_inflacion(d, L):
     sub = I["subclases"]
     dif = 100 * (sub["var_anual"] > 4).mean()
     dif6 = 100 * (sub["var_anual"] > 6).mean()
+    sub_w = con_ponderaciones(sub)
+    dif_w = (sub_w.loc[sub_w["var_anual"] > 4, "peso"].sum() / sub_w["peso"].sum() * 100) if sub_w["peso"].notna().any() else float("nan")
+    q_btn = (f'<button type="button" class="ex-q" data-dialog="exp-canasta" aria-haspopup="dialog" '
+             f'title="{"¿Qué son las 188 subclases?" if L == "es" else "What are the 188 subclasses?"}">?</button>')
     ci = I["ciudades"]
     ct = ci[(ci["division"] == "total") & (ci["ciudad"] != "Total")].set_index("ciudad")["var_anual"]
     ct23 = ct.drop("Otras Areas Urbanas", errors="ignore").sort_values()
@@ -163,7 +167,7 @@ def construir_inflacion(d, L):
         lec(tx("l_bien", L), pct(ua["no_durables"]), tx("l_serv_d", L).format(v=pct(ha["no_durables"])), meta(ua["no_durables"]), "#inf-bienes"),
         lec(tx("l_dur", L), pct(ua["durables"]), tx("l_serv_d", L).format(v=pct(ha["durables"])), "ok" if ua["durables"] <= 4 else "warn", "#inf-bienes"),
         lec(tx("l_ener", L), pct(ua["energeticos"]), tx("l_ener_d", L).format(v=pct(ha["energeticos"])), meta(ua["energeticos"]), "#inf-bienes"),
-        lec(tx("l_dif", L), pct(dif, 0), tx("l_dif_d", L), "warn" if dif > 50 else "ok", "#inf-difusion"),
+        lec(tx("l_dif", L), pct(dif, 0), tx("l_dif_d", L).format(w=pct(dif_w, 0)), "warn" if dif > 50 else "ok", "#inf-difusion"),
         lec(tx("l_ciu", L), num(ct23.iloc[-1] - ct23.iloc[0], 1, L, False, " pp"),
             tx("l_ciu_d", L).format(c1=nom_c(ct23.index[0]), v1=pct(ct23.iloc[0]), c2=nom_c(ct23.index[-1]), v2=pct(ct23.iloc[-1])), "", "#inf-ciudades"),
         lec(tx("l_ing", L), num(ing["altos"] - ing["pobres"], 2, L, True, " pp"), tx("l_ing_d", L).format(p=pct(ing["pobres"], 2), a=pct(ing["altos"], 2)), "", "#inf-ingresos"),
@@ -231,6 +235,7 @@ def construir_inflacion(d, L):
     f5.update_xaxes(ticksuffix="%", dtick=2)
     f5.update_layout(bargap=0.08, hovermode="closest")
     g5 = cs.bloque_grafico(tx("g_hist", L).format(m=m), cs.fig_html(f5, {"notime": True}, "g-inf-difusion"), tx("h_hist", L))
+    g5 = g5.replace("</figcaption>", f" {q_btn}</figcaption>", 1)
     tp = pd.concat([sub.nlargest(8, "contrib_anual"), sub.nsmallest(4, "contrib_anual")]).sort_values("contrib_anual")
     corto = lambda s_: (s_[:38] + "…") if len(s_) > 39 else s_
     f6 = cs.base(L, height=420, fecha_x=False, suffix=" pp")
@@ -248,8 +253,8 @@ def construir_inflacion(d, L):
         s_ = re.split(r"[,;(]", s_)[0].strip()
         return s_ if len(s_) <= 48 else s_[:48].rsplit(" ", 1)[0] + "…"
     lista = lambda df: ", ".join(f"{breve(s_).lower()} ({num(c_, 2, L, True)} pp)" for s_, c_ in zip(df["subclase"], df["contrib_anual"]))
-    r3 = tx("r_difusion", L).format(dif=pct(dif, 0), dif6=pct(dif6, 0), top=lista(sub.nlargest(3, "contrib_anual")), bot=lista(sub.nsmallest(2, "contrib_anual")))
-    s_dif = seccion("inf-difusion", tx("s_difusion", L), r3, f'<div class="grid">{g5}{g6}</div>')
+    r3 = tx("r_difusion", L).format(dif=pct(dif, 0), dif6=pct(dif6, 0), dw=pct(dif_w, 0), top=lista(sub.nlargest(3, "contrib_anual")), bot=lista(sub.nsmallest(2, "contrib_anual")))
+    s_dif = seccion("inf-difusion", tx("s_difusion", L), r3, f'<div class="grid">{g5}{g6}</div>') + ventana_canasta(sub_w, I["divisiones"], L, num, esc)
 
     # ------------------------------------------------ ingresos
     gi = ["pobres", "vulnerables", "media", "altos"]
@@ -298,3 +303,104 @@ def construir_inflacion(d, L):
     s_lit = (f'<section id="inf-literatura" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_lit", L)}</h2></div>'
              f'<ol class="refs">{items}</ol></section>')
     return antes, s_ap + s_bs + s_dif + s_ing + s_ciu + s_lit
+
+
+# ====================================================================== ventana explicativa: la canasta del IPC
+def _n(s):
+    import unicodedata
+    return re.sub(r"[^a-z0-9]+", " ", unicodedata.normalize("NFKD", str(s)).encode("ascii", "ignore").decode().lower()).strip()
+
+
+def con_ponderaciones(sub: pd.DataFrame) -> pd.DataFrame:
+    """Une las subclases del anexo con sus ponderaciones oficiales. Las dos listas siguen el orden COICOP:
+    si coinciden en posicion (95% de nombres iguales) se alinean por posicion; si no, por nombre."""
+    f = DATA_DIR / "ipc_ponderaciones.csv"
+    if not f.exists():
+        return sub.assign(peso=np.nan, peso_pobres=np.nan, peso_altos=np.nan)
+    w = pd.read_csv(f)
+    s = sub.reset_index(drop=True).copy()
+    if len(w) == len(s) and np.mean([_n(a) == _n(b) for a, b in zip(w["subclase"], s["subclase"])]) >= 0.95:
+        s["peso"], s["peso_pobres"], s["peso_altos"] = w["total"].values, w["pobres"].values, w["altos"].values
+        return s
+    m = dict(zip(w["subclase"].map(_n), w[["total", "pobres", "altos"]].values.tolist()))
+    vals = [m.get(_n(x), [np.nan] * 3) for x in s["subclase"]]
+    s["peso"], s["peso_pobres"], s["peso_altos"] = zip(*vals)
+    return s
+
+
+CIUDADES_PESO = [("Bogotá", 40.45), ("Medellín", 15.03), ("Cali", 9.15), ("Barranquilla", 5.31), ("Bucaramanga", 4.63),
+                 ("Otras áreas urbanas", 3.38), ("Cartagena", 3.15), ("Cúcuta", 2.31), ("Pereira", 2.06), ("Villavicencio", 1.82)]
+
+
+def ventana_canasta(sub_w: pd.DataFrame, divisiones: pd.DataFrame, L: str, num, esc) -> str:
+    """<dialog> con la explicacion oficial de la canasta: estructura COICOP, ponderaciones, ingresos, cobertura."""
+    es = L == "es"
+    pct = lambda v, d=1: num(float(v), d, L, False, "%")
+    w = sub_w.dropna(subset=["peso"])
+    top = w.nlargest(10, "peso")
+    breve = lambda s_: (lambda x: x[:1].upper() + x[1:].lower())(re.split(r"[;:(]", s_)[0].strip()[:70])
+    filas_top = "".join(f"<tr><td>{esc(breve(r.subclase))}</td><td class='n'>{pct(r.peso, 2)}</td><td class='n'>{pct(r.var_anual)}</td></tr>"
+                        for r in top.itertuples())
+    pesado = w["peso"].nlargest(10).sum()
+    dif_n = 100 * (w["var_anual"] > 4).mean()
+    dif_w = w.loc[w["var_anual"] > 4, "peso"].sum() / w["peso"].sum() * 100
+    dv = divisiones.set_index("division").drop("total")
+    # contraste pobres vs ingresos altos (subclases con mayor diferencia de peso)
+    w2 = w.assign(dif=w["peso_pobres"] - w["peso_altos"]).dropna(subset=["dif"])
+    contraste = pd.concat([w2.nlargest(3, "dif"), w2.nsmallest(3, "dif")])
+    filas_ing = "".join(f"<tr><td>{esc(breve(r.subclase))}</td><td class='n'>{pct(r.peso_pobres, 2)}</td><td class='n'>{pct(r.peso_altos, 2)}</td></tr>"
+                        for r in contraste.itertuples())
+    niveles = [("12", "divisiones", "divisions", "Alimentos y bebidas no alcohólicas", "Food and non-alcoholic beverages"),
+               ("42", "grupos", "groups", "Alimentos", "Food"),
+               ("84", "clases", "classes", "Pan y cereales", "Bread and cereals"),
+               ("188", "subclases", "subclasses", "Arroz", "Rice"),
+               ("443", "artículos", "items", "El arroz que se cotiza en cada establecimiento", "The rice priced in each store")]
+    escalera = "".join(f'<li style="--i:{k}"><b>{n}</b><span>{a if es else b}</span><em>{c if es else d}</em></li>'
+                       for k, (n, a, b, c, d) in enumerate(niveles))
+    pmax = max(p for _, p in CIUDADES_PESO)
+    ciudades = "".join(f"<li><span>{esc(c)}</span><i style='width:{p / pmax * 100:.1f}%'></i><b>{num(p, 1, L)}%</b></li>" for c, p in CIUDADES_PESO)
+    T = (lambda a, b: a if es else b)
+    return f"""<dialog class="explica" id="exp-canasta" aria-labelledby="exp-canasta-t">
+<div class="ex-cab"><p class="ex-k">{T("Para entender", "To understand")} · DANE</p><h2 id="exp-canasta-t">{T("¿Qué son las 188 subclases de la canasta del IPC?", "What are the 188 subclasses of the CPI basket?")}</h2>
+<button type="button" class="ex-x" data-cerrar aria-label="{T("Cerrar", "Close")}">✕</button></div>
+<div class="ex-cuerpo">
+<p class="ex-lede">{T("El Índice de Precios al Consumidor (IPC) mide cuánto cambian, mes a mes, los precios de los bienes y servicios que compran los hogares colombianos. El DANE no sigue «todos los precios»: sigue una <b>canasta</b> representativa del gasto de los hogares, organizada en niveles. Las <b>188 subclases</b> son el nivel en el que el DANE publica resultados detallados.",
+ "The Consumer Price Index (CPI) measures how much the prices of the goods and services bought by Colombian households change month by month. DANE does not track 'all prices': it tracks a <b>basket</b> representative of household spending, organised in levels. The <b>188 subclasses</b> are the level at which DANE publishes detailed results.")}</p>
+
+<h3>{T("1. Cómo está organizada la canasta", "1. How the basket is organised")}</h3>
+<p>{T("Desde 2019 (base diciembre de 2018 = 100) la canasta usa la nomenclatura basada en la COICOP, la clasificación de las Naciones Unidas del consumo individual por finalidad. Cada nivel se abre en el siguiente; por ejemplo, el arroz:",
+ "Since 2019 (base December 2018 = 100) the basket uses the COICOP-based nomenclature, the United Nations classification of individual consumption by purpose. Each level opens into the next; for example, rice:")}</p>
+<ol class="ex-escalera">{escalera}</ol>
+<p>{T("Las 188 subclases reúnen 443 artículos, que son los productos concretos cuyos precios recolecta el DANE en los establecimientos. Ejemplos de subclases: arroz, pan, carne de res, electricidad, transporte urbano, arriendo, comidas fuera del hogar, matrículas universitarias o servicios de comunicación.",
+ "The 188 subclasses group 443 items, the specific products whose prices DANE collects in stores. Examples of subclasses: rice, bread, beef, electricity, urban transport, rent, meals away from home, university fees or communication services.")}</p>
+
+<h3>{T("2. No todas pesan lo mismo", "2. They do not all weigh the same")}</h3>
+<p>{T(f"Cada subclase pesa según lo que los hogares gastan en ella, de acuerdo con la Encuesta Nacional de Presupuestos de los Hogares (ENPH). Las 10 subclases más pesadas suman <b>{pct(pesado)}</b> de la canasta:",
+ f"Each subclass weighs according to what households spend on it, based on the National Household Budget Survey (ENPH). The 10 heaviest subclasses add up to <b>{pct(pesado)}</b> of the basket:")}</p>
+<div class="table-wrap plano"><table class="tbl"><thead><tr><th>{T("Subclase", "Subclass")}</th><th>{T("Peso en la canasta", "Basket weight")}</th><th>{T("Inflación anual hoy", "Annual inflation today")}</th></tr></thead><tbody>{filas_top}</tbody></table></div>
+<p class="ex-nota">{T("El «arriendo imputado» es lo que pagaría en arriendo quien vive en vivienda propia: el DANE lo incluye para medir el costo del servicio de vivienda de todos los hogares.",
+ "'Imputed rent' is what owner-occupiers would pay in rent: DANE includes it to measure the cost of housing services for all households.")}</p>
+
+<h3>{T("3. Una canasta distinta para cada nivel de ingreso", "3. A different basket for each income level")}</h3>
+<p>{T("El DANE calcula el IPC para cuatro grupos de hogares definidos con un criterio absoluto de ingreso (pobres, vulnerables, clase media e ingresos altos). Por eso la misma subida de precios pesa distinto en cada uno:",
+ "DANE computes the CPI for four household groups defined by an absolute income criterion (poor, vulnerable, middle class and high income). That is why the same price rise weighs differently on each:")}</p>
+<div class="table-wrap plano"><table class="tbl"><thead><tr><th>{T("Subclase", "Subclass")}</th><th>{T("Peso · pobres", "Weight · poor")}</th><th>{T("Peso · ingresos altos", "Weight · high income")}</th></tr></thead><tbody>{filas_ing}</tbody></table></div>
+
+<h3>{T("4. Dónde se miden los precios", "4. Where prices are measured")}</h3>
+<p>{T("La actualización de 2019 amplió la cobertura de 24 a 38 ciudades (32 capitales de departamento y 6 municipios priorizados) e incluyó por primera vez a los hogares unipersonales. Se publican 23 ciudades por separado y un agregado de «otras áreas urbanas». Cada ciudad pesa según el gasto de sus hogares:",
+ "The 2019 update widened coverage from 24 to 38 cities (32 department capitals and 6 priority municipalities) and included single-person households for the first time. 23 cities are published separately plus an 'other urban areas' aggregate. Each city weighs according to its households' spending:")}</p>
+<ul class="ex-barras">{ciudades}</ul>
+
+<h3>{T("5. Cómo leer el gráfico de difusión", "5. How to read the diffusion chart")}</h3>
+<p>{T(f"El histograma cuenta subclases sin ponderar: hoy <b>{pct(dif_n, 0)}</b> de las 188 suben más de 4% al año, el techo del rango meta del Banco de la República. Si se ponderan por su peso en la canasta, esas subclases representan <b>{pct(dif_w, 0)}</b> del gasto de los hogares. Cuando ambas cifras son altas, la inflación es generalizada y no depende de unos pocos precios.",
+ f"The histogram counts subclasses without weights: today <b>{pct(dif_n, 0)}</b> of the 188 rise more than 4% a year, the ceiling of the Banco de la República target range. Weighted by their basket share, those subclasses represent <b>{pct(dif_w, 0)}</b> of household spending. When both figures are high, inflation is broad-based rather than driven by a few prices.")}</p>
+
+<h3>{T("Fuentes oficiales", "Official sources")}</h3>
+<ul class="ex-fuentes">
+<li><a href="https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc/ipc-actualizacion-metodologica-2019" target="_blank" rel="noopener">DANE — {T("IPC: actualización metodológica 2019", "CPI: 2019 methodological update")}</a></li>
+<li><a href="https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc/ipc-actualizacion-metodologica-2019/ipc-nomenclatura-basada-en-la-coicop" target="_blank" rel="noopener">DANE — {T("Nomenclatura basada en la COICOP y estructura IPC 2018", "COICOP-based nomenclature and 2018 CPI structure")}</a></li>
+<li><a href="https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc/ipc-actualizacion-metodologica-2019/ipc-ponderadores" target="_blank" rel="noopener">DANE — {T("Ponderaciones del nuevo IPC por división, grupo, clase, subclase y ciudad", "New CPI weights by division, group, class, subclass and city")}</a></li>
+<li>FMI, OIT, OCDE, Eurostat, CEPE de la ONU y Banco Mundial (2004/2006). <i>{T("Manual del índice de precios al consumidor: teoría y práctica", "Consumer Price Index Manual: Theory and Practice")}</i>.</li>
+<li>Naciones Unidas (1999). <i>{T("Clasificación del consumo individual por finalidades (COICOP)", "Classification of Individual Consumption According to Purpose (COICOP)")}</i>.</li>
+</ul>
+</div></dialog>"""
