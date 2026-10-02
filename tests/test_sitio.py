@@ -42,7 +42,7 @@ class TestSitio(unittest.TestCase):
     def tearDownClass(cls):
         cls.tmp.cleanup()
 
-    PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento", "crec-medidas", "crec-velocidad", "crec-precios", "crec-quien", "crec-amplitud", "crec-nivel", "crec-literatura"), "sectores": ("sectores",),
+    PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento", "crec-medidas", "crec-velocidad", "crec-precios", "crec-quien", "crec-demanda", "crec-inversion", "crec-hogares", "crec-persona", "crec-amplitud", "crec-nivel", "crec-literatura", "sectores"),
                "capacidad": ("capacidad",), "empleo": ("informalidad",), "inflacion": ("precios",), "tasas": ("banco",),
                "curva-tes": ("curva", "curva-app"), "mercados": ("mercados",), "empresas": ("empresas",),
                "externo": ("externo",), "comercio": ("comercio-cifras", "comercio-flujos", "comercio-vende", "comercio-compra", "comercio-socios"), "indicadores": ("indicadores", "fuentes", "noticias")}
@@ -53,9 +53,10 @@ class TestSitio(unittest.TestCase):
     def test_portada_de_sondeo_sin_graficos(self):
         for raiz in ((), ("en",)):
             html_ = self.leer(*raiz)
-            for slug in ("crecimiento", "sectores", "empleo", "inflacion", "tasas", "curva-tes", "mercados", "externo"):
+            for slug in ("crecimiento", "empleo", "inflacion", "tasas", "curva-tes", "mercados", "externo", "comercio"):
                 self.assertIn(f'id="p-{slug}"', html_)
                 self.assertIn(f'class="tile-go" href="{slug}/"', html_)
+            self.assertIn('class="tile-go" href="crecimiento/#sectores"', html_)    # sectores vive dentro de crecimiento
             for sid in ("lectura", "monitor", "descargas", "noticias"):
                 self.assertIn(f'id="{sid}"', html_)
             self.assertIn("class='tbl'", html_)                      # indicadores y fuentes

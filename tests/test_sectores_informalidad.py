@@ -145,6 +145,8 @@ class TestFichas(unittest.TestCase):
             self.assertGreaterEqual(len(paginas), 26)
             for pag in paginas:
                 html_ = pag.read_text(encoding="utf-8")
+                if 'http-equiv="refresh"' in html_:          # redireccion de una pagina que se fusiono
+                    continue
                 ids = set(re.findall(r'class="plot" id="(g-[^"]+)"', html_))
                 faltan = [i for i in ids if i not in FICHAS and i != "g-inf-ciudad"]
                 self.assertEqual(faltan, [], pag)

@@ -55,11 +55,16 @@ DESCRIPCION_CSV = {
     "importaciones_mensuales.csv": ("Importaciones mensuales (DANE)", "Monthly imports (DANE)"),
     "importaciones_cuode_anual.csv": ("Importaciones por uso, anual (DANE)", "Imports by use, annual (DANE)"),
     "importaciones_origen.csv": ("Importaciones por país de origen (DANE)", "Imports by country of origin (DANE)"),
+    "pib_gasto.csv": ("PIB por el enfoque del gasto (DANE)", "GDP by expenditure (DANE)"),
+    "pib_inversion.csv": ("Inversión fija por tipo de activo (DANE)", "Fixed investment by asset (DANE)"),
+    "pib_consumo_hogares.csv": ("Consumo de los hogares por finalidad y durabilidad (DANE)", "Household consumption by purpose and durability (DANE)"),
+    "poblacion.csv": ("Población total nacional (DANE)", "Total national population (DANE)"),
     "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
 }
 DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "exportaciones_mensuales.csv", "exportaciones_destinos.csv",
-             "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "estado_fuentes.csv"]
+             "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "pib_gasto.csv", "pib_inversion.csv",
+             "pib_consumo_hogares.csv", "poblacion.csv", "estado_fuentes.csv"]
 
 
 # ------------------------------------------------------------------ formato
@@ -1197,6 +1202,13 @@ def tabla_portada(d, s, L):
 # ------------------------------------------------------------------ pagina
 def pagina(d, s, lang, generado):
     L = lang
+    d_es = d
+    if L == "en" and d.sectores is not None:             # nombres de los sectores en ingles en las paginas /en/
+        import dataclasses
+        from colombiamacro.sitio.crecimiento_extra import SECTOR_EN
+        sc_en = d.sectores.copy()
+        sc_en["sector"] = sc_en["sector"].map(lambda n: SECTOR_EN.get(n, n))
+        d = dataclasses.replace(d, sectores=sc_en)
     ahora = pd.Timestamp.now(tz="America/Bogota")
     construido = f"{fecha(ahora, 'd', L)}, {ahora:%H:%M}"
     LANG_ACTUAL[0] = L
@@ -1446,7 +1458,7 @@ def pagina(d, s, lang, generado):
     from colombiamacro.sitio.ciclo_extra import construir_ciclo
     ciclo_antes, ciclo_despues = construir_ciclo(d, s, L)
     from colombiamacro.sitio.crecimiento_extra import construir_crecimiento
-    crec_antes, crec_despues, _ = construir_crecimiento(d, s, L)
+    crec_antes, crec_oferta, crec_resto, _ = construir_crecimiento(d_es, s, L)
     LANG_ACTUAL[0] = L
     from colombiamacro.sitio import comercio_extra as cx
     datos_com = cx.cargar()
@@ -1486,8 +1498,7 @@ def pagina(d, s, lang, generado):
     # --- paginas de detalle, agrupadas para el menu
     P = {
         "ciclo": (t("nav_ciclo", L), t("pg_ciclo", L), t("pl_ciclo", L), [ciclo_antes, explorador_ciclo(d, L), ciclo_despues], True),
-        "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [crec_antes, s1, crec_despues], True),
-        "sectores": (t("nav_sectores", L), t("pg_sectores", L), t("pl_sectores", L), [s_sec], True),
+        "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [crec_antes, s1, crec_oferta, s_sec, crec_resto], True),
         "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [s_cap], True),
         "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [s_inf], True),
         "inflacion": (t("nav_inflacion", L), t("pg_inflacion", L), t("pl_inflacion", L), [s2], True),
@@ -1500,7 +1511,7 @@ def pagina(d, s, lang, generado):
         "indicadores": (t("nav_datos", L), t("pg_indicadores", L), t("pl_indicadores", L), [s_ind], False),
     }
     P = {k: v for k, v in P.items() if any(v[3])}
-    GRUPOS = [(t("g_actividad", L), ["ciclo", "crecimiento", "sectores", "capacidad", "empleo"]),
+    GRUPOS = [(t("g_actividad", L), ["ciclo", "crecimiento", "capacidad", "empleo"]),
               (t("g_precios", L), ["inflacion", "tasas", "curva-tes"]),
               (t("g_mercados", L), ["mercados", "empresas", "externo", "comercio"])]
     GRUPOS = [(g, [x for x in sl if x in P]) for g, sl in GRUPOS]
@@ -1626,7 +1637,7 @@ def pagina(d, s, lang, generado):
     el_ = mt.estado_desempleo(s["laboral"]["td"], s["laboral"]["td_hace_12m"]) if s.get("laboral") else None
     temas = [
         ("crecimiento", "crecimiento", ["pib", "ise"], (t(f"ec_{ec}", L), tono_c)),
-        ("sectores", "sectores", ["sec_alto", "sec_bajo"], None),
+        ("crecimiento#sectores", "sectores", ["sec_alto", "sec_bajo"], None),
         ("empleo", "informalidad", ["desempleo", "informalidad"],
          (t(f"el_{el_}", L), {"mejora": "ok", "estable": "ok", "empeora": "warn"}[el_]) if el_ else None),
         ("inflacion", "precios", ["ipc", "ipc_basica"], (t(f"ei_{ei}", L), tono_i)),
@@ -1637,15 +1648,18 @@ def pagina(d, s, lang, generado):
         ("comercio", "comercio", ["expo12", "bal12"], None),
     ]
     tiles = []
-    for slug, sid, claves, estado in temas:
+    for slug_, sid, claves, estado in temas:
+        slug, _, ancla = slug_.partition("#")
         if slug not in P:
             continue
         chip = f'<span class="pill {estado[1]}">{esc(estado[0])}</span>' if estado else ""
         grupo = next((g for g, sl in GRUPOS if slug in sl), "")
+        nombre_t = t("nav_sectores", L) if ancla == "sectores" else P[slug][0]
+        tid = ancla or slug
         tiles.append(
-            f'<article class="tile" id="p-{slug}"><header class="tile-h"><span class="tile-k">{esc(grupo)} · {esc(P[slug][0])}</span>{chip}</header>'
+            f'<article class="tile" id="p-{tid}"><header class="tile-h"><span class="tile-k">{esc(grupo)} · {esc(nombre_t)}</span>{chip}</header>'
             f'<p class="tile-r">{primera(sid)}</p><div class="tile-d">{"".join(dato(c_) for c_ in claves)}</div>'
-            f'<a class="tile-go" href="{slug}/">{t("ver_analisis", L)} <span aria-hidden="true">→</span></a></article>')
+            f'<a class="tile-go" href="{slug}/{"#" + ancla if ancla else ""}">{t("ver_analisis", L)} <span aria-hidden="true">→</span></a></article>')
 
     portada = f"""<section class="hero">
   <p class="eyebrow"><span class="eb-k">{t("kicker_monitor", L)}</span><span class="eb-d">{t("datos_al", L)} {fecha(generado, "d", L)} · {t("construido", L)} {construido}</span></p>
@@ -1675,6 +1689,11 @@ def pagina(d, s, lang, generado):
 </section>
 {bloque_noticias(d, s, L, n=5).replace('id="noticias" class="notes"', 'id="noticias" class="notes corta"')}"""
     salida[None] = documento(None, t("titulo_pagina", L), portada, graficos=False)
+    # /sectores/ ahora vive dentro de /crecimiento/: se deja una redireccion para los enlaces viejos
+    salida["sectores"] = ('<!doctype html><html lang="' + L + '"><head><meta charset="utf-8">'
+                          '<meta http-equiv="refresh" content="0; url=../crecimiento/#sectores">'
+                          '<link rel="canonical" href="../crecimiento/#sectores"><title>ColombiaMacro</title></head>'
+                          '<body><a href="../crecimiento/#sectores">' + esc(t("nav_sectores", L)) + '</a></body></html>')
     return salida
 
 

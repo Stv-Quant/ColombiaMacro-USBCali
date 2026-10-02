@@ -238,7 +238,10 @@ def actualizar_laboral() -> None:
     content = requests.get(url, timeout=60).content
     labels = {"Tasa Global de Participación (TGP)": "tgp_sa",
               "Tasa de Ocupación (TO)": "to_sa",
-              "Tasa de Desocupación (TD)": "td_sa"}
+              "Tasa de Desocupación (TD)": "td_sa",
+              "Población ocupada": "ocupados_miles_sa",
+              "Población desocupada": "desocupados_miles_sa",
+              "Población fuera de la fuerza de trabajo": "fuera_ft_miles_sa"}
     table = parse_dane_block(_sheet_rows(content, "Total nacional"), labels)
     table["td_sa_3m"] = table["td_sa"].rolling(3).mean()
     table["fuente"] = url

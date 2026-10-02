@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 
 TX = {
     "s_medidas": ("El crecimiento en seis medidas", "Growth in six measures"),
+    "s_medidas8": ("El crecimiento en ocho medidas", "Growth in eight measures"),
     "s_velocidad": ("¿A qué velocidad crece la economía?", "How fast is the economy growing?"),
     "s_precios": ("¿Cuánto es crecimiento real y cuánto son precios?", "How much is real growth and how much is prices?"),
     "s_quien": ("¿Quién explica el crecimiento?", "Who explains growth?"),
@@ -237,7 +238,14 @@ def construir_crecimiento(d, s, L):
     ])
     r0 = tx("r_medidas", L).format(a=pct(M["yoy"].iloc[-1]), q=q, t=pct(M["saar"].iloc[-1]), p=periodo, c=pct(M["corrido"]),
                                    pr=pct(M["singob"].iloc[-1]), pg=tx("pg_si" if M["tot_c"].iloc[-1] - M["singob"].iloc[-1] > 0.5 else "pg_no", L), df=pct(M["defl_y"].iloc[-1], 1, False), ipc=pct(ipc_q, 1, False))
-    antes = seccion("crec-medidas", tx("s_medidas", L), r0, f'<div class="lecturas seis">{lecturas}</div>')
+    D = cargar_demanda()
+    SD = secciones_demanda(D, d, L, cs) if D is not None else {}
+    clase = "seis"
+    if SD:
+        t_ = SD["tiles"]
+        lecturas += lec(*t_[:5]) + lec(*t_[5:])
+        clase = "ocho"
+    antes = seccion("crec-medidas", tx("s_medidas8" if SD else "s_medidas", L), r0, f'<div class="lecturas {clase}">{lecturas}</div>')
 
     # ------------------------------------------------ velocidades + periodos
     desde = pd.Timestamp("2012-01-01")
@@ -379,4 +387,299 @@ def construir_crecimiento(d, s, L):
     s_lit = (f'<section id="crec-literatura" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_lit", L)}</h2></div>'
              f'<ol class="refs">{items}</ol></section>')
 
-    return antes, s_vel + s_pre + s_quien + s_amp + s_niv + s_lit, r0
+    extra = "".join(SD.get(k, "") for k in ("demanda", "inversion", "hogares", "persona"))
+    # oferta (velocidad, precios, aportes) | aqui entra la seccion de sectores | amplitud, demanda, persona, nivel, literatura
+    return antes, s_vel + s_pre + s_quien, s_amp + extra + s_niv + s_lit, r0
+
+
+# ====================================================================== demanda, inversion, hogares, por persona
+TX.update({
+    "s_demanda": ("¿Quién gasta? El PIB por el lado de la demanda", "Who spends? GDP from the demand side"),
+    "s_inversion": ("¿Cuánto invierte el país?", "How much does the country invest?"),
+    "s_hogares": ("¿En qué gastan los hogares?", "What do households spend on?"),
+    "s_persona": ("¿Cuánto produce cada colombiano?", "How much does each Colombian produce?"),
+    "l_pc": ("PIB por persona · {a}", "GDP per person · {a}"), "l_pc_d": ("crecimiento real; US$ {u} por persona", "real growth; US${u} per person"),
+    "l_tinv": ("Tasa de inversión", "Investment rate"), "l_tinv_d": ("de PIB en inversión fija (12 meses) · en 2015: {v}", "of GDP in fixed investment (12 months) · in 2015: {v}"),
+    "r_demanda": ("En {q} el consumo de los hogares aporta {h} puntos al crecimiento, el gasto del Gobierno {g} y la inversión fija {i}; "
+                  "el comercio exterior neto {x}. "
+                  "La demanda interna crece {di}, más que el PIB ({pib}): parte de ese gasto se cubre con importaciones, que suben {m}.",
+                  "In {q} household consumption contributes {h} points to growth, government spending {g} and fixed investment {i}; "
+                  "net foreign trade {x}. "
+                  "Domestic demand grows {di}, faster than GDP ({pib}): part of that spending is met by imports, which rise {m}."),
+    "r_inversion": ("Colombia destina {t} de su PIB a inversión fija, frente a {t15} en 2015 y un máximo de {tmax} en {fmax}. "
+                    "Por tipo de activo, {a1} es el más alto frente a finales de 2019 ({v1}) y {a2} el más bajo ({v2}).",
+                    "Colombia devotes {t} of GDP to fixed investment, versus {t15} in 2015 and a peak of {tmax} in {fmax}. "
+                    "By asset type, {a1} is the highest versus end-2019 ({v1}) and {a2} the lowest ({v2})."),
+    "r_hogares": ("En los últimos 12 meses el consumo de bienes durables (carros, electrodomésticos) cambia {du}, los servicios {se} y los no durables {nd}. "
+                  "Por finalidad, lo que más crece es {f1} ({v1}) y lo que menos, {f2} ({v2}). "
+                  "El consumo de los hogares equivale a {sh} del PIB.",
+                  "Over the last 12 months durable goods consumption (cars, appliances) changes {du}, services {se} and non-durables {nd}. "
+                  "By purpose, the fastest riser is {f1} ({v1}) and the slowest {f2} ({v2}). "
+                  "Household consumption equals {sh} of GDP."),
+    "r_persona": ("En {a} el PIB por persona fue {pc} millones de pesos de 2015 (US$ {usd} corrientes) y creció {g} real, frente a {gp} del PIB total: "
+                  "la población crece cerca de {gpop} al año. "
+                  "Cada ocupado produce {prod} frente a un año antes{prod_txt}.",
+                  "In {a} GDP per person was {pc} million 2015 pesos (US${usd} current) and grew {g} in real terms, versus {gp} for total GDP: "
+                  "population grows about {gpop} a year. "
+                  "Output per employed person changes {prod} versus a year earlier{prod_txt}."),
+    "prod_sube": (": la economía produce más con cada trabajador", ": the economy produces more with each worker"),
+    "prod_baja": (": el empleo crece más rápido que la producción", ": employment grows faster than output"),
+    "g_dem_aportes": ("Aportes al crecimiento del PIB por componente de la demanda", "Contributions to GDP growth by demand component"),
+    "h_dem_aportes": ("Puntos porcentuales que cada componente suma al crecimiento anual del PIB. Comercio exterior neto: exportaciones menos importaciones. "
+                      "«Existencias y discrepancia»: cambio en inventarios y diferencias del encadenamiento. La línea es el PIB.",
+                      "Percentage points each component adds to annual GDP growth. Net foreign trade: exports minus imports. "
+                      "'Inventories and discrepancy': change in inventories and chain-linking differences. The line is GDP."),
+    "dc_hog": ("Consumo de los hogares", "Household consumption"), "dc_gob": ("Gasto del Gobierno", "Government spending"),
+    "dc_inv": ("Inversión fija", "Fixed investment"), "dc_net": ("Comercio exterior neto", "Net foreign trade"),
+    "dc_res": ("Existencias y discrepancia", "Inventories and discrepancy"),
+    "g_dem_crec": ("Crecimiento anual de cada componente ({q})", "Annual growth of each component ({q})"),
+    "h_dem_crec": ("Variación real frente al mismo trimestre del año anterior. Azul: crece; naranja: cae. Las importaciones restan al PIB: si crecen, una parte del gasto se va al exterior.",
+                   "Real change versus the same quarter a year earlier. Blue: growing; orange: falling. Imports subtract from GDP: when they grow, part of spending leaks abroad."),
+    "dk": {"pib": ("PIB", "GDP"), "demanda_interna": ("Demanda interna", "Domestic demand"), "consumo_hogares": ("Consumo de los hogares", "Household consumption"),
+           "consumo_gobierno": ("Gasto del Gobierno", "Government spending"), "inversion_fija": ("Inversión fija", "Fixed investment"),
+           "exportaciones": ("Exportaciones", "Exports"), "importaciones": ("Importaciones", "Imports")},
+    "g_tinv": ("Tasa de inversión: inversión fija como % del PIB", "Investment rate: fixed investment as % of GDP"),
+    "h_tinv": ("Inversión fija (construcción, maquinaria, equipo y propiedad intelectual) dividida por el PIB, ambos en pesos corrientes y sumando 12 meses. Más inversión hoy es más capacidad de producir mañana.",
+               "Fixed investment (construction, machinery, equipment and intellectual property) divided by GDP, both in current pesos over 12 months. More investment today means more productive capacity tomorrow."),
+    "g_activos": ("Inversión por tipo de activo, T4 2019 = 100", "Investment by asset type, 2019 Q4 = 100"),
+    "h_activos": ("Inversión real desestacionalizada de cada tipo de activo frente a finales de 2019. Por encima de 100: ya superó el nivel previo a la pandemia.",
+                  "Seasonally adjusted real investment in each asset type versus end-2019. Above 100: already above the pre-pandemic level."),
+    "ak": {"vivienda": ("Vivienda", "Housing"), "otros_edificios": ("Otros edificios y obras", "Other buildings and works"),
+           "maquinaria_equipo": ("Maquinaria y equipo", "Machinery and equipment"), "propiedad_intelectual": ("Propiedad intelectual", "Intellectual property"),
+           "recursos_biologicos": ("Recursos biológicos", "Biological resources")},
+    "g_durab": ("Consumo de los hogares por durabilidad, 12 meses", "Household consumption by durability, 12 months"),
+    "h_durab": ("Variación real de los últimos 12 meses frente a los 12 anteriores. Los bienes durables son los primeros en caer en una desaceleración y en subir en una recuperación.",
+                "Real change of the last 12 months versus the previous 12. Durable goods are the first to fall in a slowdown and to rise in a recovery."),
+    "duk": {"durables": ("Bienes durables", "Durable goods"), "semidurables": ("Semidurables (ropa, calzado)", "Semi-durables (clothing, footwear)"),
+            "no_durables": ("No durables (alimentos, combustibles)", "Non-durables (food, fuel)"), "servicios": ("Servicios", "Services")},
+    "g_coicop": ("¿En qué gasta más (o menos) el hogar? 12 meses", "What are households spending more (or less) on? 12 months"),
+    "h_coicop": ("Variación real del gasto de los hogares por finalidad (clasificación COICOP), últimos 12 meses frente a los 12 anteriores. Entre paréntesis, la parte de cada grupo en el consumo.",
+                 "Real change in household spending by purpose (COICOP classification), last 12 months versus the previous 12. In brackets, each group's share of consumption."),
+    "ck": {"alimentos": ("Alimentos", "Food"), "alcohol_tabaco": ("Alcohol y tabaco", "Alcohol and tobacco"), "vestuario": ("Ropa y calzado", "Clothing and footwear"),
+           "vivienda_servicios": ("Vivienda y servicios públicos", "Housing and utilities"), "muebles_hogar": ("Muebles y hogar", "Furnishings and household"),
+           "salud": ("Salud", "Health"), "transporte": ("Transporte", "Transport"), "comunicaciones": ("Comunicaciones", "Communications"),
+           "recreacion": ("Recreación y cultura", "Recreation and culture"), "educacion": ("Educación", "Education"),
+           "restaurantes_hoteles": ("Restaurantes y hoteles", "Restaurants and hotels"), "diversos": ("Otros bienes y servicios", "Other goods and services")},
+    "g_pc": ("Crecimiento real del PIB por persona", "Real growth of GDP per person"),
+    "h_pc": ("PIB real anual dividido por la población a mitad de año (proyecciones oficiales del DANE), crecimiento frente al año anterior. Pase el cursor para ver el nivel en millones de pesos de 2015.",
+             "Annual real GDP divided by mid-year population (official DANE projections), growth versus the previous year. Hover to see the level in millions of 2015 pesos."),
+    "lbl_pc": ("Millones de pesos de 2015 por persona", "Million 2015 pesos per person"), "lbl_pcg": ("Crecimiento anual", "Annual growth"),
+    "g_usd": ("PIB por persona en dólares", "GDP per person in US dollars"),
+    "h_usd": ("PIB nominal anual dividido por la población y por la tasa de cambio promedio del año (TRM). Mezcla crecimiento, inflación y el valor del peso: un peso más fuerte sube el dato en dólares.",
+              "Annual nominal GDP divided by population and by the year's average exchange rate (TRM). It mixes growth, inflation and the peso's value: a stronger peso raises the dollar figure."),
+    "g_prod": ("Producción, empleo y producción por ocupado, 2015 = 100", "Output, employment and output per employed person, 2015 = 100"),
+    "h_prod": ("PIB real de 12 meses, número de ocupados (promedio de 12 meses, GEIH desestacionalizada) y su cociente: la productividad laboral aparente. Si la línea verde sube, cada trabajador produce más.",
+               "12-month real GDP, number of employed people (12-month average, seasonally adjusted GEIH) and their ratio: apparent labour productivity. If the green line rises, each worker produces more."),
+    "lbl_ocup": ("Ocupados", "Employed"), "lbl_prod": ("PIB por ocupado", "GDP per employed person"),
+    "parcial12": ("12 meses a {q}", "12 months to {q}"),
+})
+LITERATURA.extend([
+    ("OECD (2001). <i>Measuring Productivity: OECD Manual</i>. París: OECD.",
+     "Productividad laboral aparente: producción por persona ocupada.", "Apparent labour productivity: output per employed person."),
+    ("Naciones Unidas et al. (2009). <i>System of National Accounts 2008</i>. Nueva York.",
+     "Enfoque del gasto, formación bruta de capital y consumo por finalidad (COICOP).", "Expenditure approach, gross capital formation and consumption by purpose (COICOP)."),
+    ("DANE. Proyecciones y retroproyecciones de población, Censo Nacional de Población y Vivienda 2018 (actualización 2025).",
+     "Denominador del PIB por persona.", "Denominator of GDP per person."),
+])
+
+
+def cargar_demanda():
+    from colombiamacro.config import DATA_DIR
+    arch = {"gasto": "pib_gasto.csv", "inversion": "pib_inversion.csv", "consumo": "pib_consumo_hogares.csv", "poblacion": "poblacion.csv"}
+    if not all((DATA_DIR / f).exists() for f in arch.values()):
+        return None
+    out = {k: pd.read_csv(DATA_DIR / f, parse_dates=["fecha"] if k != "poblacion" else None) for k, f in arch.items()}
+    return out
+
+
+def medidas_demanda(D, d):
+    g = D["gasto"]
+    w = g.pivot(index="fecha", columns="componente", values="real").sort_index()
+    n = g.pivot(index="fecha", columns="componente", values="nominal").sort_index()
+    sa = g.pivot(index="fecha", columns="componente", values="real_sa").sort_index()
+    pib0 = w["pib"].shift(4)
+    ap = pd.DataFrame({k: (w[k] - w[k].shift(4)) / pib0 * 100 for k in ("consumo_hogares", "consumo_gobierno", "inversion_fija")})
+    ap["netas"] = ((w["exportaciones"] - w["exportaciones"].shift(4)) - (w["importaciones"] - w["importaciones"].shift(4))) / pib0 * 100
+    pib_y = (w["pib"] / pib0 - 1) * 100
+    ap["resto"] = pib_y - ap.sum(axis=1)
+    yoy = (w / w.shift(4) - 1) * 100
+    n4 = n.rolling(4).sum()
+    tinv = n4["inversion_fija"] / n4["pib"] * 100
+    sh_hog = n4["consumo_hogares"] / n4["pib"] * 100
+    inv = D["inversion"].pivot(index="fecha", columns="activo", values="real_sa").sort_index()
+    inv_idx = 100 * inv / inv.loc[pd.Timestamp("2019-10-01")]
+    co = D["consumo"]
+    co12 = {}
+    for tipo in ("durabilidad", "finalidad"):
+        p = co[co["tipo"] == tipo].pivot(index="fecha", columns="grupo", values="real").sort_index()
+        p4 = p.rolling(4).sum()
+        co12[tipo] = ((p4 / p4.shift(4) - 1) * 100, p4.iloc[-1] / p4.iloc[-1].sum() * 100)
+    # por persona (anual: anos completos + ultimos 12 meses)
+    pob = D["poblacion"].set_index("anio")["poblacion"].astype(float)
+    cnt = w["pib"].groupby(w.index.year).count()
+    ra = w["pib"].groupby(w.index.year).sum()[cnt == 4]
+    na = n["pib"].groupby(n.index.year).sum()[cnt == 4]
+    anos = [a for a in ra.index if a in pob.index]
+    pc = ra[anos] * 1e9 / pob[anos]                       # pesos de 2015 por persona
+    trm = d.extra.get("trm")
+    usd = pd.Series(dtype=float)
+    if trm is not None and not trm.empty:
+        t_ = trm.set_index("fecha")["trm"]
+        tm = t_.groupby(t_.index.year).mean()
+        usd = (na[anos] * 1e9 / pob[anos] / tm.reindex(anos)).dropna()
+    # productividad laboral aparente
+    prod = None
+    lab = d.laboral
+    if lab is not None and "ocupados_miles_sa" in lab.columns and lab["ocupados_miles_sa"].notna().sum() > 60:
+        oc = lab.set_index("fecha")["ocupados_miles_sa"].resample("QS").mean()
+        r4 = w["pib"].rolling(4).sum()
+        oc4 = oc.rolling(4).mean().reindex(r4.index)
+        base = r4.loc["2015"].mean(), oc4.loc["2015"].mean()
+        prod = pd.DataFrame({"pib": 100 * r4 / base[0], "ocup": 100 * oc4 / base[1]}).dropna()
+        prod["prod"] = 100 * prod["pib"] / prod["ocup"]
+    return {"w": w, "ap": ap.dropna(), "pib_y": pib_y, "yoy": yoy, "tinv": tinv.dropna(), "sh_hog": sh_hog.dropna(), "inv_idx": inv_idx,
+            "co12": co12, "pc": pc, "usd": usd, "pob": pob, "prod": prod}
+
+
+def secciones_demanda(D, d, L, cs):
+    num, fecha = cs.num, cs.fecha
+    pct = lambda v, dec=1, sg=True: num(float(v), dec, L, sg, "%")
+    X = medidas_demanda(D, d)
+    out = {}
+    q = fecha(X["ap"].index[-1], "q", L)
+    # ---------- demanda
+    ap = X["ap"].iloc[-16:]
+    f1 = cs.base(L, height=360, suffix=" pp")
+    xq = _qx(ap.index)
+    for k, lbl, col in (("consumo_hogares", "dc_hog", cs.C1), ("consumo_gobierno", "dc_gob", cs.C7), ("inversion_fija", "dc_inv", cs.C3),
+                        ("netas", "dc_net", cs.C2), ("resto", "dc_res", cs.GRAY)):
+        f1.add_trace(go.Bar(x=xq, y=ap[k].round(2), name=tx(lbl, L), marker=dict(color=col, line=dict(width=0)), hovertemplate="%{y:.2f} pp"))
+    py = X["pib_y"].loc[ap.index]
+    f1.add_trace(go.Scatter(x=xq, y=py.round(2), name="PIB" if L == "es" else "GDP",
+                            mode="lines+markers", line=dict(color=cs.INK, width=2), marker=dict(size=6, color=cs.INK), hovertemplate="%{y:.1f}%"))
+    f1.add_hline(y=0, line=dict(color=cs.INK2, width=1))
+    f1.update_layout(barmode="relative", bargap=0.25)
+    f1.update_xaxes(dtick="M6", tickformat="%m/%Y")
+    g1 = cs.bloque_grafico(tx("g_dem_aportes", L), cs.fig_html(f1, {"notime": True}, "g-demanda-aportes"), tx("h_dem_aportes", L))
+    dk = TX["dk"]
+    orden = ["pib", "demanda_interna", "consumo_hogares", "consumo_gobierno", "inversion_fija", "exportaciones", "importaciones"]
+    yv = X["yoy"].iloc[-1]
+    filas = [(dk[k][0 if L == "es" else 1], float(yv[k])) for k in orden][::-1]
+    f2 = cs.base(L, height=330, fecha_x=False)
+    f2.add_trace(go.Bar(y=[r[0] for r in filas], x=[round(r[1], 2) for r in filas], orientation="h", showlegend=False,
+                        marker=dict(color=[cs.C1 if r[1] >= 0 else cs.C2 for r in filas], line=dict(width=0)),
+                        text=[pct(r[1]) for r in filas], textposition="outside", cliponaxis=False, hovertemplate="%{y}: %{x:.1f}%<extra></extra>"))
+    m = max(abs(r[1]) for r in filas) * 1.35
+    f2.add_vline(x=0, line=dict(color=cs.INK2, width=1))
+    f2.update_xaxes(range=[min(-3, min(r[1] for r in filas) * 1.6), m], ticksuffix="%", showgrid=True, gridcolor=cs.GRID)
+    f2.update_yaxes(ticksuffix="", tickfont=dict(size=12.5, color=cs.INK2))
+    f2.update_layout(hovermode="closest", bargap=0.35)
+    g2 = cs.bloque_grafico(tx("g_dem_crec", L).format(q=q), cs.fig_html(f2, {"notime": True}, "g-demanda-crec"), tx("h_dem_crec", L))
+    ua = X["ap"].iloc[-1]
+    rd = tx("r_demanda", L).format(q=q, h=num(ua["consumo_hogares"], 1, L, True), g=num(ua["consumo_gobierno"], 1, L, True),
+                                   i=num(ua["inversion_fija"], 1, L, True), x=num(ua["netas"], 1, L, True), di=pct(yv["demanda_interna"]),
+                                   pib=pct(yv["pib"]), m=pct(yv["importaciones"]))
+    out["demanda"] = (f'<section id="crec-demanda" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_demanda", L)}</h2></div>'
+                      f'{cs.respuesta_html(rd, L)}<div class="grid">{g1}{g2}</div></section>')
+    # ---------- inversion
+    ti = X["tinv"]
+    f3 = cs.base(L, height=330)
+    cs.linea(f3, _qx(ti.index), ti, tx("l_tinv", L), cs.C3, width=2.6, lang=L)
+    f3.update_layout(showlegend=False)
+    f3.update_yaxes(range=[max(0, ti.min() - 3), ti.max() + 2])
+    g3 = cs.bloque_grafico(tx("g_tinv", L), cs.fig_html(f3, {"noy": True}, "g-tasa-inversion"), tx("h_tinv", L))
+    ii = X["inv_idx"].loc["2015":]
+    ak = TX["ak"]
+    f4 = cs.base(L, height=330, suffix="")
+    for k, col in (("vivienda", cs.C2), ("otros_edificios", cs.C4), ("maquinaria_equipo", cs.C1), ("propiedad_intelectual", cs.C7)):
+        if k in ii:
+            cs.linea(f4, _qx(ii.index), ii[k], ak[k][0 if L == "es" else 1], col, width=2.2, suf="", lang=L)
+    f4.add_hline(y=100, line=dict(color=cs.INK2, width=1, dash="dot"))
+    g4 = cs.bloque_grafico(tx("g_activos", L), cs.fig_html(f4, {}, "g-inversion-activos"), tx("h_activos", L))
+    ul = X["inv_idx"].iloc[-1].drop("recursos_biologicos", errors="ignore").sort_values()
+    t15 = ti.loc["2015"].mean()
+    ri = tx("r_inversion", L).format(t=pct(ti.iloc[-1], 1, False), t15=pct(t15, 1, False), tmax=pct(ti.max(), 1, False), fmax=fecha(ti.idxmax(), "q", L),
+                                     a1=ak[ul.index[-1]][0 if L == "es" else 1].lower(), v1=num(ul.iloc[-1], 0, L),
+                                     a2=ak[ul.index[0]][0 if L == "es" else 1].lower(), v2=num(ul.iloc[0], 0, L))
+    out["inversion"] = (f'<section id="crec-inversion" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_inversion", L)}</h2></div>'
+                        f'{cs.respuesta_html(ri, L)}<div class="grid">{g3}{g4}</div></section>')
+    # ---------- hogares
+    dur, _ = X["co12"]["durabilidad"]
+    dur = dur.loc["2015":].dropna()
+    duk = TX["duk"]
+    f5 = cs.base(L, height=340)
+    for k, col, wd in (("durables", cs.C2, 2.4), ("semidurables", cs.C4, 1.8), ("no_durables", cs.C3, 1.8), ("servicios", cs.C1, 2.2)):
+        cs.linea(f5, _qx(dur.index), dur[k].clip(-30, 40), duk[k][0 if L == "es" else 1], col, width=wd, lang=L)
+    f5.add_hline(y=0, line=dict(color=cs.INK2, width=1))
+    g5 = cs.bloque_grafico(tx("g_durab", L), cs.fig_html(f5, {}, "g-consumo-durabilidad"), tx("h_durab", L))
+    fin_, sh = X["co12"]["finalidad"]
+    uf = fin_.iloc[-1].sort_values()
+    ck = TX["ck"]
+    nm = lambda k: ck[k][0 if L == "es" else 1]
+    f6 = cs.base(L, height=420, fecha_x=False)
+    f6.add_trace(go.Bar(y=[f"{nm(k)} ({num(sh[k], 0, L)}%)" for k in uf.index], x=uf.round(2), orientation="h", showlegend=False,
+                        marker=dict(color=[cs.C1 if v >= 0 else cs.C2 for v in uf], line=dict(width=0)),
+                        text=[pct(v) for v in uf], textposition="outside", cliponaxis=False, hovertemplate="%{y}: %{x:.1f}%<extra></extra>"))
+    f6.add_vline(x=0, line=dict(color=cs.INK2, width=1))
+    f6.update_xaxes(range=[min(-3, uf.min() * 1.6), uf.max() * 1.35], ticksuffix="%", showgrid=True, gridcolor=cs.GRID)
+    f6.update_yaxes(ticksuffix="", tickfont=dict(size=12, color=cs.INK2))
+    f6.update_layout(hovermode="closest", bargap=0.3)
+    g6 = cs.bloque_grafico(tx("g_coicop", L), cs.fig_html(f6, {"notime": True}, "g-consumo-finalidad"), tx("h_coicop", L))
+    ud = dur.iloc[-1]
+    rh = tx("r_hogares", L).format(du=pct(ud["durables"]), se=pct(ud["servicios"]), nd=pct(ud["no_durables"]),
+                                   f1=nm(uf.index[-1]).lower(), v1=pct(uf.iloc[-1]), f2=nm(uf.index[0]).lower(), v2=pct(uf.iloc[0]),
+                                   sh=pct(X["sh_hog"].iloc[-1], 0, False))
+    out["hogares"] = (f'<section id="crec-hogares" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_hogares", L)}</h2></div>'
+                      f'{cs.respuesta_html(rh, L)}<div class="grid">{g5}{g6}</div></section>')
+    # ---------- por persona
+    pc = X["pc"]
+    pcg = pc.pct_change() * 100
+    xa = [pd.Timestamp(a, 7, 1) for a in pc.index]
+    f7 = cs.base(L, height=340, fecha_x=False)
+    pcg_ = pcg.dropna()
+    f7.add_trace(go.Bar(x=[str(a_) for a_ in pcg_.index], y=pcg_.round(2), showlegend=False,
+                        marker=dict(color=[cs.C1 if v >= 0 else cs.C2 for v in pcg_], line=dict(width=0)),
+                        text=[pct(v) for v in pcg_], textposition="outside", cliponaxis=False, textfont=dict(size=10, color=cs.INK2),
+                        customdata=[num(pc[a_] / 1e6, 1, L) for a_ in pcg_.index],
+                        hovertemplate="%{x}: %{y:.1f}%<br>" + tx("lbl_pc", L) + ": %{customdata}<extra></extra>"))
+    f7.add_hline(y=0, line=dict(color=cs.INK2, width=1))
+    f7.update_xaxes(tickangle=-45)
+    f7.update_layout(bargap=0.25, hovermode="closest")
+    g7 = cs.bloque_grafico(tx("g_pc", L), cs.fig_html(f7, {"notime": True}, "g-pib-persona"), tx("h_pc", L))
+    usd = X["usd"]
+    g8 = ""
+    if not usd.empty:
+        f8 = cs.base(L, height=340, suffix="", fecha_x=False)
+        f8.add_trace(go.Bar(x=[str(a) for a in usd.index], y=usd.round(0), showlegend=False, marker=dict(color=cs.C1, line=dict(width=0)),
+                            text=[num(v / 1000, 1, L) + (" mil" if L == "es" else "k") for v in usd], textposition="outside", cliponaxis=False,
+                            textfont=dict(size=10, color=cs.INK2), hovertemplate="%{x}: US$ %{y:,.0f}<extra></extra>"))
+        f8.update_yaxes(tickprefix="US$ ", tickformat=",.0f")
+        f8.update_xaxes(tickangle=-45)
+        f8.update_layout(bargap=0.25, hovermode="closest")
+        g8 = cs.bloque_grafico(tx("g_usd", L), cs.fig_html(f8, {"notime": True}, "g-pib-persona-usd"), tx("h_usd", L))
+    g9, prod_v, prod_txt = "", None, ""
+    if X["prod"] is not None:
+        pr = X["prod"].loc["2015":]
+        f9 = cs.base(L, height=340, suffix="")
+        cs.linea(f9, _qx(pr.index), pr["pib"], "PIB" if L == "es" else "GDP", cs.C1, width=2.0, suf="", lang=L)
+        cs.linea(f9, _qx(pr.index), pr["ocup"], tx("lbl_ocup", L), cs.C2, width=2.0, suf="", lang=L)
+        cs.linea(f9, _qx(pr.index), pr["prod"], tx("lbl_prod", L), cs.C3, width=2.8, suf="", lang=L)
+        f9.add_hline(y=100, line=dict(color=cs.INK2, width=1, dash="dot"))
+        g9 = cs.bloque_grafico(tx("g_prod", L), cs.fig_html(f9, {}, "g-productividad"), tx("h_prod", L), ancho=True)
+        p_ = X["prod"]["prod"]
+        prod_v = (p_.iloc[-1] / p_.iloc[-5] - 1) * 100
+        prod_txt = tx("prod_sube" if prod_v >= 0 else "prod_baja", L)
+    a = int(pc.index[-1])
+    pib_a = X["w"]["pib"].groupby(X["w"].index.year).sum()
+    gp = (pib_a[a] / pib_a[a - 1] - 1) * 100
+    gpop = (X["pob"][a] / X["pob"][a - 1] - 1) * 100
+    rp = tx("r_persona", L).format(a=a, pc=num(pc.iloc[-1] / 1e6, 1, L), usd=num(usd.iloc[-1], 0, L) if not usd.empty else "—",
+                                   g=pct(pcg.iloc[-1]), gp=pct(gp), gpop=pct(gpop, 1, False),
+                                   prod=pct(prod_v) if prod_v is not None else "—", prod_txt=prod_txt)
+    out["persona"] = (f'<section id="crec-persona" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_persona", L)}</h2></div>'
+                      f'{cs.respuesta_html(rp, L)}<div class="grid">{g7}{g8}{g9}</div></section>')
+    out["tiles"] = (tx("l_pc", L).format(a=a), pct(pcg.iloc[-1]), tx("l_pc_d", L).format(u=num(usd.iloc[-1], 0, L) if not usd.empty else "—"),
+                    "ok" if pcg.iloc[-1] >= 0 else "warn", "#crec-persona",
+                    tx("l_tinv", L), pct(ti.iloc[-1], 1, False), tx("l_tinv_d", L).format(v=pct(t15, 1, False)),
+                    "ok" if ti.iloc[-1] >= t15 else "warn", "#crec-inversion")
+    return out

@@ -273,6 +273,36 @@ FICHAS = {
                  "Index 2019 Q4 = 100. Earlier path: log-linear regression of seasonally adjusted GDP over 2015Q1–2019Q4, extended with the same slope. "
                  "A descriptive counterfactual, not a forecast. See Cerra and Saxena (2008) on permanent level losses after crises.")),
 
+    # --- demanda, inversion, hogares y por persona
+    "g-demanda-aportes": (("DANE, PIB por el enfoque del gasto (anexos a precios constantes y corrientes)", "DANE, GDP by expenditure (constant and current price annexes)"),
+                          ("Aporte = (componente_t − componente_t−4) / PIB_t−4 × 100, con volúmenes encadenados en datos originales. Comercio neto = aporte de exportaciones − aporte de importaciones. "
+                           "«Existencias y discrepancia» es el residuo hasta el crecimiento del PIB: variación de inventarios más la no aditividad de los índices encadenados.",
+                           "Contribution = (component_t − component_t−4) / GDP_t−4 × 100, using chain-linked volumes (original data). Net trade = exports contribution − imports contribution. "
+                           "'Inventories and discrepancy' is the residual up to GDP growth: change in inventories plus the non-additivity of chain-linked indices.")),
+    "g-demanda-crec": (("DANE, PIB por el enfoque del gasto (anexos a precios constantes y corrientes)", "DANE, GDP by expenditure (constant and current price annexes)"),
+                       ("Variación anual de los volúmenes encadenados (datos originales) del último trimestre publicado. Consumo de los hogares incluye las ISFLH.",
+                        "Annual change of chain-linked volumes (original data) in the latest published quarter. Household consumption includes NPISHs.")),
+    "g-tasa-inversion": (("DANE, PIB por el enfoque del gasto (anexos a precios constantes y corrientes)", "DANE, GDP by expenditure (constant and current price annexes)"),
+                         ("Formación bruta de capital fijo / PIB, ambos a precios corrientes y como suma de los últimos 4 trimestres. No incluye variación de existencias.",
+                          "Gross fixed capital formation / GDP, both at current prices and summed over the latest 4 quarters. Excludes change in inventories.")),
+    "g-inversion-activos": (("DANE, PIB por el enfoque del gasto (anexos a precios constantes y corrientes)", "DANE, GDP by expenditure (constant and current price annexes)"),
+                            ("Cuadro 6 del anexo de gasto: formación bruta de capital fijo por tipo de activo (AN111 vivienda, AN112 otros edificios y estructuras, AN113+AN114 maquinaria y equipo, AN117 propiedad intelectual), volúmenes desestacionalizados; índice T4 2019 = 100.",
+                             "Table 6 of the expenditure annex: gross fixed capital formation by asset (AN111 housing, AN112 other buildings and structures, AN113+AN114 machinery and equipment, AN117 intellectual property), seasonally adjusted volumes; index 2019 Q4 = 100.")),
+    "g-consumo-durabilidad": (("DANE, PIB por el enfoque del gasto (anexos a precios constantes y corrientes)", "DANE, GDP by expenditure (constant and current price annexes)"),
+                              ("Cuadro 3: gasto de consumo final de los hogares en el territorio por durabilidad, volúmenes en datos originales; variación de la suma de 4 trimestres frente a los 4 anteriores.",
+                               "Table 3: household final consumption in the territory by durability, volumes in original data; change of the 4-quarter sum versus the previous 4.")),
+    "g-consumo-finalidad": (("DANE, PIB por el enfoque del gasto (anexos a precios constantes y corrientes)", "DANE, GDP by expenditure (constant and current price annexes)"),
+                            ("Cuadro 3: consumo de los hogares por división COICOP (12 finalidades), volúmenes en datos originales; variación de 12 meses. La participación usa la suma de volúmenes encadenados (aproximada).",
+                             "Table 3: household consumption by COICOP division (12 purposes), volumes in original data; 12-month change. Shares use the sum of chain-linked volumes (approximate).")),
+    "g-pib-persona": (("DANE: PIB real y proyecciones de población (Censo 2018, actualización 2025); cálculo propio", "DANE: real GDP and population projections (2018 Census, 2025 update); own calculation"),
+                      ("PIB real anual (suma de 4 trimestres, pesos de 2015) / población total nacional a 30 de junio. La población de 2018 en adelante es la proyección oficial vigente del DANE; antes de 2018, la retroproyección.",
+                       "Annual real GDP (sum of 4 quarters, 2015 pesos) / total national population at 30 June. Population from 2018 onwards is DANE's current official projection; before 2018, the back-projection.")),
+    "g-pib-persona-usd": (("DANE (PIB nominal, población) y Banco de la República (TRM); cálculo propio", "DANE (nominal GDP, population) and Banco de la República (TRM); own calculation"),
+                          ("PIB nominal anual / población / TRM promedio del año calendario. Método Atlas no aplicado: es la conversión simple a la tasa de mercado.",
+                           "Annual nominal GDP / population / calendar-year average TRM. The Atlas method is not applied: it is a simple conversion at the market rate.")),
+    "g-productividad": (("DANE: PIB real y GEIH desestacionalizada (población ocupada); cálculo propio", "DANE: real GDP and seasonally adjusted GEIH (employed population); own calculation"),
+                        ("Productividad laboral aparente (OECD, 2001) = PIB real de 4 trimestres / promedio de ocupados de 12 meses; índices 2015 = 100. No corrige por horas trabajadas ni por informalidad.",
+                         "Apparent labour productivity (OECD, 2001) = 4-quarter real GDP / 12-month average employment; indices 2015 = 100. Not adjusted for hours worked or informality.")),
 }
 
 

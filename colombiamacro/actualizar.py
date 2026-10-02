@@ -26,6 +26,7 @@ PASOS = [
     ("Politica, TRM, inflacion basica, externo — BanRep", "colombiamacro.fuentes.complementarias", ["--solo", "banrep"]),
     ("ISE y mercado laboral — DANE", "colombiamacro.fuentes.complementarias", ["--solo", "dane"]),
     ("Informalidad laboral — DANE", "colombiamacro.fuentes.informalidad", []),
+    ("PIB por el gasto y poblacion — DANE", "colombiamacro.fuentes.demanda", []),
     ("Comercio exterior — DANE (DIAN-DANE)", "colombiamacro.fuentes.comercio", []),
     ("Canasta COLCAP (iShares) y acciones (Yahoo Finance)", "colombiamacro.fuentes.acciones", []),
 ]
