@@ -307,7 +307,7 @@ def construir_crecimiento(d, s, L):
 
     # ------------------------------------------------ quien: grupos + sin gobierno
     gr = M["grupos"].loc[pd.Timestamp(fin) - pd.DateOffset(years=4):]
-    colores = {"gr_serv": cs.C1, "gr_gob": cs.C7, "gr_ind": cs.C4, "gr_prim": cs.C2}
+    colores = {"gr_serv": cs.C1, "gr_gob": cs.C7, "gr_ind": cs.C3, "gr_prim": cs.C2}
     f5 = cs.base(L, height=360, suffix=" pp")
     xg = _qx(gr.index)
     for k in ("gr_serv", "gr_gob", "gr_ind", "gr_prim"):
@@ -591,7 +591,7 @@ def secciones_demanda(D, d, L, cs):
     ii = X["inv_idx"].loc["2015":]
     ak = TX["ak"]
     f4 = cs.base(L, height=330, suffix="")
-    for k, col in (("vivienda", cs.C2), ("otros_edificios", cs.C4), ("maquinaria_equipo", cs.C1), ("propiedad_intelectual", cs.C7)):
+    for k, col in (("maquinaria_equipo", cs.C1), ("vivienda", cs.C2), ("otros_edificios", cs.C3), ("propiedad_intelectual", cs.C7)):
         if k in ii:
             cs.linea(f4, _qx(ii.index), ii[k], ak[k][0 if L == "es" else 1], col, width=2.2, suf="", lang=L)
     f4.add_hline(y=100, line=dict(color=cs.INK2, width=1, dash="dot"))
@@ -608,7 +608,7 @@ def secciones_demanda(D, d, L, cs):
     dur = dur.loc["2015":].dropna()
     duk = TX["duk"]
     f5 = cs.base(L, height=340)
-    for k, col, wd in (("durables", cs.C2, 2.4), ("semidurables", cs.C4, 1.8), ("no_durables", cs.C3, 1.8), ("servicios", cs.C1, 2.2)):
+    for k, col, wd in (("servicios", cs.C1, 2.2), ("durables", cs.C2, 2.4), ("no_durables", cs.C3, 1.8), ("semidurables", cs.C7, 1.8)):
         cs.linea(f5, _qx(dur.index), dur[k].clip(-30, 40), duk[k][0 if L == "es" else 1], col, width=wd, lang=L)
     f5.add_hline(y=0, line=dict(color=cs.INK2, width=1))
     g5 = cs.bloque_grafico(tx("g_durab", L), cs.fig_html(f5, {}, "g-consumo-durabilidad"), tx("h_durab", L))

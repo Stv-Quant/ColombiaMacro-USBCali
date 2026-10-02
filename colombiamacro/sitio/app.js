@@ -12,13 +12,13 @@
     ['#b9b7b0', 'rgba(20,22,26,0.32)', 'rgba(238,240,243,0.32)'], ['#c9c7c0', 'rgba(20,22,26,0.24)', 'rgba(238,240,243,0.24)'],
     ['#fff', '#f3f0e8', '#0c1527'], ['#ffffff', '#faf8f3', '#0d1830'], ['#f7f6f2', '#efebe1', '#17233a'],
     ['#f3c9b3', '#e8c3ad', '#6e3a22'], ['#bfd7f3', '#c3d3e3', '#1d3f6b'], ['#9ec5f0', '#9db8d3', '#3a5f8f'], ['#5b9be3', '#4d7aa6', '#6f9ccf'],
-    ['#2a78d6', '#1f4e79', '#9fc3ef'], ['#eb6834', '#b5501a', '#e8a07a'], ['#1baf7a', '#0d5a43', '#8fd1b0'], ['#eda100', '#a77300', '#e7c27a'],
-    ['#4a3aa7', '#5b4b8a', '#b4a6f0'], ['#1f4f8f', '#14365a', '#cfe0f5'], ['#1a7f4b', '#0f6a4c', '#7fcaa3'], ['#b7791f', '#8a5a00', '#e2b968'],
+    ['#2a78d6', '#2a64ad', '#5b8fd8'], ['#eb6834', '#c44a26', '#d9653f'], ['#1baf7a', '#108063', '#2c9f78'], ['#eda100', '#998000', '#a3951f'],
+    ['#4a3aa7', '#7a4fb0', '#9b7bdb'], ['#1f4f8f', '#14365a', '#cfe0f5'], ['#1a7f4b', '#0f6a4c', '#7fcaa3'], ['#b7791f', '#8a5a00', '#e2b968'],
     ['#c0392b', '#a3341f', '#f0a48a'], ['#2b6cb0', '#244f7d', '#a8c8ee'], ['#b3261e', '#9b2c1a', '#ee9a86'], ['#b04a17', '#943f14', '#f2b08f'],
-    ['#127a55', '#0b5a42', '#9ad8b8'], ['#8a6d3b', '#7a5f30', '#d6b27a'], ['#d6457a', '#9e3a5f', '#e897b5'], ['#0f8fa3', '#1f6c78', '#7cc6d2'],
+    ['#127a55', '#0b5a42', '#9ad8b8'], ['#8a6d3b', '#9a5a22', '#b07040'], ['#d6457a', '#c2457d', '#cc64b4'], ['#0f8fa3', '#1a8fa6', '#2a9cb0'],
     ['rgba(11,11,11,0.07)', 'rgba(20,22,26,0.06)', 'rgba(255,255,255,0.07)'], ['rgba(82,81,78,0.13)', 'rgba(20,22,26,0.1)', 'rgba(183,195,212,0.14)'],
     ['rgba(27,175,122,0.12)', 'rgba(13,90,67,0.10)', 'rgba(143,209,176,0.10)'],
-    ['rgba(42,120,214,0.62)', 'rgba(31,78,121,0.6)', 'rgba(159,195,239,0.6)'], ['rgba(235,104,52,0.68)', 'rgba(181,80,26,0.62)', 'rgba(232,160,122,0.62)']
+    ['rgba(42,120,214,0.62)', 'rgba(42,100,173,0.55)', 'rgba(91,143,216,0.6)'], ['rgba(235,104,52,0.68)', 'rgba(196,74,38,0.6)', 'rgba(217,101,63,0.62)']
   ];
   var FUENTE = { light: '"InterTight", "Segoe UI", system-ui, sans-serif', dark: '"Plex", "Segoe UI", system-ui, sans-serif' };
   function nrm(c) { return String(c).replace(/\s+/g, '').toLowerCase(); }
@@ -179,7 +179,7 @@
   }
 
   // ---------------------------------------------------------------- curva TES
-  var PALETA = ['#eb6834', '#1baf7a', '#eda100', '#4a3aa7', '#d6457a', '#0f8fa3', '#8a6d3b', '#6b6a66'];
+  var PALETA = ['#eb6834', '#1baf7a', '#4a3aa7', '#eda100', '#0f8fa3', '#8a6d3b', '#d6457a', '#6b6a66'];   // orden categorico fijo (azul = hoy)
   var TXT = {
     es: { plazos: ['1 año', '5 años', '10 años'], pend: 'Pendiente 10a − 1a', vs: 'vs. hace 1 año', cierre: 'Cierre', fijada: 'fijada (clic en la historia para soltar)',
           meses: ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'], normal: 'normal', plana: 'plana', invertida: 'invertida' },
