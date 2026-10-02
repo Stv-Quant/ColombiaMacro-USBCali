@@ -45,7 +45,7 @@ class TestSitio(unittest.TestCase):
     PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento",), "sectores": ("sectores",),
                "capacidad": ("capacidad",), "empleo": ("informalidad",), "inflacion": ("precios",), "tasas": ("banco",),
                "curva-tes": ("curva", "curva-app"), "mercados": ("mercados",), "empresas": ("empresas",),
-               "externo": ("externo",), "indicadores": ("indicadores", "fuentes", "noticias")}
+               "externo": ("externo",), "comercio": ("comercio-cifras", "comercio-flujos", "comercio-vende", "comercio-compra", "comercio-socios"), "indicadores": ("indicadores", "fuentes", "noticias")}
 
     def leer(self, *partes):
         return (self.out.joinpath(*partes) / "index.html").read_text(encoding="utf-8")

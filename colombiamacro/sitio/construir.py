@@ -50,10 +50,16 @@ DESCRIPCION_CSV = {
     "series_banrep.csv": ("Series del Banco de la República", "Banco de la República series"),
     "ise_mensual.csv": ("Actividad económica mensual (ISE)", "Monthly economic activity (ISE)"),
     "mercado_laboral.csv": ("Mercado laboral (GEIH)", "Labour market (GEIH)"),
+    "exportaciones_mensuales.csv": ("Exportaciones por producto (DANE)", "Exports by product (DANE)"),
+    "exportaciones_destinos.csv": ("Exportaciones por destino (DANE)", "Exports by destination (DANE)"),
+    "importaciones_mensuales.csv": ("Importaciones mensuales (DANE)", "Monthly imports (DANE)"),
+    "importaciones_cuode_anual.csv": ("Importaciones por uso, anual (DANE)", "Imports by use, annual (DANE)"),
+    "importaciones_origen.csv": ("Importaciones por país de origen (DANE)", "Imports by country of origin (DANE)"),
     "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
 }
 DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
-             "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "estado_fuentes.csv"]
+             "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "exportaciones_mensuales.csv", "exportaciones_destinos.csv",
+             "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "estado_fuentes.csv"]
 
 
 # ------------------------------------------------------------------ formato
@@ -1066,7 +1072,7 @@ def inf_13_lista(d):
 
 
 PAGINA_DE = {"crecimiento": "crecimiento/", "precios": "inflacion/", "banco": "tasas/", "informalidad": "empleo/", "curva": "curva-tes/",
-             "mercados": "mercados/", "externo": "externo/", "ciclo": "ciclo/"}
+             "mercados": "mercados/", "externo": "externo/", "ciclo": "ciclo/", "comercio": "comercio/"}
 RESPUESTAS = {}   # id de seccion -> texto de respuesta (lo usa la portada para resumir)
 
 
@@ -1437,6 +1443,13 @@ def pagina(d, s, lang, generado):
     micro = (" · ".join([t("kicker_monitor", L), "DANE", "Banco de la República", "BVC", "MinHacienda", "ColombiaMacro"]) + " · ") * 14
     RESPUESTAS["curva"] = resp_curva
 
+    from colombiamacro.sitio.ciclo_extra import construir_ciclo
+    ciclo_antes, ciclo_despues = construir_ciclo(d, s, L)
+    from colombiamacro.sitio import comercio_extra as cx
+    datos_com = cx.cargar()
+    s_com, R_com = "", None
+    if datos_com is not None:
+        s_com, RESPUESTAS["comercio"], R_com = cx.construir_comercio(datos_com, L)
     tabla = tabla_indicadores(d, s, L)
     fuentes = tabla_fuentes(d, L)
     gloss = "".join(f"<dt>{esc(k)}</dt><dd>{esc(v)}</dd>" for k, v in GLOSARIO[L])
@@ -1469,7 +1482,7 @@ def pagina(d, s, lang, generado):
 
     # --- paginas de detalle, agrupadas para el menu
     P = {
-        "ciclo": (t("nav_ciclo", L), t("pg_ciclo", L), t("pl_ciclo", L), [explorador_ciclo(d, L)], False),
+        "ciclo": (t("nav_ciclo", L), t("pg_ciclo", L), t("pl_ciclo", L), [ciclo_antes, explorador_ciclo(d, L), ciclo_despues], True),
         "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [s1], True),
         "sectores": (t("nav_sectores", L), t("pg_sectores", L), t("pl_sectores", L), [s_sec], True),
         "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [s_cap], True),
@@ -1480,12 +1493,13 @@ def pagina(d, s, lang, generado):
         "mercados": (t("nav_mercados", L), t("pg_mercados", L), t("pl_mercados", L), [s4], True),
         "empresas": (t("nav_empresas", L), t("pg_empresas", L), t("pl_empresas", L), [s_emp], True),
         "externo": (t("nav_externo", L), t("pg_externo", L), t("pl_externo", L), [s5], True),
+        "comercio": (t("nav_comercio", L), t("pg_comercio", L), t("pl_comercio", L), [s_com], True),
         "indicadores": (t("nav_datos", L), t("pg_indicadores", L), t("pl_indicadores", L), [s_ind], False),
     }
     P = {k: v for k, v in P.items() if any(v[3])}
     GRUPOS = [(t("g_actividad", L), ["ciclo", "crecimiento", "sectores", "capacidad", "empleo"]),
               (t("g_precios", L), ["inflacion", "tasas", "curva-tes"]),
-              (t("g_mercados", L), ["mercados", "empresas", "externo"])]
+              (t("g_mercados", L), ["mercados", "empresas", "externo", "comercio"])]
     GRUPOS = [(g, [x for x in sl if x in P]) for g, sl in GRUPOS]
     orden = [x for _, sl in GRUPOS for x in sl] + ["indicadores"]
 
@@ -1582,6 +1596,13 @@ def pagina(d, s, lang, generado):
                             "cambio": txt_cambio(pe - pa, "pp", L, 2) if pa == pa else "—",
                             "clase": "up" if pe - pa > 0.005 else ("down" if pe - pa < -0.005 else "flat"),
                             "ventana": t("en_12m", L), "fecha": fecha(u_["fecha"], "d", L)}
+    if R_com is not None:
+        mm = lambda v, sg=False: (f"US$ {num(v / 1000, 1, L, sg)} mil M" if L == "es" else f"US${num(v / 1000, 1, L, sg)} bn")
+        fc = fecha(R_com["fin"], "m", L)
+        sen["expo12"] = {"nombre": t("pd_expo12", L), "valor": mm(R_com["expo12"]), "cambio": num(R_com["expo_var"], 1, L, True, "%"),
+                         "clase": "up" if R_com["expo_var"] > 0 else "down", "ventana": t("anual", L), "fecha": fc}
+        sen["bal12"] = {"nombre": t("pd_bal12", L), "valor": mm(R_com["bal12"], True), "cambio": "", "clase": "flat",
+                        "ventana": "", "fecha": fc}
     if tt.get("tpm_real_exante") is not None:
         sen["tpm_real"] = {"nombre": t("tpm_real_corta", L), "valor": num(tt["tpm_real_exante"], 1, L, suf="%"),
                            "cambio": t("neutral_ref", L), "clase": "flat", "ventana": "", "fecha": ""}
@@ -1610,6 +1631,7 @@ def pagina(d, s, lang, generado):
         ("curva-tes", "curva", ["tes10", "pendiente"], None),
         ("mercados", "mercados", ["trm", "colcap"], None),
         ("externo", "externo", ["cc", "deuda"], None),
+        ("comercio", "comercio", ["expo12", "bal12"], None),
     ]
     tiles = []
     for slug, sid, claves, estado in temas:

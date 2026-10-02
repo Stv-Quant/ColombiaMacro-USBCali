@@ -262,3 +262,181 @@ def percentil(series: pd.Series, value: float, desde: str | None = "2010-01-01",
     if s.empty or pd.isna(value):
         return np.nan
     return float(100 * (s <= value).mean())
+
+
+# ============================================================ ciclo ampliado (v12.3)
+# Todo lo de esta seccion describe el presente con datos observados: no proyecta.
+
+HP_LAMBDA_MENSUAL = 129600          # Ravn y Uhlig (2002): equivalente mensual de 1.600
+COVID_MES_DESDE, COVID_MES_HASTA = "2020-03-01", "2021-06-01"
+CF_BANDA = (6, 32)                   # Baxter y King / Christiano y Fitzgerald: 1,5 a 8 anos
+BN_REZAGOS = 4
+
+
+def cf_filter(y: pd.Series, low: int = CF_BANDA[0], high: int = CF_BANDA[1]) -> pd.Series:
+    """Christiano y Fitzgerald (2003), filtro asimetrico de paso de banda para un paseo
+    aleatorio con deriva. Devuelve el componente ciclico (periodos entre low y high)."""
+    s = y.dropna()
+    x = s.to_numpy(dtype=float)
+    n = len(x)
+    x = x - (x[-1] - x[0]) / (n - 1) * np.arange(n)          # quitar la deriva
+    a, b = 2 * np.pi / high, 2 * np.pi / low
+    j = np.arange(1, n + 1)
+    Bj = np.r_[(b - a) / np.pi, (np.sin(j * b) - np.sin(j * a)) / (j * np.pi)]
+    c = np.empty(n)
+    for i in range(n):
+        # pesos de los extremos elegidos para que el filtro sume cero (elimina la raiz unitaria)
+        w_fin = -0.5 * Bj[0] - np.sum(Bj[1:-i - 2])
+        w_ini = -Bj[0] - np.sum(Bj[1:-i - 2]) - np.sum(Bj[1:i]) - w_fin
+        c[i] = (Bj[0] * x[i] + np.dot(Bj[1:-i - 2], x[i + 1:-1]) + w_fin * x[-1]
+                + np.dot(Bj[1:i], x[1:i][::-1]) + w_ini * x[0])
+    return pd.Series(c, index=s.index).reindex(y.index)
+
+
+def bn_cycle(y: pd.Series, p: int = BN_REZAGOS, estimar_con: pd.Series | None = None) -> pd.Series:
+    """Descomposicion de Beveridge y Nelson (1981) con un AR(p) para el crecimiento.
+    Ciclo = -(crecimiento esperado futuro por encima de la media). Se estima con la serie
+    depurada (estimar_con) y se evalua sobre el dato observado."""
+    base = (estimar_con if estimar_con is not None else y).dropna()
+    dy = base.diff().dropna()
+    mu = dy.mean()
+    x = (dy - mu).to_numpy()
+    X = np.column_stack([x[p - k - 1:len(x) - k - 1] for k in range(p)])
+    phi = np.linalg.lstsq(X, x[p:], rcond=None)[0]
+    F = np.zeros((p, p))
+    F[0] = phi
+    F[1:, :-1] = np.eye(p - 1)
+    A = F @ np.linalg.inv(np.eye(p) - F)
+    dyo = (y.diff() - mu).to_numpy()
+    out = np.full(len(y), np.nan)
+    for t in range(p, len(y)):
+        estado = dyo[t - p + 1:t + 1][::-1]
+        if not np.isnan(estado).any():
+            out[t] = -(A @ estado)[0]
+    return pd.Series(out, index=y.index)
+
+
+NOMBRES_METODOS = {
+    "brecha_hp_tiempo_real": ("HP en tiempo real", "Real-time HP"),
+    "brecha_hp_dos_colas": ("HP dos colas", "Two-sided HP"),
+    "brecha_hamilton": ("Hamilton (2018)", "Hamilton (2018)"),
+    "brecha_cf": ("Christiano-Fitzgerald", "Christiano-Fitzgerald"),
+    "brecha_bn": ("Beveridge-Nelson", "Beveridge-Nelson"),
+}
+
+
+def brechas_consenso(pib: pd.DataFrame, ciclo: pd.DataFrame) -> pd.DataFrame:
+    """Cinco medidas de la brecha del producto y su resumen (mediana, rango, cuantas positivas)."""
+    df = pib.sort_values("fecha").set_index("fecha")
+    y = 100 * np.log(df["pib_real_ajustado_miles_millones_ref2015"].astype(float))
+    yc = serie_sin_covid(y)
+    out = ciclo.set_index("fecha")[["brecha_hp_tiempo_real", "brecha_hp_dos_colas", "brecha_hamilton"]].copy()
+    trend_cf = yc - cf_filter(yc)
+    out["brecha_cf"] = (y - trend_cf).reindex(out.index)
+    out["brecha_bn"] = bn_cycle(y, estimar_con=yc).reindex(out.index)
+    m = out[list(NOMBRES_METODOS)]
+    out["mediana"] = m.median(axis=1)
+    out["minimo"] = m.min(axis=1)
+    out["maximo"] = m.max(axis=1)
+    out["positivos"] = (m > 0).sum(axis=1)
+    out["disponibles"] = m.notna().sum(axis=1)
+    return out.reset_index()
+
+
+def _sin_covid_mensual(s: pd.Series) -> pd.Series:
+    c = s.copy()
+    c[(c.index >= pd.Timestamp(COVID_MES_DESDE)) & (c.index <= pd.Timestamp(COVID_MES_HASTA))] = np.nan
+    return c.interpolate(method="index", limit_area="inside")
+
+
+def brecha_mensual(nivel: pd.Series, min_obs: int = 36) -> pd.Series:
+    """Brecha mensual (%): log del indice frente a su tendencia HP en tiempo real (lambda 129.600)."""
+    y = 100 * np.log(nivel.astype(float).dropna())
+    tr = hp_one_sided(_sin_covid_mensual(y), lamb=HP_LAMBDA_MENSUAL, min_obs=min_obs)
+    return y - tr
+
+
+def ciclo_mensual(ise: pd.DataFrame) -> pd.DataFrame:
+    """Brecha del ISE y fase mensual; tambien la brecha de las tres grandes ramas."""
+    s = ise.set_index("fecha").sort_index()
+    out = pd.DataFrame(index=s.index)
+    out["brecha"] = brecha_mensual(s["ise_sa"])
+    out["delta_3m"] = out["brecha"].diff(3)
+    out["fase"] = [fase(g, dl) for g, dl in zip(out["brecha"], out["delta_3m"])]
+    for rama in ("primarias", "secundarias", "terciarias"):
+        col = f"{rama}_sa"
+        if col in s:
+            out[f"brecha_{rama}"] = brecha_mensual(s[col])
+            out[f"yoy_{rama}"] = 100 * (s[col] / s[col].shift(12) - 1)
+    out["yoy"] = s.get("ise_sa_yoy")
+    out["ritmo_3m"] = s.get("ise_sa_3m3m_saar")
+    return out.reset_index()
+
+
+def brecha_sectores(sectores: pd.DataFrame) -> pd.DataFrame:
+    """Brecha de cada sector del PIB frente a su propia tendencia HP en tiempo real."""
+    niv = sectores.pivot(index="fecha", columns="sector", values="nivel").sort_index()
+    out = {}
+    for s_ in niv:
+        y = 100 * np.log(niv[s_].astype(float))
+        out[s_] = y - hp_one_sided(serie_sin_covid(y))
+    return pd.DataFrame(out)
+
+
+def difusion(brechas: pd.DataFrame) -> pd.Series:
+    """Indice de difusion: % de sectores sobre su tendencia (promedio de 2 trimestres)."""
+    pct = (brechas > 0).sum(axis=1) / brechas.notna().sum(axis=1) * 100
+    return pct.where(brechas.notna().sum(axis=1) > 0).rolling(2).mean()
+
+
+def giros_clasicos(nivel: pd.Series, ventana: int = 6) -> list[tuple[pd.Timestamp, str, float]]:
+    """Picos (P) y valles (V) del nivel, en la linea de Bry y Boschan (1971): extremos locales
+    del promedio movil de 3 meses en ventanas de +/- `ventana` meses, alternados."""
+    s = nivel.astype(float).rolling(3, center=True).mean().dropna()
+    v, idx = s.to_numpy(), s.index
+    giros = []
+    for i in range(ventana, len(v) - ventana):
+        tramo = v[i - ventana:i + ventana + 1]
+        if v[i] == tramo.max():
+            giros.append((idx[i], "P", float(v[i])))
+        elif v[i] == tramo.min():
+            giros.append((idx[i], "V", float(v[i])))
+    alt = []
+    for g in giros:
+        if alt and alt[-1][1] == g[1]:
+            if (g[1] == "P" and g[2] > alt[-1][2]) or (g[1] == "V" and g[2] < alt[-1][2]):
+                alt[-1] = g
+        else:
+            alt.append(g)
+    while alt and alt[0][1] == "V" and len(alt) > 1 and alt[1][1] == "P" and alt[0][0] < alt[1][0] and \
+            (alt[1][0].to_period("M") - alt[0][0].to_period("M")).n < 6:
+        alt.pop(0)                                             # valle espurio al inicio de la muestra
+    return alt
+
+
+def episodios(nivel: pd.Series, giros: list) -> tuple[list[dict], list[dict]]:
+    """Recesiones (pico->valle) y expansiones (valle->pico o valle->hoy) con duracion y variacion."""
+    s = nivel.astype(float).rolling(3, center=True).mean()
+    rec, exp_ = [], []
+    for a, b in zip(giros, giros[1:]):
+        meses = (b[0].to_period("M") - a[0].to_period("M")).n
+        reg = {"desde": a[0], "hasta": b[0], "meses": meses, "variacion": 100 * (b[2] / a[2] - 1), "en_curso": False}
+        (rec if a[1] == "P" else exp_).append(reg)
+    if giros and giros[-1][1] == "V":
+        a = giros[-1]
+        ult = nivel.dropna()
+        exp_.append({"desde": a[0], "hasta": ult.index[-1], "meses": (ult.index[-1].to_period("M") - a[0].to_period("M")).n,
+                     "variacion": 100 * (float(s.dropna().iloc[-1]) / a[2] - 1), "en_curso": True})
+    return rec, exp_
+
+
+def okun(brecha: pd.Series, desempleo_mensual: pd.Series) -> dict:
+    """Ley de Okun en brechas: desempleo frente a su tendencia (pp) contra brecha del producto (%).
+    Excluye 2020-2021. Devuelve la serie trimestral de ambas y la pendiente estimada."""
+    td = desempleo_mensual.astype(float).resample("QS").mean()
+    tdc = serie_sin_covid(td).dropna()
+    brecha_u = td - pd.Series(hp_trend(tdc.to_numpy()), index=tdc.index)
+    J = pd.concat([brecha.rename("brecha"), brecha_u.rename("brecha_u")], axis=1, sort=True).dropna()
+    Jn = J[(J.index < "2020-01-01") | (J.index > "2021-12-31")]
+    pend, cte = np.polyfit(Jn["brecha"], Jn["brecha_u"], 1)
+    return {"serie": J, "pendiente": float(pend), "constante": float(cte), "correlacion": float(Jn.corr().iloc[0, 1]), "n": len(Jn)}

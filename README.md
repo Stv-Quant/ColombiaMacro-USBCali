@@ -29,6 +29,7 @@ Páginas de análisis (menú agrupado):
 | Mercados y cuentas | `/mercados/` | Dólar (TRM) y COLCAP |
 | | `/empresas/` | COLCAP vs. equiponderado vs. 7 Magníficas, pesos de la canasta |
 | | `/externo/` | Cuenta corriente y deuda del Gobierno |
+| | `/comercio/` | Comercio exterior (DANE con registros de la DIAN): exportaciones e importaciones en 12 meses, balanza por año, qué vende (petróleo, carbón, café, no tradicionales), qué compra por uso (CUODE), destinos y orígenes |
 | Datos | `/indicadores/` | Indicadores, publicaciones oficiales, fuentes, descargas y glosario |
 
 Todas las páginas existen en español (`/`) e inglés (`/en/`). Cada gráfico lleva su **fuente**, un

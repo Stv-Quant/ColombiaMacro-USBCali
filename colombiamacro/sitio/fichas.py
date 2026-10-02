@@ -11,6 +11,10 @@ DANE_INF = ("DANE, GEIH – empleo informal y seguridad social", "DANE, GEIH –
 BR_TES = ("Banco de la República, curvas cero cupón de los TES (series 15272–15277)",
           "Banco de la República, TES zero-coupon curves (series 15272–15277)")
 
+DANE_EXPO = ("DANE con registros de la DIAN: exportaciones (anexos estadísticos)", "DANE with DIAN records: exports (statistical annexes)")
+DANE_IMPO = ("DANE con registros de la DIAN: importaciones (anexos estadísticos)", "DANE with DIAN records: imports (statistical annexes)")
+DANE_EXPO_IMPO = ("DANE con registros de la DIAN: exportaciones e importaciones", "DANE with DIAN records: exports and imports")
+
 FICHAS = {
     "g-crec": (("DANE: PIB trimestral e Indicador de Seguimiento a la Economía (ISE)",
                 "DANE: quarterly GDP and Economic Tracking Indicator (ISE)"),
@@ -151,6 +155,83 @@ FICHAS = {
                     ("Variación anual mensual de cada grupo. Regulados: servicios públicos, combustibles, transporte y educación con "
                      "precio fijado por el Estado.", "Monthly annual change of each group. Regulated: utilities, fuel, transport and "
                      "education with state-set prices.")),
+    "g-consenso": (("DANE, PIB real desestacionalizado; cálculo propio", "DANE, seasonally adjusted real GDP; own calculation"),
+                   ("Cinco brechas del producto (log del PIB menos su tendencia): HP en tiempo real (λ = 1.600, solo datos hasta cada trimestre); "
+                    "HP de dos colas; Hamilton (2018), error de proyección a 8 trimestres con 4 rezagos; Christiano y Fitzgerald (2003), filtro de "
+                    "banda de 6 a 32 trimestres; Beveridge y Nelson (1981) con un AR(4) del crecimiento. La tendencia se estima sin 2020T2–2021T2. "
+                    "La mediana es el consenso; el rango mide la incertidumbre.",
+                    "Five output gaps (log GDP minus trend): real-time HP (λ = 1,600, data up to each quarter only); two-sided HP; Hamilton (2018), "
+                    "8-quarter-ahead projection error with 4 lags; Christiano-Fitzgerald (2003) band-pass of 6 to 32 quarters; Beveridge-Nelson (1981) "
+                    "with an AR(4) of growth. Trend estimated excluding 2020Q2–2021Q2. The median is the consensus; the range measures uncertainty.")),
+    "g-ciclo-mensual": (("DANE, Indicador de Seguimiento a la Economía (ISE), serie desestacionalizada", "DANE, Economic Tracking Indicator (ISE), seasonally adjusted"),
+                        ("Brecha = 100 × (log ISE − tendencia HP en tiempo real, λ = 129.600 de Ravn y Uhlig). La tendencia excluye mar-2020 a jun-2021. "
+                         "Fase: signo de la brecha y su cambio en 3 meses (reloj del ciclo de la OCDE).",
+                         "Gap = 100 × (log ISE − real-time HP trend, λ = 129,600 per Ravn-Uhlig). Trend excludes Mar-2020 to Jun-2021. "
+                         "Phase: sign of the gap and its 3-month change (OECD cycle clock).")),
+    "g-motores": (("DANE, ISE por grandes ramas, series desestacionalizadas", "DANE, ISE by broad branch, seasonally adjusted"),
+                  ("Misma brecha mensual del ISE, calculada para actividades primarias, secundarias y terciarias por separado.",
+                   "Same monthly ISE gap, computed separately for primary, secondary and tertiary activities.")),
+    "g-aportes": ((DANE_PIB[0], DANE_PIB[1]),
+                  ("Aporte = crecimiento anual real del sector × su peso en el PIB del mismo trimestre del año anterior (precios constantes). "
+                   "La suma de los aportes es el crecimiento del PIB a precios básicos.",
+                   "Contribution = sector's real annual growth × its GDP share in the same quarter a year earlier (constant prices). "
+                   "Contributions add up to GDP growth at basic prices.")),
+    "g-amplitud": ((DANE_PIB[0], DANE_PIB[1]),
+                   ("Para cada uno de los 12 sectores: 100 × (log del valor agregado real − tendencia HP en tiempo real, λ = 1.600, sin 2020T2–2021T2). "
+                    "Es un índice de difusión al estilo de los de la Reserva Federal de Filadelfia.",
+                    "For each of the 12 sectors: 100 × (log real value added − real-time HP trend, λ = 1,600, excluding 2020Q2–2021Q2). "
+                    "A diffusion index in the style of the Philadelphia Fed.")),
+    "g-ritmo": (("DANE, ISE desestacionalizado", "DANE, seasonally adjusted ISE"),
+                ("Anual: variación frente al mismo mes del año anterior. Últimos 3 meses: (promedio de los 3 últimos / promedio de los 3 anteriores)^4 − 1. "
+                 "Ambas se recortan en −15% y 25% para que 2020 no aplaste la escala.",
+                 "Annual: change versus the same month a year earlier. Last 3 months: (average of last 3 / previous 3)^4 − 1. "
+                 "Both capped at −15% and 25% so 2020 does not flatten the scale.")),
+    "g-expansiones": (("DANE, ISE desestacionalizado; cálculo propio", "DANE, seasonally adjusted ISE; own calculation"),
+                      ("Picos y valles: máximos y mínimos locales del promedio móvil de 3 meses en ventanas de ±6 meses, alternados (Bry y Boschan, 1971; "
+                       "Harding y Pagan, 2002). Variación: cambio del ISE entre el inicio y el fin de cada fase. Es un fechado académico, no oficial.",
+                       "Peaks and troughs: local maxima and minima of the 3-month moving average in ±6-month windows, alternating (Bry-Boschan, 1971; "
+                       "Harding-Pagan, 2002). Change: ISE change between start and end of each phase. An academic dating, not an official one.")),
+    "g-empleo-ciclo": ((DANE_GEIH[0], DANE_GEIH[1]),
+                       ("Diferencia en puntos porcentuales entre el promedio de 3 meses de cada tasa (desestacionalizada) y el mismo promedio 12 meses antes.",
+                        "Percentage-point difference between the 3-month average of each (seasonally adjusted) rate and the same average 12 months earlier.")),
+    "g-okun": (("DANE: PIB real y GEIH; cálculo propio", "DANE: real GDP and GEIH; own calculation"),
+               ("Okun (1962) en brechas: (desempleo − tendencia HP) = β × brecha del producto (HP dos colas). Se estima por MCO con 2009–2025 sin 2020–2021. "
+                "Una β cercana a cero indica que el empleo responde poco a la producción.",
+                "Okun (1962) in gaps: (unemployment − HP trend) = β × output gap (two-sided HP). OLS over 2009–2025 excluding 2020–2021. "
+                "A β close to zero means employment responds little to output.")),
+    # --- comercio exterior (DANE con registros administrativos de la DIAN)
+    "g-comercio-flujos": (DANE_EXPO_IMPO,
+                          ("Exportaciones FOB (valor en el puerto colombiano) e importaciones CIF (incluyen seguro y flete), en dólares corrientes. "
+                           "Cada punto es la suma móvil de 12 meses, que elimina la estacionalidad sin modelos. Las cifras del último año son provisionales.",
+                           "Exports FOB (value at the Colombian port) and imports CIF (including insurance and freight), in current dollars. "
+                           "Each point is a 12-month moving sum, which removes seasonality without models. Latest-year figures are provisional.")),
+    "g-balanza": (DANE_EXPO_IMPO,
+                  ("Balanza = exportaciones FOB − importaciones CIF de cada año calendario (sumas mensuales del DANE). Como las importaciones incluyen "
+                   "flete y seguro, este saldo es algo más negativo que el de la balanza de pagos del Banco de la República (que usa FOB en ambos lados).",
+                   "Balance = FOB exports − CIF imports for each calendar year (DANE monthly sums). Because imports include freight and insurance, "
+                   "this balance is somewhat more negative than the Banco de la República balance-of-payments figure (FOB on both sides).")),
+    "g-expo-productos": (DANE_EXPO,
+                         ("Suma de los últimos 12 meses por grupo del DANE: café, carbón, petróleo y derivados, ferroníquel (tradicionales) y no tradicionales. "
+                          "Variación: frente a los 12 meses anteriores, en dólares.",
+                          "Sum of the last 12 months by DANE group: coffee, coal, oil and derivatives, ferronickel (traditional) and non-traditional. "
+                          "Change: versus the previous 12 months, in dollars.")),
+    "g-expo-minero": (DANE_EXPO,
+                      ("(Petróleo y derivados + carbón) / exportaciones totales, con sumas móviles de 12 meses. Depende de precios internacionales y volúmenes.",
+                       "(Oil and derivatives + coal) / total exports, using 12-month moving sums. Driven by international prices and volumes.")),
+    "g-impo-uso": (DANE_IMPO,
+                   ("Cuadro A13 del anexo de importaciones: clasificación CUODE (uso o destino económico), valor CIF del periodo enero–último mes "
+                    "frente al mismo periodo del año anterior. Entre paréntesis: participación en el total del periodo.",
+                    "Table A13 of the imports annex: CUODE classification (economic use), CIF value for January–latest month versus the same period "
+                    "a year earlier. In brackets: share of the period total.")),
+    "g-impo-estructura": (DANE_IMPO,
+                          ("Participación de los tres grandes grupos CUODE en el valor CIF anual (sin «no clasificados»). El año en curso (*) es acumulado a la fecha.",
+                           "Share of the three main CUODE groups in annual CIF value (excluding 'not classified'). The current year (*) is year-to-date.")),
+    "g-destinos": (DANE_EXPO,
+                   ("Anexo de exportaciones por principales destinos (valor FOB). Participación de la suma de 12 meses; «Resto» incluye los demás países.",
+                    "Exports annex by main destination (FOB value). Share of the 12-month sum; 'Rest' includes the remaining countries.")),
+    "g-origenes": (DANE_IMPO,
+                   ("Anexo de importaciones por principales países de origen (valor CIF). Participación de la suma de 12 meses sobre las importaciones totales publicadas.",
+                    "Imports annex by main country of origin (CIF value). Share of the 12-month sum over total published imports.")),
 }
 
 
