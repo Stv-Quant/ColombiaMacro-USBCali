@@ -9,36 +9,38 @@ Proyecto académico · Universidad de San Buenaventura Cali.
 
 ## Qué muestra
 
-| # | Pregunta | Gráficos principales |
-|---|----------|----------------------|
-| ◷ | ¿En qué parte del ciclo está la economía? | **Reloj del ciclo interactivo** (fase, nivel y dirección; recorrido por trimestre desde 2014) |
-| 1 | ¿Está creciendo la economía? | PIB trimestral e ISE mensual y **crecimiento real por año** (con el año en curso como últimos 12 meses) |
-| 2 | ¿Qué sectores impulsan la economía? | Crecimiento de los 12 sectores del PIB (cualquier trimestre desde 2010 vs. un año antes) y mapa de calor (clic = ver ese trimestre) |
-| 3 | ¿Produce por encima o por debajo de su capacidad? | **Producción frente a su capacidad** (frontera de producción en el tiempo) |
-| 4 | ¿Cómo está el empleo y cuánto es informal? | Desempleo, informalidad nacional y 13 ciudades, por sector y por cada una de las 23 ciudades |
-| 5 | ¿Qué pasa con los precios? | Inflación vs. meta 2–4 %, inflación esperada y **trayectoria que descuenta el mercado para los próximos 10 años** (1 año, años 1–5 y 5y5y) |
-| 6 | ¿Qué hace el Banco de la República? | Tasa de política vs. inflación |
-| 7 | ¿Cuánto cobra el mercado por prestarle al Gobierno? | **Curva cero cupón TES** interactiva (cualquier día desde 2003, comparación por años) |
-| 8 | ¿Cómo están el dólar y la bolsa? | TRM, COLCAP |
-| 9 | ¿Qué empresas mueven la bolsa? | COLCAP vs. equiponderado vs. **7 Magníficas** (base 100), pesos de la canasta, tabla de las 7 |
-| 10 | ¿Cómo están las cuentas externas y fiscales? | Cuenta corriente, deuda del Gobierno |
-| 11 | Todos los indicadores | Último dato, cambio y nivel frente a su historia |
-| — | Nota: últimas publicaciones oficiales | Último dato de DANE, BanRep y BVC en una línea, con enlace oficial (discreta, al final) |
-| 12 | Fuentes | Estado de cada fuente, descargas CSV, metodología |
+**Portada: lectura en un vistazo, sin gráficos.** La respuesta en tres frases y la fase del ciclo;
+seis cifras clave con su tendencia; ocho temas en una frase con sus dos cifras (cada uno abre su
+página de análisis); los 16 indicadores con su nivel histórico; el estado de las fuentes con las
+**descargas CSV**; y las últimas publicaciones oficiales.
 
-Cada gráfico lleva al pie su **fuente** y un **?** que muestra la metodología, y un botón **⤢** que lo amplía sobre la página sin moverla. Muestra arriba el **último dato y su cambio** (frente a hace un año, al trimestre
-o al mes anterior), abajo un **panel de barras con ese cambio a lo largo del tiempo**, y el
-recuadro flotante indica el cambio de cada punto. Las escalas se ajustan al periodo visible
-(2020 incluido). Los métodos técnicos
-(brecha del producto HP/Hamilton, reloj del ciclo, tasa real, 5y5y) están en los paneles
-"Detalle técnico", siempre explicados.
+Páginas de análisis (menú agrupado):
 
-**Interfaz (v12, terminal de vidrio).** Tema oscuro tipo terminal financiera por defecto y tema
-claro con un botón (☀/☾, se recuerda en el navegador). Fondo con rejilla, luces de color y las
-**velas mensuales reales del COLCAP** y la tasa TES a 10 años (muy tenues). Debajo del menú corre
-una **cinta de cotizaciones** con los 16 indicadores y su cambio; las tarjetas muestran una
-mini-serie de tendencia; cada sección abre con **"Lo clave"**: la respuesta en puntos, con las cifras
-resaltadas. Se respeta `prefers-reduced-motion` (sin animaciones) y funciona desde 375 px de ancho.
+| Grupo | Página | Contenido |
+|-------|--------|-----------|
+| Actividad | `/ciclo/` | Reloj del ciclo interactivo y recorrido trimestral desde 2014 |
+| | `/crecimiento/` | PIB trimestral, ISE mensual y crecimiento real por año |
+| | `/sectores/` | Los 12 sectores del PIB en cualquier trimestre desde 2010 y mapa de calor |
+| | `/capacidad/` | Producción frente a su capacidad (brecha del producto) |
+| | `/empleo/` | Desempleo e informalidad nacional, por sector y por ciudad |
+| Precios y tasas | `/inflacion/` | Inflación vs. meta, qué precios suben más, inflación esperada y trayectoria a 10 años |
+| | `/tasas/` | Tasa del Banco de la República y tasa real |
+| | `/curva-tes/` | Curva cero cupón TES interactiva desde 2003 |
+| Mercados y cuentas | `/mercados/` | Dólar (TRM) y COLCAP |
+| | `/empresas/` | COLCAP vs. equiponderado vs. 7 Magníficas, pesos de la canasta |
+| | `/externo/` | Cuenta corriente y deuda del Gobierno |
+| Datos | `/indicadores/` | Indicadores, publicaciones oficiales, fuentes, descargas y glosario |
+
+Todas las páginas existen en español (`/`) e inglés (`/en/`). Cada gráfico lleva su **fuente**, un
+**?** con la metodología y un botón **⤢** para ampliarlo.
+
+Proyecto académico de la Universidad de San Buenaventura Cali, con el apoyo de **FinancialTools.io**
+en el Laboratorio de Trading.
+
+**Interfaz.** Tema claro "Andes" por defecto (papel, curvas de nivel, Source Serif 4 + Inter Tight) y
+tema oscuro "Banco central" (azul tinta, latón, grabado tipo billete, Newsreader + IBM Plex) con el
+botón ☀/☾. Paneles de vidrio esmerilado; fuentes servidas desde el propio sitio (sin Google Fonts).
+Respeta `prefers-reduced-motion` y funciona desde 375 px de ancho.
 
 ## Estructura
 

@@ -5,27 +5,35 @@
   // ---------------------------------------------------------------- tema oscuro / claro para los graficos
   // Los graficos se definen con la paleta clara; en tema oscuro cada color conocido se cambia por su par.
   // El fondo de todos los graficos es transparente: se ve el vidrio de la tarjeta.
-  var PARES = [
-    ['#0b0b0b', '#eaf0f8'], ['#52514e', '#b7c3d4'], ['#7a7974', '#8796ab'], ['#a3a19b', '#6f7d92'], ['#6b6a66', '#9aa7ba'],
-    ['#dcdad4', 'rgba(148,170,205,0.26)'], ['#eeede8', 'rgba(148,170,205,0.10)'], ['#b9b7b0', 'rgba(148,170,205,0.45)'],
-    ['#c9c7c0', 'rgba(148,170,205,0.34)'], ['#fff', '#0c1527'], ['#ffffff', '#0c1527'], ['#f7f6f2', '#17233a'],
-    ['#f3c9b3', '#7a3a1c'], ['#bfd7f3', '#1d4475'], ['#9ec5f0', '#2c5d9c'], ['#5b9be3', '#4f8fe0'],
-    ['#2a78d6', '#5aa6ff'], ['#1f4f8f', '#9cc8ff'], ['#4a3aa7', '#a397ff'], ['#1a7f4b', '#3fdc9a'], ['#b7791f', '#ffbd4a'],
-    ['#c0392b', '#ff7070'], ['#2b6cb0', '#7cc0ff'], ['#b3261e', '#ff6b6b'], ['#b04a17', '#ff9a5c'], ['#127a55', '#36d39a'],
-    ['#8a6d3b', '#d6b27a'], ['rgba(11,11,11,0.07)', 'rgba(255,255,255,0.08)'], ['rgba(82,81,78,0.13)', 'rgba(183,195,212,0.14)']
+  // [color de origen (Python), tema claro "Andes", tema oscuro "Banco central"]
+  var ROLES = [
+    ['#0b0b0b', '#14161a', '#eef0f3'], ['#52514e', '#3d424a', '#b9c0cc'], ['#7a7974', '#62676f', '#8a93a3'], ['#a3a19b', '#9a9da3', '#6f7d92'],
+    ['#6b6a66', '#55595f', '#9aa7ba'], ['#dcdad4', 'rgba(20,22,26,0.18)', 'rgba(207,179,122,0.28)'], ['#eeede8', 'rgba(20,22,26,0.07)', 'rgba(238,240,243,0.07)'],
+    ['#b9b7b0', 'rgba(20,22,26,0.32)', 'rgba(238,240,243,0.32)'], ['#c9c7c0', 'rgba(20,22,26,0.24)', 'rgba(238,240,243,0.24)'],
+    ['#fff', '#f3f0e8', '#0c1527'], ['#ffffff', '#faf8f3', '#0d1830'], ['#f7f6f2', '#efebe1', '#17233a'],
+    ['#f3c9b3', '#e8c3ad', '#6e3a22'], ['#bfd7f3', '#c3d3e3', '#1d3f6b'], ['#9ec5f0', '#9db8d3', '#3a5f8f'], ['#5b9be3', '#4d7aa6', '#6f9ccf'],
+    ['#2a78d6', '#1f4e79', '#9fc3ef'], ['#eb6834', '#b5501a', '#e8a07a'], ['#1baf7a', '#0d5a43', '#8fd1b0'], ['#eda100', '#a77300', '#e7c27a'],
+    ['#4a3aa7', '#5b4b8a', '#b4a6f0'], ['#1f4f8f', '#14365a', '#cfe0f5'], ['#1a7f4b', '#0f6a4c', '#7fcaa3'], ['#b7791f', '#8a5a00', '#e2b968'],
+    ['#c0392b', '#a3341f', '#f0a48a'], ['#2b6cb0', '#244f7d', '#a8c8ee'], ['#b3261e', '#9b2c1a', '#ee9a86'], ['#b04a17', '#943f14', '#f2b08f'],
+    ['#127a55', '#0b5a42', '#9ad8b8'], ['#8a6d3b', '#7a5f30', '#d6b27a'], ['#d6457a', '#9e3a5f', '#e897b5'], ['#0f8fa3', '#1f6c78', '#7cc6d2'],
+    ['rgba(11,11,11,0.07)', 'rgba(20,22,26,0.06)', 'rgba(255,255,255,0.07)'], ['rgba(82,81,78,0.13)', 'rgba(20,22,26,0.1)', 'rgba(183,195,212,0.14)'],
+    ['rgba(27,175,122,0.12)', 'rgba(13,90,67,0.10)', 'rgba(143,209,176,0.10)'],
+    ['rgba(42,120,214,0.62)', 'rgba(31,78,121,0.6)', 'rgba(159,195,239,0.6)'], ['rgba(235,104,52,0.68)', 'rgba(181,80,26,0.62)', 'rgba(232,160,122,0.62)']
   ];
+  var FUENTE = { light: '"InterTight", "Segoe UI", system-ui, sans-serif', dark: '"Plex", "Segoe UI", system-ui, sans-serif' };
   function nrm(c) { return String(c).replace(/\s+/g, '').toLowerCase(); }
-  var A_OSCURO = {}, A_CLARO = {};
-  PARES.forEach(function (p) { A_OSCURO[nrm(p[0])] = p[1]; if (!(nrm(p[1]) in A_CLARO)) A_CLARO[nrm(p[1])] = p[0]; });
-  function tema() { return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+  var ROL = {};
+  ROLES.forEach(function (r, i) { r.forEach(function (v) { if (!(nrm(v) in ROL)) ROL[nrm(v)] = i; }); });
+  function tema() { return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; }
   function esColor(v) { return typeof v === 'string' && (v.charAt(0) === '#' || v.slice(0, 3) === 'rgb'); }
-  function convertir(o, mapa, prof) {
+  function cambiar(v, col) { var i = ROL[nrm(v)]; return i === undefined ? v : ROLES[i][col]; }
+  function convertir(o, col, prof) {
     if (!o || typeof o !== 'object' || prof > 9 || ArrayBuffer.isView(o)) return o;
     if (Array.isArray(o)) {
       if (o.length > 40 && !esColor(o[0]) && !(o[0] && typeof o[0] === 'object')) return o;   // series de datos
       for (var i = 0; i < o.length; i++) {
         var v = o[i];
-        if (esColor(v)) { var r = mapa[nrm(v)]; if (r) o[i] = r; } else if (v && typeof v === 'object') convertir(v, mapa, prof + 1);
+        if (esColor(v)) o[i] = cambiar(v, col); else if (v && typeof v === 'object') convertir(v, col, prof + 1);
       }
       return o;
     }
@@ -33,11 +41,12 @@
       if (!Object.prototype.hasOwnProperty.call(o, k) || k.charAt(0) === '_') continue;
       var w = o[k];
       if (k === 'paper_bgcolor' || k === 'plot_bgcolor') { o[k] = 'rgba(0,0,0,0)'; continue; }
-      if (esColor(w)) { var rr = mapa[nrm(w)]; if (rr) o[k] = rr; } else if (w && typeof w === 'object') convertir(w, mapa, prof + 1);
+      if (k === 'family' && typeof w === 'string') { o[k] = FUENTE[col === 2 ? 'dark' : 'light']; continue; }
+      if (esColor(w)) o[k] = cambiar(w, col); else if (w && typeof w === 'object') convertir(w, col, prof + 1);
     }
     return o;
   }
-  function tematizar(obj) { return convertir(obj, tema() === 'dark' ? A_OSCURO : A_CLARO, 0); }
+  function tematizar(obj) { return convertir(obj, tema() === 'dark' ? 2 : 1, 0); }
   if (window.Plotly) {
     ['newPlot', 'react'].forEach(function (fn) {
       var orig = Plotly[fn];
@@ -480,34 +489,42 @@
   function cabecera() {
     var top = document.querySelector('.top'), btn = document.getElementById('menu-toggle');
     if (!top) return;
-    var ultimo = window.scrollY, movil = function () { return window.matchMedia('(max-width:980px)').matches; };
+    var ultimo = window.scrollY, movil = function () { return window.matchMedia('(max-width:1100px)').matches; };
     window.addEventListener('scroll', function () {
       var y = window.scrollY, bajando = y > ultimo + 4, subiendo = y < ultimo - 4;
       if (bajando && y > 120) { top.classList.add('oculta'); document.body.classList.add('top-oculta'); document.body.classList.remove('menu-abierto'); if (btn && movil()) btn.classList.remove('abierto'); }
       else if (subiendo || y < 60) { top.classList.remove('oculta'); document.body.classList.remove('top-oculta'); }
       if (bajando || subiendo) ultimo = y;
     }, { passive: true });
+    // grupos del menu: clic abre/cierra (en escritorio tambien abren al pasar el cursor)
+    var grupos = Array.prototype.slice.call(document.querySelectorAll('.grp'));
+    function cerrarGrupos(salvo) {
+      grupos.forEach(function (g) { if (g !== salvo) { g.classList.remove('abierto'); g.querySelector('.grp-b').setAttribute('aria-expanded', 'false'); } });
+    }
+    grupos.forEach(function (g) {
+      var b = g.querySelector('.grp-b');
+      b.addEventListener('click', function (ev) {
+        if (document.body.classList.contains('menu-abierto')) return;   // en el menu movil los grupos van desplegados
+        ev.stopPropagation();
+        var abre = !g.classList.contains('abierto');
+        cerrarGrupos(g); g.classList.toggle('abierto', abre); b.setAttribute('aria-expanded', abre ? 'true' : 'false');
+      });
+    });
+    document.addEventListener('click', function (ev) { if (!ev.target.closest('.grp')) cerrarGrupos(null); });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrarGrupos(null); });
     if (!btn) return;
     var txt = btn.querySelector('.mt-txt');
     function pintar() {
-      var visible = movil() ? document.body.classList.contains('menu-abierto') : !document.body.classList.contains('sin-menu');
+      var visible = document.body.classList.contains('menu-abierto');
       btn.setAttribute('aria-expanded', visible ? 'true' : 'false');
       btn.classList.toggle('abierto', visible);
       if (txt) txt.textContent = visible ? btn.dataset.ocultar : btn.dataset.mostrar;
     }
-    var guardado = null;
-    try { guardado = localStorage.getItem('cm-sin-menu'); } catch (e) {}
-    if (guardado === '1') document.body.classList.add('sin-menu');
-    btn.addEventListener('click', function () {
-      if (movil()) { document.body.classList.toggle('menu-abierto'); pintar(); return; }
-      var oculto = document.body.classList.toggle('sin-menu');
-      try { localStorage.setItem('cm-sin-menu', oculto ? '1' : '0'); } catch (e) {}
-      pintar();
-    });
+    btn.addEventListener('click', function () { cerrarGrupos(null); document.body.classList.toggle('menu-abierto'); pintar(); });
     document.querySelectorAll('.menu a').forEach(function (a) {
       a.addEventListener('click', function () { document.body.classList.remove('menu-abierto'); pintar(); });
     });
-    window.addEventListener('resize', pintar);
+    window.addEventListener('resize', function () { if (!movil()) document.body.classList.remove('menu-abierto'); pintar(); });
     pintar();
   }
 

@@ -141,13 +141,17 @@ class TestFichas(unittest.TestCase):
         from colombiamacro.sitio.fichas import FICHAS
         with tempfile.TemporaryDirectory() as tmp:
             out = cs.construir(Path(tmp) / "site")
-            for pag in (out / "index.html", out / "en" / "index.html"):
+            paginas = [p for p in out.rglob("index.html")]
+            self.assertGreaterEqual(len(paginas), 26)
+            for pag in paginas:
                 html_ = pag.read_text(encoding="utf-8")
                 ids = set(re.findall(r'class="plot" id="(g-[^"]+)"', html_))
                 faltan = [i for i in ids if i not in FICHAS and i != "g-inf-ciudad"]
-                self.assertEqual(faltan, [])
+                self.assertEqual(faltan, [], pag)
                 self.assertGreaterEqual(html_.count('class="ficha"'), len(ids) - 1)
                 self.assertIn('id="menu-toggle"', html_)
+            for raiz in (out, out / "en"):
+                html_ = (raiz / "indicadores" / "index.html").read_text(encoding="utf-8")
                 self.assertLess(html_.index('id="noticias"'), html_.index('id="fuentes"'))
                 self.assertGreater(html_.index('id="noticias"'), html_.index('id="indicadores"'))
 

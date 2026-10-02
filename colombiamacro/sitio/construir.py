@@ -38,6 +38,20 @@ BAND = "rgba(27,175,122,0.12)"
 FONT = "Inter, 'Segoe UI', system-ui, -apple-system, sans-serif"
 MESES = {"es": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
          "en": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
+DESCRIPCION_CSV = {
+    "pib_colombia.csv": ("PIB trimestral real y nominal", "Quarterly real and nominal GDP"),
+    "pib_sectores.csv": ("PIB por sectores (12 ramas)", "GDP by sector (12 branches)"),
+    "informalidad.csv": ("Informalidad laboral", "Labour informality"),
+    "informalidad_ramas.csv": ("Informalidad por sector", "Informality by sector"),
+    "informalidad_ciudades.csv": ("Informalidad por ciudad", "Informality by city"),
+    "inflacion_clean.csv": ("Inflación (IPC) mensual", "Monthly inflation (CPI)"),
+    "tasas_interes_clean.csv": ("Tasas TES, inflación esperada y tasa del Banco", "TES yields, expected inflation and policy rate"),
+    "colcap_oficial.csv": ("COLCAP diario", "Daily COLCAP"),
+    "series_banrep.csv": ("Series del Banco de la República", "Banco de la República series"),
+    "ise_mensual.csv": ("Actividad económica mensual (ISE)", "Monthly economic activity (ISE)"),
+    "mercado_laboral.csv": ("Mercado laboral (GEIH)", "Labour market (GEIH)"),
+    "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
+}
 DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "estado_fuentes.csv"]
 
@@ -83,9 +97,6 @@ def _serie_limpia(x, y, desde=None, regla=None):
     return s_
 
 
-_SPARK_N = [0]
-
-
 def sparkline(s_, ancho=160, alto=40):
     """Mini serie en SVG (sin ejes) para las tarjetas: tendencia de un vistazo."""
     if s_ is None or len(s_) < 3:
@@ -95,13 +106,9 @@ def sparkline(s_, ancho=160, alto=40):
     rng = (hi - lo) or 1.0
     pts = [(i / (len(v) - 1) * ancho, alto - 3 - (val - lo) / rng * (alto - 8)) for i, val in enumerate(v)]
     linea_ = "M" + " L".join(f"{a:.1f},{b:.1f}" for a, b in pts)
-    area = linea_ + f" L{ancho},{alto} L0,{alto} Z"
     ux, uy = pts[-1]
-    _SPARK_N[0] += 1
-    gid = f"sg{_SPARK_N[0]}"
     return (f'<svg class="spark" viewBox="0 0 {ancho} {alto}" preserveAspectRatio="none" aria-hidden="true">'
-            f'<defs><linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="spark-s0"/><stop offset="1" class="spark-s1"/></linearGradient></defs>'
-            f'<path class="spark-a" d="{area}" fill="url(#{gid})"/><path class="spark-l" d="{linea_}" vector-effect="non-scaling-stroke"/>'
+            f'<path class="spark-l" d="{linea_}" vector-effect="non-scaling-stroke"/>'
             f'<line class="spark-u" x1="{ux:.1f}" x2="{ux:.1f}" y1="{uy:.1f}" y2="{uy:.1f}" vector-effect="non-scaling-stroke"/></svg>')
 
 
@@ -124,92 +131,6 @@ def respuesta_html(txt, lang, rid=None):
     idattr = f' id="{rid}"' if rid else ""
     return (f'<div class="answer"{idattr}><span class="ans-k">{t("lo_clave", lang)}</span>'
             f'<ul class="ans-list">{items}</ul></div>')
-
-
-TICKERS = {  # nombre en ingles de tabla_senales -> (codigo es, codigo en)
-    "Economic growth (real GDP, y/y)": ("PIB a/a", "GDP y/y"),
-    "Output vs capacity (output gap)": ("BRECHA", "OUTPUT GAP"),
-    "Monthly economic activity (ISE, y/y)": ("ISE a/a", "ISE y/y"),
-    "Unemployment rate": ("DESEMPLEO", "UNEMPL."),
-    "Inflation, y/y": ("IPC a/a", "CPI y/y"),
-    "Underlying inflation (ex food & regulated)": ("IPC BÁSICA", "CORE CPI"),
-    "Market-expected inflation (next year)": ("BEI 1A", "BEI 1Y"),
-    "Market-expected inflation (long term)": ("BEI 5A5A", "BEI 5Y5Y"),
-    "Banco de la República policy rate": ("TPM", "POLICY RATE"),
-    "Real interest rate (net of expected inflation)": ("TPM REAL", "REAL RATE"),
-    "10-year government bonds (TES)": ("TES 10A", "TES 10Y"),
-    "US dollar (TRM, pesos per USD)": ("USD/COP", "USD/COP"),
-    "Real exchange rate (2010 = 100)": ("ITCR", "REER"),
-    "Colombian stock index (COLCAP)": ("COLCAP", "COLCAP"),
-    "Current account": ("CTA. CTE.", "CURR. ACCT."),
-    "Central government gross debt": ("DEUDA GNC", "GOV. DEBT"),
-}
-
-
-def cinta(d, s, L):
-    """Cinta de cotizaciones tipo terminal: cada indicador con su ultimo dato y su cambio."""
-    try:
-        df = mt.tabla_senales(d, s, "en")
-    except Exception:
-        return ""
-    items = []
-    for _, r in df.iterrows():
-        cod = TICKERS.get(r["indicador"])
-        if not cod:
-            continue
-        cod = cod[0 if L == "es" else 1]
-        uni = str(r["unidad"])
-        val = num(r["valor"], r["dec"], L) + ("%" if uni == "%" else (" pts" if uni == "pts" else ("% PIB" if uni.startswith("%") and L == "es" else ("% GDP" if uni.startswith("%") else ""))))
-        ch = r["cambio"]
-        if ch is None or pd.isna(ch):
-            chtxt, cl, fl = "", "flat", ""
-        else:
-            cl = "up" if ch > 0.005 else ("down" if ch < -0.005 else "flat")
-            fl = "▲" if cl == "up" else ("▼" if cl == "down" else "■")
-            chtxt = num(ch, 1, L, True, "%") if r["relativo"] else num(ch, 2 if r["dec"] >= 2 else 1, L, True, " pp")
-        ventana = ("3m" if r["ventana"] == 91 else "12m")
-        items.append(f'<span class="tk"><b class="tk-c">{esc(cod)}</b><span class="tk-v">{val}</span>'
-                     f'<span class="tk-d {cl}">{fl} {chtxt}</span><small>{ventana}</small></span>')
-    if not items:
-        return ""
-    fila = "".join(items)
-    return (f'<div class="tape" role="region" aria-label="{t("cinta", L)}"><div class="tape-track">'
-            f'<div class="tape-row">{fila}</div><div class="tape-row" aria-hidden="true">{fila}</div></div></div>')
-
-
-def fondo_svg(d):
-    """Fondo de la pagina: velas mensuales reales del COLCAP y la tasa TES a 10 anos, muy tenues."""
-    try:
-        c = d.colcap.dropna(subset=["colcap_puntos"]).set_index("fecha")["colcap_puntos"].sort_index()
-        c = c[c.index >= c.index[-1] - pd.DateOffset(years=12)]
-        o = c.resample("ME").agg(["first", "max", "min", "last"]).dropna()
-    except Exception:
-        return ""
-    if len(o) < 12:
-        return ""
-    W, H = 1600, 900
-    lo, hi = o["min"].min(), o["max"].max()
-    y = lambda v: H * 0.88 - (v - lo) / (hi - lo) * H * 0.55
-    paso = W / len(o)
-    velas = []
-    for k, r in enumerate(o.itertuples()):
-        x = k * paso + paso / 2
-        sube = r.last >= r.first
-        top, bot = y(max(r.first, r.last)), y(min(r.first, r.last))
-        velas.append(f'<g class="{"cu" if sube else "cd"}"><line x1="{x:.1f}" x2="{x:.1f}" y1="{y(r.max):.1f}" y2="{y(r.min):.1f}"/>'
-                     f'<rect x="{x - paso * 0.32:.1f}" y="{top:.1f}" width="{paso * 0.64:.1f}" height="{max(bot - top, 1):.1f}"/></g>')
-    linea_ = ""
-    try:
-        tt = d.tasas.dropna(subset=["tes_pesos_10y"]).set_index("fecha")["tes_pesos_10y"].sort_index()
-        tt = tt[tt.index >= o.index[0]].resample("W").last().dropna()
-        tl, th = tt.min(), tt.max()
-        x0, x1 = tt.index[0].value, tt.index[-1].value
-        pts = " ".join(f"{(ix.value - x0) / (x1 - x0) * W:.1f},{H * 0.42 - (v - tl) / (th - tl) * H * 0.3:.1f}" for ix, v in tt.items())
-        linea_ = f'<polyline class="bg-tes" points="{pts}"/>'
-    except Exception:
-        pass
-    return (f'<svg class="bg-chart" viewBox="0 0 {W} {H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
-            f'{"".join(velas)}{linea_}</svg>')
 
 
 # ------------------------------------------------------------------ graficos
@@ -414,6 +335,49 @@ class Graficos:
             items.append((t("inf_mes", L), x, inf["inflacion_mensual"], "pp", "a", "m", 2, "%"))
         fig.update_xaxes(range=rango_inicial(inf["fecha"].max()))
         return fig, {"franja": franja(L, items)}
+
+    def componentes_barras(self):
+        """Inflacion anual por grupo de precios: ultimo dato y hace un ano (raya)."""
+        L, inf = self.lang, self.d.inflacion
+        grupos = [("inflacion_alimentos", t("cp_alim", L)), ("inflacion_regulados", t("cp_reg", L)),
+                  ("inflacion_sin_alimentos", t("cp_sinal", L)), ("inflacion_basica_sar", t("cp_basica", L)),
+                  ("inflacion_anual", t("cp_total", L))]
+        filas = []
+        for col, nombre in grupos:
+            if col not in inf or inf[col].dropna().empty:
+                continue
+            sub = inf.dropna(subset=[col])
+            u = sub.iloc[-1]
+            a = sub[sub["fecha"] <= u["fecha"] - pd.DateOffset(years=1)]
+            filas.append((nombre, float(u[col]), float(a.iloc[-1][col]) if not a.empty else None, u["fecha"]))
+        if not filas:
+            return None, {}
+        filas.sort(key=lambda r: r[1])
+        fig = base(L, height=430, fecha_x=False)
+        fig.add_vrect(x0=2, x1=4, fillcolor=BAND, line_width=0, layer="below")
+        fig.add_trace(go.Bar(y=[r[0] for r in filas], x=[r[1] for r in filas], orientation="h", showlegend=False,
+                             marker=dict(color=[C2 if r[1] > 4 else C1 for r in filas], line=dict(width=0)),
+                             text=[num(r[1], 2, L, suf="%") for r in filas], textposition="outside", cliponaxis=False,
+                             customdata=[num(r[2], 2, L, suf="%") if r[2] is not None else "—" for r in filas],
+                             hovertemplate="<b>%{y}</b><br>%{x:.2f}%<br>" + t("hace_ano", L) + ": %{customdata}<extra></extra>"))
+        fig.add_trace(go.Scatter(y=[r[0] for r in filas], x=[r[2] for r in filas], mode="markers", hoverinfo="skip",
+                                 name=t("cp_raya", L), marker=dict(symbol="line-ns", size=18, line=dict(width=2.5, color=INK))))
+        fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID, range=[0, max(max(r[1] for r in filas), max(r[2] or 0 for r in filas)) * 1.22])
+        fig.update_yaxes(ticksuffix="", tickfont=dict(size=12.5, color=INK2))
+        fig.update_layout(hovermode="closest", bargap=0.35)
+        return fig, {"notime": True}
+
+    def componentes_lineas(self):
+        L, inf = self.lang, self.d.inflacion
+        fig = base(L, height=330)
+        meta_banda(fig, L)
+        x = inf["fecha"] + pd.offsets.MonthEnd(0)
+        for col, nombre, color, w in (("inflacion_alimentos", t("cp_alim", L), C2, 2.0), ("inflacion_regulados", t("cp_reg", L), C7, 1.6),
+                                      ("inflacion_basica_sar", t("cp_basica", L), C1, 2.0)):
+            if col in inf and inf[col].notna().any():
+                self._l(fig, x, inf[col], nombre, color, width=w, fmt=".2f", cambio=("pp", "a"))
+        fig.update_xaxes(range=rango_inicial(inf["fecha"].max()))
+        return fig, {}
 
     def expectativas(self):
         L, d = self.lang, self.d
@@ -1056,7 +1020,7 @@ def fig_html(fig, meta, gid):
 
 # ------------------------------------------------------------------ piezas HTML
 def tarjeta(titulo, valor, detalle, estado, tono, pregunta_id, spark=""):
-    return (f'<a class="card tone-{tono}" href="#{pregunta_id}"><div class="card-top"><span class="card-title">{esc(titulo)}</span>'
+    return (f'<a class="card tone-{tono}" href="{PAGINA_DE.get(pregunta_id, pregunta_id + '/')}"><div class="card-top"><span class="card-title">{esc(titulo)}</span>'
             f'<span class="pill {tono}">{esc(estado)}</span></div>'
             f'<div class="card-mid"><div class="card-value">{esc(valor)}</div>{spark}</div><div class="card-detail">{detalle}</div></a>')
 
@@ -1101,8 +1065,14 @@ def inf_13_lista(d):
     return sorted(ic[ic["grupo"] == "13"]["ciudad"].unique())
 
 
+PAGINA_DE = {"crecimiento": "crecimiento/", "precios": "inflacion/", "banco": "tasas/", "informalidad": "empleo/", "curva": "curva-tes/",
+             "mercados": "mercados/", "externo": "externo/", "ciclo": "ciclo/"}
+RESPUESTAS = {}   # id de seccion -> texto de respuesta (lo usa la portada para resumir)
+
+
 def seccion(sid, num_, titulo, respuesta, graficos, detalle_html, lang, abierto=False):
     """abierto=True: el bloque extra se muestra siempre (no es detalle tecnico)."""
+    RESPUESTAS[sid] = respuesta
     if detalle_html and abierto:
         det = f'<div class="extra">{detalle_html}</div>'
     elif detalle_html:
@@ -1112,6 +1082,64 @@ def seccion(sid, num_, titulo, respuesta, graficos, detalle_html, lang, abierto=
     return (f'<section id="{sid}" class="section"><div class="sec-head"><span class="sec-num">{num_}</span>'
             f'<h2>{esc(titulo)}</h2></div>{respuesta_html(respuesta, lang)}'
             f'<div class="grid">{"".join(graficos)}</div>{det}</section>')
+
+
+# ------------------------------------------------------------------ portada: graficos compactos y datos clave
+NOMBRES_PORTADA = {
+    "pib": ("PIB real, anual", "Real GDP, y/y"), "ise": ("Actividad mensual (ISE)", "Monthly activity (ISE)"),
+    "ipc": ("Inflación anual", "Inflation, y/y"), "ipc_basica": ("Inflación de fondo", "Underlying inflation"),
+    "desempleo": ("Desempleo", "Unemployment"), "informalidad": ("Informalidad", "Informality"),
+    "tpm": ("Tasa del Banco", "Policy rate"), "tes10": ("TES 10 años", "10-year TES"),
+    "trm": ("Dólar (TRM)", "US dollar (TRM)"), "colcap": ("COLCAP", "COLCAP"),
+    "cc": ("Cuenta corriente", "Current account"), "deuda": ("Deuda del Gobierno", "Government debt"),
+}
+CLAVE_SENAL = {  # nombre en ingles de tabla_senales -> clave de la portada
+    "Economic growth (real GDP, y/y)": "pib", "Monthly economic activity (ISE, y/y)": "ise",
+    "Inflation, y/y": "ipc", "Underlying inflation (ex food & regulated)": "ipc_basica", "Unemployment rate": "desempleo",
+    "Banco de la República policy rate": "tpm", "10-year government bonds (TES)": "tes10",
+    "US dollar (TRM, pesos per USD)": "trm", "Colombian stock index (COLCAP)": "colcap",
+    "Current account": "cc", "Central government gross debt": "deuda",
+}
+
+
+def tabla_portada(d, s, L):
+    """Ultimo dato y cambio de cada indicador que muestra la portada (mismas cifras que la tabla completa)."""
+    filas = []
+    df = mt.tabla_senales(d, s, "en")
+    for _, r in df.iterrows():
+        clave = CLAVE_SENAL.get(r["indicador"])
+        if not clave:
+            continue
+        uni = str(r["unidad"])
+        suf = "%" if uni == "%" else (" pts" if uni == "pts" else ("% " + ("PIB" if L == "es" else "GDP") if uni.startswith("%") else ""))
+        pre = "$" if clave == "trm" else ""
+        ch = r["cambio"]
+        if ch is None or pd.isna(ch):
+            cambio, clase = "—", "flat"
+        else:
+            clase = "up" if ch > 0.005 else ("down" if ch < -0.005 else "flat")
+            cambio = txt_cambio(ch, "pct" if r["relativo"] else "pp", L, 1)
+        filas.append({"clave": clave, "nombre": NOMBRES_PORTADA[clave][0 if L == "es" else 1],
+                      "valor": pre + num(r["valor"], int(r["dec"]), L) + suf, "cambio": cambio, "clase": clase,
+                      "ventana": t("en_3m", L) if r["ventana"] == 91 else t("en_12m", L), "fecha": fecha(r["fecha"], r["freq"], L)})
+    an = s["tasas"].get("tpm_anunciada")
+    if an:   # misma cifra que la tarjeta: la tasa ya anunciada, aunque aun no este vigente
+        for f_ in filas:
+            if f_["clave"] == "tpm":
+                ch = an["tasa"] - (s["tasas"].get("tpm_hace_12m") or an["anterior"])
+                f_.update(valor=num(an["tasa"], 2, L, suf="%"), cambio=txt_cambio(ch, "pp", L, 2),
+                          clase="up" if ch > 0 else ("down" if ch < 0 else "flat"),
+                          fecha=t("anunciada", L) + " " + fecha(an["anuncio"], "d", L))
+    inf = d.informalidad
+    if inf is not None and not inf.empty:
+        u = inf.iloc[-1]
+        a = inf[inf["fecha"] <= u["fecha"] - pd.DateOffset(years=1)]
+        ch = float(u["nacional"] - a.iloc[-1]["nacional"]) if not a.empty else float("nan")
+        filas.append({"clave": "informalidad", "nombre": NOMBRES_PORTADA["informalidad"][0 if L == "es" else 1],
+                      "valor": num(u["nacional"], 1, L, suf="%"), "cambio": txt_cambio(ch, "pp", L, 1) if ch == ch else "—",
+                      "clase": "up" if ch > 0.005 else ("down" if ch < -0.005 else "flat"),
+                      "ventana": t("en_12m", L), "fecha": fecha(u["fecha"], "m", L)})
+    return filas
 
 
 # ------------------------------------------------------------------ pagina
@@ -1274,7 +1302,9 @@ def pagina(d, s, lang, generado):
                                              a=num(i["hace_12m"], 1, L)) + " " + basica + " " +
                  t("resp_espera", L).format(v=num(tt["bei_1y"], 1, L)),
                  [bloque_grafico(t("g_inf", L), fig_html(fi, mi, "g-inf"), t("h_inf", L)),
-                  bloque_grafico(t("g_espera", L), fig_html(fe, me, "g-espera"), t("h_espera", L)), graf_tray],
+                  bloque_grafico(t("g_cp_barras", L), fig_html(*g.componentes_barras(), "g-cp-barras"), t("h_cp_barras", L)),
+                  bloque_grafico(t("g_cp_lineas", L), fig_html(*g.componentes_lineas(), "g-cp-lineas"), t("h_cp_lineas", L), ancho=True),
+                  bloque_grafico(t("g_espera", L), fig_html(fe, me, "g-espera"), t("h_espera", L), ancho=True), graf_tray],
                  s2_det, L)
 
     fp, mp = g.politica()
@@ -1352,67 +1382,229 @@ def pagina(d, s, lang, generado):
                   bloque_grafico(t("g_deuda", L), fig_html(*g.barras("deuda_bruta_gnc_pct_pib", "y", C7, False), "g-deuda"),
                                  t("h_deuda", L))], "", L)
 
+    tr_c = datos_ciclo(d, L)["trimestres"]
+    ult_c = tr_c[-1]
+    racha_c = 1
+    while racha_c < len(tr_c) and tr_c[-1 - racha_c]["fase"] == ult_c["fase"]:
+        racha_c += 1
+    titular = re.sub(r"(colombiana\?|Colombia's economy)", r"<em>\1</em>", esc(t("h1", L)).replace("&#x27;", "'"))
+    micro = (" · ".join([t("kicker_monitor", L), "DANE", "Banco de la República", "BVC", "MinHacienda", "ColombiaMacro"]) + " · ") * 14
+    RESPUESTAS["curva"] = resp_curva
+
     tabla = tabla_indicadores(d, s, L)
     fuentes = tabla_fuentes(d, L)
     gloss = "".join(f"<dt>{esc(k)}</dt><dd>{esc(v)}</dd>" for k, v in GLOSARIO[L])
-    descargas = " ".join(f'<a href="datos/{f}" download>{f}</a>' for f in DESCARGAS if (DATA_DIR / f).exists())
-    otro = "en/" if L == "es" else "../"
-    raiz = "" if L == "es" else "../"
-    return f"""<!doctype html>
+
+    horizonte = (f'<div class="horizon" role="group" aria-label="{t("horizonte", L)}"><span>{t("horizonte", L)}</span>'
+                 f'<button data-years="3">{t("h3", L)}</button><button data-years="5">{t("h5", L)}</button>'
+                 f'<button data-years="10" class="on">{t("h10", L)}</button><button data-years="0">{t("htodo", L)}</button></div>')
+
+    def descargas_html(aroot):
+        items = []
+        for f in DESCARGAS:
+            ruta = DATA_DIR / f
+            if not ruta.exists():
+                continue
+            kb = max(1, round(ruta.stat().st_size / 1024))
+            nombre = DESCRIPCION_CSV.get(f, (f, f))[0 if L == "es" else 1]
+            items.append(f'<a class="dl" href="{aroot}datos/{f}" download><span class="dl-n">{esc(nombre)}</span>'
+                         f'<span class="dl-f">{f} · {kb} KB</span><span class="dl-i" aria-hidden="true">↓</span></a>')
+        return f'<div class="dl-grid">{"".join(items)}</div>'
+
+    def documentos_html():
+        return (f'<p class="downloads"><b>{t("documentos", L)}:</b> <a href="{REPO_URL}/blob/main/docs/METODOLOGIA.md">{t("metodologia", L)}</a> · '
+                f'<a href="{REPO_URL}/raw/main/docs/Manual_ColombiaMacro.pdf">{t("manual", L)}</a> · <a href="{REPO_URL}">GitHub</a></p>')
+
+    s_ind = (f'<section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{t("q_todos", L)}</h2></div>'
+             f'{respuesta_html(t("resp_todos", L), L)}{tabla}</section>')
+    s_fuentes_det = (f'<section id="fuentes" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{t("q_fuentes", L)}</h2></div>'
+                     f'{respuesta_html(t("resp_fuentes", L), L)}{fuentes}<h3 class="sub dl-t">{t("descargar", L)}</h3>{descargas_html("@@AROOT@@")}'
+                     f'{documentos_html()}<details class="tech"><summary>{t("glosario", L)}</summary><dl class="gloss">{gloss}</dl></details></section>')
+
+    # --- paginas de detalle, agrupadas para el menu
+    P = {
+        "ciclo": (t("nav_ciclo", L), t("pg_ciclo", L), t("pl_ciclo", L), [explorador_ciclo(d, L)], False),
+        "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [s1], True),
+        "sectores": (t("nav_sectores", L), t("pg_sectores", L), t("pl_sectores", L), [s_sec], True),
+        "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [s_cap], True),
+        "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [s_inf], True),
+        "inflacion": (t("nav_inflacion", L), t("pg_inflacion", L), t("pl_inflacion", L), [s2], True),
+        "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [s3], True),
+        "curva-tes": (t("nav_curva", L), t("pg_curva", L), t("pl_curva", L), [s_curva], False),
+        "mercados": (t("nav_mercados", L), t("pg_mercados", L), t("pl_mercados", L), [s4], True),
+        "empresas": (t("nav_empresas", L), t("pg_empresas", L), t("pl_empresas", L), [s_emp], True),
+        "externo": (t("nav_externo", L), t("pg_externo", L), t("pl_externo", L), [s5], True),
+        "indicadores": (t("nav_datos", L), t("pg_indicadores", L), t("pl_indicadores", L), [s_ind], False),
+    }
+    P = {k: v for k, v in P.items() if any(v[3])}
+    GRUPOS = [(t("g_actividad", L), ["ciclo", "crecimiento", "sectores", "capacidad", "empleo"]),
+              (t("g_precios", L), ["inflacion", "tasas", "curva-tes"]),
+              (t("g_mercados", L), ["mercados", "empresas", "externo"])]
+    GRUPOS = [(g, [x for x in sl if x in P]) for g, sl in GRUPOS]
+    orden = [x for _, sl in GRUPOS for x in sl] + ["indicadores"]
+
+    def menu_html(base, slug):
+        act = ' class="activo" aria-current="page"'
+        partes = []
+        for k, (grupo, slugs) in enumerate(GRUPOS):
+            enl = "".join(f'<a href="{base}{x}/"{act if x == slug else ""}>{esc(P[x][0])}</a>' for x in slugs)
+            partes.append(f'<div class="grp{" activo" if slug in slugs else ""}"><button type="button" class="grp-b" aria-expanded="false" '
+                          f'aria-controls="grp-{k}">{esc(grupo)}<span aria-hidden="true">▾</span></button>'
+                          f'<div class="grp-m" id="grp-{k}">{enl}</div></div>')
+        partes.append(f'<a class="m-solo" href="{base}indicadores/"{act if slug == "indicadores" else ""}>{esc(P["indicadores"][0])}</a>')
+        return "".join(partes)
+
+    def documento(slug, titulo_doc, cuerpo, graficos=True):
+        """Envoltura comun: cabecera, menu y pie. slug=None es la portada."""
+        base = "" if slug is None else "../"                       # raiz del idioma
+        aroot = base + ("" if L == "es" else "../")                # raiz del sitio (assets, datos)
+        if slug is None:
+            otro = "en/" if L == "es" else "../"
+        else:
+            otro = f"../en/{slug}/" if L == "es" else f"../../{slug}/"
+        plotly = f'<script src="{aroot}assets/plotly.min.js?v={VERSION_ACTIVOS[1]}" defer></script>\n' if graficos else ""
+        cuerpo = cuerpo.replace("@@AROOT@@", aroot)
+        return f"""<!doctype html>
 <html lang="{L}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{t("titulo_pagina", L)}</title>
+<title>{esc(titulo_doc)}</title>
 <meta name="description" content="{esc(t('meta_desc', L))}">
-<link rel="icon" href="{raiz}assets/favicon.svg">
-<meta name="color-scheme" content="dark light">
-<script>(function(){{var t=null;try{{t=localStorage.getItem('cm-tema')}}catch(e){{}}document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}})();</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="{raiz}assets/estilo.css?v={VERSION_ACTIVOS[0]}">
-<script src="{raiz}assets/plotly.min.js?v={VERSION_ACTIVOS[1]}" defer></script>
-<script src="{raiz}assets/app.js?v={VERSION_ACTIVOS[0]}" defer></script>
-</head><body>
-<div class="bg" aria-hidden="true"><div class="bg-grid"></div><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="bg-glow g3"></div>{fondo_svg(d)}<div class="bg-vignette"></div></div>
+<link rel="icon" href="{aroot}assets/favicon.svg">
+<meta name="color-scheme" content="light dark">
+<script>(function(){{var t=null;try{{t=localStorage.getItem('cm-tema')}}catch(e){{}}document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}})();</script>
+<link rel="preload" href="{aroot}assets/fuentes/source-serif-4-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{aroot}assets/fuentes/inter-tight-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{aroot}assets/estilo.css?v={VERSION_ACTIVOS[0]}">
+{plotly}<script src="{aroot}assets/app.js?v={VERSION_ACTIVOS[0]}" defer></script>
+</head><body class="{"home" if slug is None else "detalle"}">
+<div class="bg" aria-hidden="true"><div class="bg-art"></div><div class="bg-shade"></div></div>
 <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
 <header class="top"><div class="wrap top-in">
-  <a class="brand" href="#inicio"><img src="{raiz}assets/logo_usb.png" alt="USB Cali"><span><b>ColombiaMacro</b><small>{t("sub_marca", L)}</small></span></a>
-  <nav class="menu" id="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#capacidad">{t("nav_cap", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a></nav>
-  <button class="menu-toggle" id="menu-toggle" aria-controls="menu" aria-expanded="true" title="{t("menu_ocultar", L)}" data-ocultar="{t("menu_btn_ocultar", L)}" data-mostrar="{t("menu_btn_mostrar", L)}"><span class="mt-ico" aria-hidden="true">☰</span><span class="mt-txt">{t("menu_btn_ocultar", L)}</span></button>
+  <a class="brand" href="{base or './'}"><span class="logos"><img src="{aroot}assets/logo_usb.png" alt="Universidad de San Buenaventura Cali" height="30">
+    <img src="{aroot}assets/logo_financialtools.png" alt="FinancialTools.io" height="30" class="logo-ft"></span>
+    <span class="brand-t"><b>Colombia<i>Macro</i></b><small>{t("sub_marca", L)}</small></span></a>
+  <nav class="menu" id="menu" aria-label="{t('nav_aria', L)}">{menu_html(base, slug)}</nav>
+  <button class="menu-toggle" id="menu-toggle" aria-controls="menu" aria-expanded="false" title="{t("menu_ocultar", L)}" data-ocultar="{t("menu_btn_ocultar", L)}" data-mostrar="{t("menu_btn_mostrar", L)}"><span class="mt-ico" aria-hidden="true">☰</span><span class="mt-txt">{t("menu_btn_mostrar", L)}</span></button>
   <button class="theme-btn" id="theme-btn" type="button" aria-label="{t("tema_btn", L)}" title="{t("tema_btn", L)}" data-oscuro="{t("tema_oscuro", L)}" data-claro="{t("tema_claro", L)}">
     <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
     <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 0 1 9.4 3.8a8.4 8.4 0 1 0 10.8 10.8z"/></svg>
   </button>
-  <a class="lang" href="{otro}">{t("otro_idioma", L)}</a>
-</div>{cinta(d, s, L)}</header>
+  <a class="lang" href="{otro}" hreflang="{"en" if L == "es" else "es"}">{t("otro_idioma", L)}</a>
+</div><div class="micro" aria-hidden="true">{micro}</div></header>
 <main id="inicio" class="wrap">
-<section class="hero">
-  <p class="term"><span class="live"><i></i>{t("en_vivo", L)}</span><span class="term-cmd">{t("terminal", L)} <b>&lt;GO&gt;</b></span></p>
-  <p class="kicker">{t("kicker", L)} · {t("datos_al", L)} {fecha(generado, "d", L)} · {t("construido", L)} {construido}</p>
+{cuerpo}
+</main>
+<footer class="foot"><div class="wrap foot-in">
+  <div><b class="foot-brand">Colombia<i>Macro</i></b><p>{t("aviso", L)}</p>
+    <p class="aliados"><img src="{aroot}assets/logo_usb.png" alt="Universidad de San Buenaventura Cali" height="34"><img src="{aroot}assets/logo_financialtools.png" alt="FinancialTools.io" height="34"><span>{t("aliados", L)}</span></p></div>
+  <nav class="foot-nav">{"".join(f'<div><b>{esc(g)}</b>' + "".join(f'<a href="{base}{x}/">{esc(P[x][0])}</a>' for x in sl) + '</div>' for g, sl in GRUPOS)}<div><b>{esc(P["indicadores"][0])}</b><a href="{base}indicadores/">{t("q_todos", L)}</a><a href="{base}indicadores/#fuentes">{t("q_fuentes", L)}</a><a href="{base}#descargas">{t("descargar", L)}</a></div></nav>
+  <p class="foot-meta">DANE · Banco de la República · BVC/MSCI · Ministerio de Hacienda · {t("generado", L)} {fecha(generado, "d", L)} · Universidad de San Buenaventura Cali · FinancialTools.io</p>
+</div></footer>
+</body></html>"""
+
+    # --- paginas de detalle
+    salida = {}
+    for k, slug in enumerate(orden):
+        nombre, titulo_pg, lede, secciones, con_h = P[slug]
+        sig, ant = orden[(k + 1) % len(orden)], orden[k - 1]
+        grupo = next((g for g, sl in GRUPOS if slug in sl), None)
+        extra = (bloque_noticias(d, s, L) + s_fuentes_det) if slug == "indicadores" else ""
+        ruta = f'<a href="../">{t("inicio", L)}</a><span>/</span>' + (f'{esc(grupo)}<span>/</span>' if grupo else "") + esc(nombre)
+        cuerpo = (f'<section class="page-head"><nav class="crumbs" aria-label="{t("ruta", L)}">{ruta}</nav>'
+                  f'<p class="eyebrow"><span class="eb-k">{t("kicker_monitor", L)}</span><span class="eb-d">{t("datos_al", L)} {fecha(generado, "d", L)}</span></p>'
+                  f'<h1>{esc(titulo_pg)}</h1><p class="summary">{lede}</p></section>'
+                  + (horizonte if con_h else "") + "".join(secciones) + extra +
+                  f'<nav class="pager"><a class="pg-prev" href="../{ant}/"><small>{t("anterior", L)}</small>{esc(P[ant][0])}</a>'
+                  f'<a class="pg-home" href="../">{t("volver_tablero", L)}</a>'
+                  f'<a class="pg-next" href="../{sig}/"><small>{t("siguiente", L)}</small>{esc(P[sig][0])}</a></nav>')
+        salida[slug] = numerar_secciones(documento(slug, f"{titulo_pg} · ColombiaMacro", cuerpo))
+
+    # --- portada: lectura en un vistazo, sin graficos
+    sen = {r["clave"]: r for r in tabla_portada(d, s, L)}
+    sc = d.sectores
+    if sc is not None and not sc.empty:
+        u_ = sc[sc["fecha"] == sc["fecha"].max()].sort_values("yoy", ascending=False)
+        qs = fecha(sc["fecha"].max(), "q", L)
+        for clave, r_, nm in (("sec_alto", u_.iloc[0], t("sec_mas", L)), ("sec_bajo", u_.iloc[-1], t("sec_menos", L))):
+            sen[clave] = {"nombre": nm, "valor": num(r_["yoy"], 1, L, True, "%"), "cambio": esc(r_["sector"]), "clase": "flat",
+                          "ventana": t("anual", L), "fecha": qs}
+    tc_ = d.tasas.dropna(subset=["tes_pesos_1y", "tes_pesos_10y"])
+    if not tc_.empty:
+        u_ = tc_.iloc[-1]
+        a_ = tc_[tc_["fecha"] <= u_["fecha"] - pd.DateOffset(years=1)]
+        pe, pa = u_["tes_pesos_10y"] - u_["tes_pesos_1y"], (a_.iloc[-1]["tes_pesos_10y"] - a_.iloc[-1]["tes_pesos_1y"]) if not a_.empty else float("nan")
+        sen["pendiente"] = {"nombre": t("pend_corta", L), "valor": num(pe, 2, L, True, " pp"),
+                            "cambio": txt_cambio(pe - pa, "pp", L, 2) if pa == pa else "—",
+                            "clase": "up" if pe - pa > 0.005 else ("down" if pe - pa < -0.005 else "flat"),
+                            "ventana": t("en_12m", L), "fecha": fecha(u_["fecha"], "d", L)}
+    if tt.get("tpm_real_exante") is not None:
+        sen["tpm_real"] = {"nombre": t("tpm_real_corta", L), "valor": num(tt["tpm_real_exante"], 1, L, suf="%"),
+                           "cambio": t("neutral_ref", L), "clase": "flat", "ventana": "", "fecha": ""}
+
+    def dato(clave):
+        r = sen.get(clave)
+        if not r:
+            return ""
+        meta_ = " · ".join(x for x in (r["ventana"], r["fecha"]) if x)
+        return (f'<div class="pd"><span class="pd-n">{esc(r["nombre"])}</span><span class="pd-v">{r["valor"]}</span>'
+                f'<span class="pd-c"><span class="chg {r["clase"]}">{r["cambio"]}</span> <small>{meta_}</small></span></div>')
+
+    def primera(sid):
+        txt = re.sub(r"\s+", " ", str(RESPUESTAS.get(sid, ""))).strip()
+        partes = [p_ for p_ in _ORACION.split(txt) if p_.strip()]
+        return partes[0] if partes else ""
+
+    el_ = mt.estado_desempleo(s["laboral"]["td"], s["laboral"]["td_hace_12m"]) if s.get("laboral") else None
+    temas = [
+        ("crecimiento", "crecimiento", ["pib", "ise"], (t(f"ec_{ec}", L), tono_c)),
+        ("sectores", "sectores", ["sec_alto", "sec_bajo"], None),
+        ("empleo", "informalidad", ["desempleo", "informalidad"],
+         (t(f"el_{el_}", L), {"mejora": "ok", "estable": "ok", "empeora": "warn"}[el_]) if el_ else None),
+        ("inflacion", "precios", ["ipc", "ipc_basica"], (t(f"ei_{ei}", L), tono_i)),
+        ("tasas", "banco", ["tpm", "tpm_real"], (t(f"ep_{post}", L), {"restrictiva": "warn", "neutral": "ok", "expansiva": "warn"}.get(post, "neutral")) if post else None),
+        ("curva-tes", "curva", ["tes10", "pendiente"], None),
+        ("mercados", "mercados", ["trm", "colcap"], None),
+        ("externo", "externo", ["cc", "deuda"], None),
+    ]
+    tiles = []
+    for slug, sid, claves, estado in temas:
+        if slug not in P:
+            continue
+        chip = f'<span class="pill {estado[1]}">{esc(estado[0])}</span>' if estado else ""
+        grupo = next((g for g, sl in GRUPOS if slug in sl), "")
+        tiles.append(
+            f'<article class="tile" id="p-{slug}"><header class="tile-h"><span class="tile-k">{esc(grupo)} · {esc(P[slug][0])}</span>{chip}</header>'
+            f'<p class="tile-r">{primera(sid)}</p><div class="tile-d">{"".join(dato(c_) for c_ in claves)}</div>'
+            f'<a class="tile-go" href="{slug}/">{t("ver_analisis", L)} <span aria-hidden="true">→</span></a></article>')
+
+    portada = f"""<section class="hero">
+  <p class="eyebrow"><span class="eb-k">{t("kicker_monitor", L)}</span><span class="eb-d">{t("datos_al", L)} {fecha(generado, "d", L)} · {t("construido", L)} {construido}</span></p>
   <div class="hero-grid">
-    <div class="hero-text"><h1>{t("h1", L)}</h1>
+    <div class="hero-text"><h1>{titular}</h1>
       <p class="summary">{esc(mt.resumen_simple(s, L))}</p></div>
-    <div class="phase-box ph-{c["fase"]}">
-      <span class="phase-k">{t("ck_fase", L)}</span><b class="phase-v">{esc(fase)}</b>
-      <span class="phase-q">{fecha(c["fecha"], "q", L)}</span><a class="phase-go" href="#ciclo">{t("nav_ciclo", L)} →</a></div>
+    <a class="phase-box ph-{c["fase"]}" href="ciclo/">
+      <span class="phase-k">{t("ck_fase", L)} · {ult_c["q"]}</span><b class="phase-v">{esc(fase)}</b>
+      <span class="phase-t">{t("fd_" + ult_c["fase"], L).split(": ", 1)[-1].capitalize()}</span>
+      <span class="phase-dl"><span><small>{t("ph_brecha", L)}</small>{num(ult_c["x"], 1, L, True, "%")}</span><span><small>{t("ph_dir", L)}</small><em class="{"up" if ult_c["y"] >= 0 else "down"}">{num(ult_c["y"], 1, L, True, " pp")}</em></span><span><small>{t("ph_racha", L)}</small>{racha_c} {t("ck_trim1" if racha_c == 1 else "ck_trim", L)}</span></span>
+      <span class="phase-go">{t("cta_ciclo", L)} →</span></a>
   </div>
   <div class="cards">{"".join(cards)}</div>
-  <p class="disclaimer">{t("aviso_estados", L)}</p>
+  <p class="disclaimer"><span>{t("fuentes_corto", L)}</span><span>{t("aviso_estados", L)}</span></p>
 </section>
-{explorador_ciclo(d, L)}
-<div class="horizon" role="group" aria-label="{t('horizonte', L)}"><span>{t("horizonte", L)}:</span>
-  <button data-years="3">{t("h3", L)}</button><button data-years="5">{t("h5", L)}</button><button data-years="10" class="on">{t("h10", L)}</button><button data-years="0">{t("htodo", L)}</button></div>
-{s1}{s_sec}{s_cap}{s_inf}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
-<section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">8</span><h2>{t("q_todos", L)}</h2></div>
-{respuesta_html(t("resp_todos", L), L)}{tabla}</section>
-{bloque_noticias(d, s, L)}
-<section id="fuentes" class="section"><div class="sec-head"><span class="sec-num">9</span><h2>{t("q_fuentes", L)}</h2></div>
-{respuesta_html(t("resp_fuentes", L), L)}{fuentes}
-<p class="downloads"><b>{t("descargar", L)}:</b> {descargas}</p>
-<p class="downloads"><b>{t("documentos", L)}:</b> <a href="{REPO_URL}/blob/main/docs/METODOLOGIA.md">{t("metodologia", L)}</a> · <a href="{REPO_URL}/raw/main/docs/Manual_ColombiaMacro.pdf">{t("manual", L)}</a> · <a href="{REPO_URL}">GitHub</a></p>
-<details class="tech"><summary>{t("glosario", L)}</summary><dl class="gloss">{gloss}</dl></details>
+<section class="bloque" id="lectura" aria-labelledby="lectura-t">
+  <div class="bloque-h"><span class="sec-num">01</span><h2 id="lectura-t">{t("lectura_t", L)}</h2><p>{t("lectura_d", L)}</p></div>
+  <div class="tiles">{"".join(tiles)}</div>
 </section>
-</main>
-<footer class="wrap foot"><p>{t("aviso", L)}</p><p>DANE · Banco de la República · BVC/MSCI · Ministerio de Hacienda · {t("generado", L)} {fecha(generado, "d", L)}</p></footer>
-</body></html>"""
+<section class="bloque" id="monitor" aria-labelledby="monitor-t">
+  <div class="bloque-h"><span class="sec-num">02</span><h2 id="monitor-t">{t("q_todos", L)}</h2><p>{t("resp_todos", L)}</p></div>
+  {tabla}
+</section>
+<section class="bloque" id="descargas" aria-labelledby="descargas-t">
+  <div class="bloque-h"><span class="sec-num">03</span><h2 id="descargas-t">{t("fuentes_descargas", L)}</h2><p>{t("resp_fuentes", L)}</p></div>
+  <div class="fd-grid"><div>{fuentes}</div><div><h3 class="sub dl-t">{t("descargar", L)}</h3>{descargas_html("@@AROOT@@")}{documentos_html()}</div></div>
+</section>
+{bloque_noticias(d, s, L, n=5).replace('id="noticias" class="notes"', 'id="noticias" class="notes corta"')}"""
+    salida[None] = documento(None, t("titulo_pagina", L), portada, graficos=False)
+    return salida
 
 
 def numerar_secciones(html_: str) -> str:
@@ -1470,9 +1662,11 @@ def construir(salida: Path = SITE_DIR) -> Path:
     (salida / "assets").mkdir(parents=True)
     (salida / "en").mkdir()
     (salida / "datos").mkdir()
-    for f in ("estilo.css", "app.js", "favicon.svg"):
+    for f in ("estilo.css", "app.js", "favicon.svg", "fondo_billete.svg", "fondo_andes.svg"):
         shutil.copy(HERE / f, salida / "assets" / f)
+    shutil.copytree(HERE / "fuentes", salida / "assets" / "fuentes")
     shutil.copy(DOCS_DIR / "presentacion" / "logo_usb.png", salida / "assets" / "logo_usb.png")
+    shutil.copy(HERE / "logo_financialtools.png", salida / "assets" / "logo_financialtools.png")
     (salida / "assets" / "plotly.min.js").write_text(get_plotlyjs(), encoding="utf-8")
     for f in DESCARGAS:
         if (DATA_DIR / f).exists():
@@ -1484,8 +1678,11 @@ def construir(salida: Path = SITE_DIR) -> Path:
         h.update((salida / "assets" / f).read_bytes())
     VERSION_ACTIVOS[0] = h.hexdigest()[:10]
     VERSION_ACTIVOS[1] = hashlib.sha256((salida / "assets" / "plotly.min.js").read_bytes()).hexdigest()[:10]
-    (salida / "index.html").write_text(numerar_secciones(pagina(d, s, "es", generado)), encoding="utf-8")
-    (salida / "en" / "index.html").write_text(numerar_secciones(pagina(d, s, "en", generado)), encoding="utf-8")
+    for L, raiz in (("es", salida), ("en", salida / "en")):
+        for slug, html_ in pagina(d, s, L, generado).items():
+            destino = raiz if slug is None else raiz / slug
+            destino.mkdir(parents=True, exist_ok=True)
+            (destino / "index.html").write_text(html_, encoding="utf-8")
     (salida / ".nojekyll").write_text("")
     resumen = {"generado": str(generado.date()), "fase": s["ciclo"]["fase"],
                "resumen_es": mt.resumen_simple(s, "es"), "resumen_en": mt.resumen_simple(s, "en")}

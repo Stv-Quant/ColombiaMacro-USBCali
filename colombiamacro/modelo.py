@@ -459,8 +459,9 @@ def tabla_senales(d: Datos, s: dict, lang: str = "es") -> pd.DataFrame:
         d.tasas, "bei_1y", "%", 91, "d")
     add("Inflación que espera el mercado (largo plazo)", "Market-expected inflation (long term)",
         d.tasas, "bei_5y5y", "%", 91, "d")
+    tpm_diaria = d.extra.get("tpm")   # serie diaria propia: no espera al ultimo dia con datos TES
     add("Tasa de interés del Banco de la República", "Banco de la República policy rate",
-        d.tasas, "tpm", "%", 365, "d")
+        tpm_diaria if tpm_diaria is not None and not tpm_diaria.empty else d.tasas, "tpm", "%", 365, "d")
     add("Tasa de interés real (descontada la inflación esperada)", "Real interest rate (net of expected inflation)",
         d.tasas, "tpm_real_exante", "%", 365, "d")
     add("Bonos del Gobierno a 10 años (TES)", "10-year government bonds (TES)",

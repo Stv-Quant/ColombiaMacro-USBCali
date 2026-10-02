@@ -141,6 +141,16 @@ FICHAS = {
     "g-curva-tes": (BR_TES, ("Tasas cero cupón a 1, 5 y 10 años del día elegido; líneas finas: cierre de cada año marcado.",
                              "Zero-coupon yields at 1, 5 and 10 years on the chosen day; thin lines: year-end of each ticked year.")),
     "g-curva-hist": (BR_TES, ("Serie diaria de las tasas cero cupón a 1, 5 y 10 años.", "Daily series of 1-, 5- and 10-year zero-coupon yields.")),
+    "g-cp-barras": (("Banco de la República (IPC por grupos: alimentos, regulados, sin alimentos, sin alimentos ni regulados) y DANE, IPC",
+                     "Banco de la República (CPI groups: food, regulated, ex food, ex food & regulated) and DANE, CPI"),
+                    ("Variación anual del índice de precios de cada grupo en el último mes publicado; la raya es el mismo dato 12 meses "
+                     "antes. Los grupos se solapan (el total contiene a todos), por eso no suman.",
+                     "Annual change of each group's price index in the latest published month; the tick is the same figure 12 months "
+                     "earlier. Groups overlap (headline contains all of them), so they do not add up.")),
+    "g-cp-lineas": (("Banco de la República, inflación por grupos de precios", "Banco de la República, inflation by price group"),
+                    ("Variación anual mensual de cada grupo. Regulados: servicios públicos, combustibles, transporte y educación con "
+                     "precio fijado por el Estado.", "Monthly annual change of each group. Regulated: utilities, fuel, transport and "
+                     "education with state-set prices.")),
 }
 
 

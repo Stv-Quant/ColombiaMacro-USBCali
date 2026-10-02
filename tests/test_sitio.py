@@ -42,35 +42,66 @@ class TestSitio(unittest.TestCase):
     def tearDownClass(cls):
         cls.tmp.cleanup()
 
-    def test_paginas_en_dos_idiomas(self):
-        es = (self.out / "index.html").read_text(encoding="utf-8")
-        en = (self.out / "en" / "index.html").read_text(encoding="utf-8")
-        for html_ in (es, en):
-            for sid in ("crecimiento", "sectores", "informalidad", "precios", "banco", "curva", "mercados", "empresas",
-                        "externo", "indicadores", "fuentes"):
+    PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento",), "sectores": ("sectores",),
+               "capacidad": ("capacidad",), "empleo": ("informalidad",), "inflacion": ("precios",), "tasas": ("banco",),
+               "curva-tes": ("curva", "curva-app"), "mercados": ("mercados",), "empresas": ("empresas",),
+               "externo": ("externo",), "indicadores": ("indicadores", "fuentes", "noticias")}
+
+    def leer(self, *partes):
+        return (self.out.joinpath(*partes) / "index.html").read_text(encoding="utf-8")
+
+    def test_portada_de_sondeo_sin_graficos(self):
+        for raiz in ((), ("en",)):
+            html_ = self.leer(*raiz)
+            for slug in ("crecimiento", "sectores", "empleo", "inflacion", "tasas", "curva-tes", "mercados", "externo"):
+                self.assertIn(f'id="p-{slug}"', html_)
+                self.assertIn(f'class="tile-go" href="{slug}/"', html_)
+            for sid in ("lectura", "monitor", "descargas", "noticias"):
                 self.assertIn(f'id="{sid}"', html_)
-            self.assertIn('id="curva-app"', html_)
-            self.assertIn('id="ciclo-app"', html_)
-            self.assertIn('id="ciclo-datos"', html_)
-            self.assertIn('class="stats"', html_)
-        self.assertIn('lang="es"', es)
-        self.assertIn('lang="en"', en)
+            self.assertIn("class='tbl'", html_)                      # indicadores y fuentes
+            self.assertIn('datos/inflacion_clean.csv" download', html_)
+            self.assertNotIn('data-for="', html_)                     # sin graficos en la portada
+            self.assertNotIn("plotly.min.js", html_)
+            self.assertIn("logo_financialtools.png", html_)
+            self.assertIn('href="ciclo/"', html_)
+        self.assertIn('lang="es"', self.leer())
+        self.assertIn('lang="en"', self.leer("en"))
+        self.assertIn('href="datos/', self.leer())
+        self.assertIn('href="../datos/', self.leer("en"))
+
+    def test_paginas_de_detalle_en_dos_idiomas(self):
+        for slug, ids in self.PAGINAS.items():
+            for raiz in ((), ("en",)):
+                html_ = self.leer(*raiz, slug)
+                for sid in ids:
+                    self.assertIn(f'id="{sid}"', html_, (raiz, slug, sid))
+                self.assertIn('aria-current="page"', html_)
+                self.assertIn('class="pager"', html_)
+                self.assertIn('assets/estilo.css', html_)
+
+    def test_enlaces_relativos_correctos(self):
+        self.assertIn('href="../en/inflacion/"', self.leer("inflacion"))
+        self.assertIn('href="../../inflacion/"', self.leer("en", "inflacion"))
+        self.assertIn('src="../assets/app.js', self.leer("inflacion"))
+        self.assertIn('src="../../assets/app.js', self.leer("en", "inflacion"))
+        self.assertIn('href="../../datos/tasas_interes_clean.csv"', self.leer("en", "indicadores"))
 
     def test_secciones_numeradas_en_orden(self):
         import re
-        es = (self.out / "index.html").read_text(encoding="utf-8")
-        nums = [int(n) for n in re.findall(r'<span class="sec-num">(\d+)</span>', es)]
-        self.assertEqual(nums, list(range(1, len(nums) + 1)))
-        self.assertGreaterEqual(len(nums), 11)
+        for slug in self.PAGINAS:
+            nums = [int(n) for n in re.findall(r'<span class="sec-num">(\d+)</span>', self.leer(slug))]
+            self.assertEqual(nums, list(range(1, len(nums) + 1)), slug)
 
     def test_menu_no_usa_textos_de_metodo(self):
-        es = (self.out / "index.html").read_text(encoding="utf-8")
+        es = self.leer()
         menu = es[es.index('<nav class="menu"'):es.index("</nav>")]
         self.assertNotIn("Método", menu)
-        self.assertIn("Curva TES", menu)
+        self.assertIn("Inflación", menu)
+        self.assertIn('class="grp-b"', menu)
 
     def test_archivos_y_descargas(self):
         for f in ("assets/app.js", "assets/estilo.css", "assets/plotly.min.js", "assets/curva_tes.json",
+                  "assets/fondo_andes.svg", "assets/fondo_billete.svg", "assets/fuentes/inter-tight-latin-500-normal.woff2",
                   "resumen.json", ".nojekyll", "datos/tasas_interes_clean.csv"):
             self.assertTrue((self.out / f).exists(), f)
 
@@ -87,14 +118,13 @@ class TestSitio(unittest.TestCase):
         self.assertAlmostEqual(c["tes_pesos_10y"][-1], round(float(ult["tes_pesos_10y"]), 3))
 
     def test_graficos_json_validos(self):
-        es = (self.out / "index.html").read_text(encoding="utf-8")
         n = 0
-        for bloque in es.split('<script type="application/json" data-for="')[1:]:
-            data = bloque.split('">', 1)[1].split("</script>", 1)[0]
-            fig = json.loads(data)
-            self.assertIn("data", fig)
-            n += 1
-        self.assertGreaterEqual(n, 8)
+        for partes in [(), *[(slug,) for slug in self.PAGINAS]]:
+            for bloque in self.leer(*partes).split('<script type="application/json" data-for="')[1:]:
+                data = bloque.split('">', 1)[1].split("</script>", 1)[0]
+                self.assertIn("data", json.loads(data))
+                n += 1
+        self.assertGreaterEqual(n, 22)
 
 
 class TestPanelesDeCambio(unittest.TestCase):
