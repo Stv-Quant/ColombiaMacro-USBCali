@@ -72,6 +72,146 @@ def esc(s):
     return html.escape(str(s), quote=True)
 
 
+# ------------------------------------------------------------------ piezas visuales v12 (terminal de vidrio)
+def _serie_limpia(x, y, desde=None, regla=None):
+    s_ = pd.Series(pd.to_numeric(pd.Series(list(y)), errors="coerce").values, index=pd.to_datetime(pd.Series(list(x))))
+    s_ = s_[~s_.index.duplicated(keep="last")].sort_index().dropna()
+    if desde is not None and not s_.empty:
+        s_ = s_[s_.index >= s_.index[-1] - desde]
+    if regla and not s_.empty:
+        s_ = s_.resample(regla).last().dropna()
+    return s_
+
+
+_SPARK_N = [0]
+
+
+def sparkline(s_, ancho=160, alto=40):
+    """Mini serie en SVG (sin ejes) para las tarjetas: tendencia de un vistazo."""
+    if s_ is None or len(s_) < 3:
+        return ""
+    v = s_.values.astype(float)
+    lo, hi = float(np.nanmin(v)), float(np.nanmax(v))
+    rng = (hi - lo) or 1.0
+    pts = [(i / (len(v) - 1) * ancho, alto - 3 - (val - lo) / rng * (alto - 8)) for i, val in enumerate(v)]
+    linea_ = "M" + " L".join(f"{a:.1f},{b:.1f}" for a, b in pts)
+    area = linea_ + f" L{ancho},{alto} L0,{alto} Z"
+    ux, uy = pts[-1]
+    _SPARK_N[0] += 1
+    gid = f"sg{_SPARK_N[0]}"
+    return (f'<svg class="spark" viewBox="0 0 {ancho} {alto}" preserveAspectRatio="none" aria-hidden="true">'
+            f'<defs><linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="spark-s0"/><stop offset="1" class="spark-s1"/></linearGradient></defs>'
+            f'<path class="spark-a" d="{area}" fill="url(#{gid})"/><path class="spark-l" d="{linea_}" vector-effect="non-scaling-stroke"/>'
+            f'<line class="spark-u" x1="{ux:.1f}" x2="{ux:.1f}" y1="{uy:.1f}" y2="{uy:.1f}" vector-effect="non-scaling-stroke"/></svg>')
+
+
+_ORACION = re.compile(r"(?<=[.!?])\s+(?=[¿¡A-ZÁÉÍÓÚÑ(<\"“])")
+_CIFRA = re.compile(r"(?<![\w>.,])((?:[+\-−]\s?)?(?:\$\d(?:[\d.,]*\d)?|\d(?:[\d.,]*\d)?\s?(?:%|pp\b|pts\b)|\d(?:[\d.,]*\d)?\s(?:puntos|points|millones|million)\b))")
+
+
+def respuesta_html(txt, lang, rid=None):
+    """Convierte el parrafo de respuesta en una lista corta de puntos con las cifras resaltadas."""
+    txt = re.sub(r"\s+", " ", str(txt)).strip()
+    if not txt:
+        return ""
+    partes = [p.strip() for p in _ORACION.split(txt) if p.strip()]
+
+    def resaltar(frase):
+        trozos = re.split(r"(<[^>]+>)", frase)   # no tocar etiquetas HTML
+        return "".join(tr if tr.startswith("<") else _CIFRA.sub(r'<b class="hl">\1</b>', tr) for tr in trozos)
+
+    items = "".join(f"<li>{resaltar(p)}</li>" for p in partes)
+    idattr = f' id="{rid}"' if rid else ""
+    return (f'<div class="answer"{idattr}><span class="ans-k">{t("lo_clave", lang)}</span>'
+            f'<ul class="ans-list">{items}</ul></div>')
+
+
+TICKERS = {  # nombre en ingles de tabla_senales -> (codigo es, codigo en)
+    "Economic growth (real GDP, y/y)": ("PIB a/a", "GDP y/y"),
+    "Output vs capacity (output gap)": ("BRECHA", "OUTPUT GAP"),
+    "Monthly economic activity (ISE, y/y)": ("ISE a/a", "ISE y/y"),
+    "Unemployment rate": ("DESEMPLEO", "UNEMPL."),
+    "Inflation, y/y": ("IPC a/a", "CPI y/y"),
+    "Underlying inflation (ex food & regulated)": ("IPC BÁSICA", "CORE CPI"),
+    "Market-expected inflation (next year)": ("BEI 1A", "BEI 1Y"),
+    "Market-expected inflation (long term)": ("BEI 5A5A", "BEI 5Y5Y"),
+    "Banco de la República policy rate": ("TPM", "POLICY RATE"),
+    "Real interest rate (net of expected inflation)": ("TPM REAL", "REAL RATE"),
+    "10-year government bonds (TES)": ("TES 10A", "TES 10Y"),
+    "US dollar (TRM, pesos per USD)": ("USD/COP", "USD/COP"),
+    "Real exchange rate (2010 = 100)": ("ITCR", "REER"),
+    "Colombian stock index (COLCAP)": ("COLCAP", "COLCAP"),
+    "Current account": ("CTA. CTE.", "CURR. ACCT."),
+    "Central government gross debt": ("DEUDA GNC", "GOV. DEBT"),
+}
+
+
+def cinta(d, s, L):
+    """Cinta de cotizaciones tipo terminal: cada indicador con su ultimo dato y su cambio."""
+    try:
+        df = mt.tabla_senales(d, s, "en")
+    except Exception:
+        return ""
+    items = []
+    for _, r in df.iterrows():
+        cod = TICKERS.get(r["indicador"])
+        if not cod:
+            continue
+        cod = cod[0 if L == "es" else 1]
+        uni = str(r["unidad"])
+        val = num(r["valor"], r["dec"], L) + ("%" if uni == "%" else (" pts" if uni == "pts" else ("% PIB" if uni.startswith("%") and L == "es" else ("% GDP" if uni.startswith("%") else ""))))
+        ch = r["cambio"]
+        if ch is None or pd.isna(ch):
+            chtxt, cl, fl = "", "flat", ""
+        else:
+            cl = "up" if ch > 0.005 else ("down" if ch < -0.005 else "flat")
+            fl = "▲" if cl == "up" else ("▼" if cl == "down" else "■")
+            chtxt = num(ch, 1, L, True, "%") if r["relativo"] else num(ch, 2 if r["dec"] >= 2 else 1, L, True, " pp")
+        ventana = ("3m" if r["ventana"] == 91 else "12m")
+        items.append(f'<span class="tk"><b class="tk-c">{esc(cod)}</b><span class="tk-v">{val}</span>'
+                     f'<span class="tk-d {cl}">{fl} {chtxt}</span><small>{ventana}</small></span>')
+    if not items:
+        return ""
+    fila = "".join(items)
+    return (f'<div class="tape" role="region" aria-label="{t("cinta", L)}"><div class="tape-track">'
+            f'<div class="tape-row">{fila}</div><div class="tape-row" aria-hidden="true">{fila}</div></div></div>')
+
+
+def fondo_svg(d):
+    """Fondo de la pagina: velas mensuales reales del COLCAP y la tasa TES a 10 anos, muy tenues."""
+    try:
+        c = d.colcap.dropna(subset=["colcap_puntos"]).set_index("fecha")["colcap_puntos"].sort_index()
+        c = c[c.index >= c.index[-1] - pd.DateOffset(years=12)]
+        o = c.resample("ME").agg(["first", "max", "min", "last"]).dropna()
+    except Exception:
+        return ""
+    if len(o) < 12:
+        return ""
+    W, H = 1600, 900
+    lo, hi = o["min"].min(), o["max"].max()
+    y = lambda v: H * 0.88 - (v - lo) / (hi - lo) * H * 0.55
+    paso = W / len(o)
+    velas = []
+    for k, r in enumerate(o.itertuples()):
+        x = k * paso + paso / 2
+        sube = r.last >= r.first
+        top, bot = y(max(r.first, r.last)), y(min(r.first, r.last))
+        velas.append(f'<g class="{"cu" if sube else "cd"}"><line x1="{x:.1f}" x2="{x:.1f}" y1="{y(r.max):.1f}" y2="{y(r.min):.1f}"/>'
+                     f'<rect x="{x - paso * 0.32:.1f}" y="{top:.1f}" width="{paso * 0.64:.1f}" height="{max(bot - top, 1):.1f}"/></g>')
+    linea_ = ""
+    try:
+        tt = d.tasas.dropna(subset=["tes_pesos_10y"]).set_index("fecha")["tes_pesos_10y"].sort_index()
+        tt = tt[tt.index >= o.index[0]].resample("W").last().dropna()
+        tl, th = tt.min(), tt.max()
+        x0, x1 = tt.index[0].value, tt.index[-1].value
+        pts = " ".join(f"{(ix.value - x0) / (x1 - x0) * W:.1f},{H * 0.42 - (v - tl) / (th - tl) * H * 0.3:.1f}" for ix, v in tt.items())
+        linea_ = f'<polyline class="bg-tes" points="{pts}"/>'
+    except Exception:
+        pass
+    return (f'<svg class="bg-chart" viewBox="0 0 {W} {H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+            f'{"".join(velas)}{linea_}</svg>')
+
+
 # ------------------------------------------------------------------ graficos
 CHG_UP, CHG_DN = "rgba(42,120,214,0.62)", "rgba(235,104,52,0.68)"
 
@@ -840,7 +980,7 @@ def explorador_ciclo(d: mt.Datos, lang: str) -> str:
                       for v in am.FASES.values())
     return f"""<section id="ciclo" class="cycle">
   <div class="sec-head"><span class="sec-num">◷</span><h2>{t("q_ciclo", L)}</h2></div>
-  <p class="answer" id="ciclo-resp">{resp}</p>
+  {respuesta_html(resp, L, "ciclo-resp")}
   <div class="curve-app cycle-app" id="ciclo-app" data-lang="{L}">
     <div class="curve-ctrl">
       <label class="curve-date">{t("ck_ver", L)} <b id="ciclo-q">—</b></label>
@@ -915,10 +1055,10 @@ def fig_html(fig, meta, gid):
 
 
 # ------------------------------------------------------------------ piezas HTML
-def tarjeta(titulo, valor, detalle, estado, tono, pregunta_id):
-    return (f'<a class="card" href="#{pregunta_id}"><div class="card-top"><span class="card-title">{esc(titulo)}</span>'
+def tarjeta(titulo, valor, detalle, estado, tono, pregunta_id, spark=""):
+    return (f'<a class="card tone-{tono}" href="#{pregunta_id}"><div class="card-top"><span class="card-title">{esc(titulo)}</span>'
             f'<span class="pill {tono}">{esc(estado)}</span></div>'
-            f'<div class="card-value">{esc(valor)}</div><div class="card-detail">{detalle}</div></a>')
+            f'<div class="card-mid"><div class="card-value">{esc(valor)}</div>{spark}</div><div class="card-detail">{detalle}</div></a>')
 
 
 def pie_ficha(gid, L):
@@ -970,7 +1110,7 @@ def seccion(sid, num_, titulo, respuesta, graficos, detalle_html, lang, abierto=
     else:
         det = ""
     return (f'<section id="{sid}" class="section"><div class="sec-head"><span class="sec-num">{num_}</span>'
-            f'<h2>{esc(titulo)}</h2></div><p class="answer">{respuesta}</p>'
+            f'<h2>{esc(titulo)}</h2></div>{respuesta_html(respuesta, lang)}'
             f'<div class="grid">{"".join(graficos)}</div>{det}</section>')
 
 
@@ -986,15 +1126,24 @@ def pagina(d, s, lang, generado):
     ei = mt.estado_inflacion(i["total"])
     post = mt.postura_monetaria(tt.get("tpm_real_exante"))
 
+    sp = {"crec": sparkline(_serie_limpia(d.ciclo["fecha"], d.ciclo["pib_real_yoy"], pd.DateOffset(years=6))),
+          "inf": sparkline(_serie_limpia(d.inflacion["fecha"], d.inflacion["inflacion_anual"], pd.DateOffset(years=5))),
+          "tasa": sparkline(_serie_limpia(d.tasas["fecha"], d.tasas["tpm"], pd.DateOffset(years=5), "ME")),
+          "empleo": "", "dolar": "", "bolsa": ""}
+    if d.laboral is not None:
+        sp["empleo"] = sparkline(_serie_limpia(d.laboral["fecha"], d.laboral["td_sa"], pd.DateOffset(years=5)))
+    if not d.extra["trm"].empty:
+        sp["dolar"] = sparkline(_serie_limpia(d.extra["trm"]["fecha"], d.extra["trm"]["trm"], pd.DateOffset(years=2), "W"))
+    sp["bolsa"] = sparkline(_serie_limpia(d.colcap["fecha"], d.colcap["colcap_puntos"], pd.DateOffset(years=2), "W"))
     tono_c = {"fuerte": "ok", "normal": "ok", "lento": "warn", "contraccion": "bad"}[ec]
     tono_i = {"en_meta": "ok", "baja": "warn", "sobre_meta": "warn", "alta": "bad"}[ei]
     cards = [
         tarjeta(t("c_crec", L), num(c["pib_real_yoy"], 1, L, suf="%"),
                 f'{t("crec_detalle", L)} · {fecha(c["fecha"], "q", L)}<br>{t("ritmo_normal_corto", L)}: {num(c["crecimiento_potencial_hp"], 1, L, suf="%")}',
-                t(f"ec_{ec}", L), tono_c, "crecimiento"),
+                t(f"ec_{ec}", L), tono_c, "crecimiento", sp["crec"]),
         tarjeta(t("c_inf", L), num(i["total"], 2, L, suf="%"),
                 f'{t("inf_detalle", L)} · {fecha(i["fecha"], "m", L)}<br>{t("hace_ano", L)}: {num(i["hace_12m"], 1, L, suf="%")} · {t("meta_corta", L)}',
-                t(f"ei_{ei}", L), tono_i, "precios"),
+                t(f"ei_{ei}", L), tono_i, "precios", sp["inf"]),
     ]
     if tt.get("tpm") is not None:
         tono_p = {"restrictiva": "warn", "neutral": "ok", "expansiva": "warn"}.get(post, "neutral")
@@ -1005,26 +1154,26 @@ def pagina(d, s, lang, generado):
             cards.append(tarjeta(t("c_tasa", L), num(an["tasa"], 2, L, suf="%"),
                                  t("an_detalle", L).format(a=fecha(an["anuncio"], "d", L), v=fecha(an["vigente"], "d", L),
                                                            p=num(an["anterior"], 2, L)),
-                                 verbo, "warn", "banco"))
+                                 verbo, "warn", "banco", sp["tasa"]))
         else:
             cards.append(tarjeta(t("c_tasa", L), num(tt["tpm"], 2, L, suf="%"),
                                  f'{t("tasa_detalle", L)}<br>{t("hace_ano", L)}: {num(cambio, 2, L, suf="%")}',
-                                 t(f"ep_{post}", L), tono_p, "banco"))
+                                 t(f"ep_{post}", L), tono_p, "banco", sp["tasa"]))
     if s.get("laboral"):
         lb = s["laboral"]
         el = mt.estado_desempleo(lb["td"], lb["td_hace_12m"])
         cards.append(tarjeta(t("c_empleo", L), num(lb["td"], 1, L, suf="%"),
                              f'{t("empleo_detalle", L)} · {fecha(lb["fecha"], "m", L)}<br>{t("hace_ano", L)}: {num(lb["td_hace_12m"], 1, L, suf="%")}',
-                             t(f"el_{el}", L), {"mejora": "ok", "estable": "ok", "empeora": "warn"}[el], "crecimiento"))
+                             t(f"el_{el}", L), {"mejora": "ok", "estable": "ok", "empeora": "warn"}[el], "informalidad", sp["empleo"]))
     if m.get("trm") is not None:
         cards.append(tarjeta(t("c_dolar", L), "$" + num(m["trm"], 0, L),
                              f'{t("dolar_detalle", L)} · {fecha(m["trm_fecha"], "d", L)}<br>{t("en_un_ano", L)}: {num(m["trm_12m"], 1, L, True, "%")}',
                              t("peso_fuerte" if m["trm_12m"] < -5 else ("peso_debil" if m["trm_12m"] > 5 else "peso_estable"), L),
-                             "neutral", "mercados"))
+                             "neutral", "mercados", sp["dolar"]))
     cards.append(tarjeta(t("c_bolsa", L), num(m["colcap"], 0, L) + " pts",
                          f'{t("bolsa_detalle", L)} · {fecha(m["fecha"], "d", L)}<br>{t("en_un_ano", L)}: {num(m["colcap_12m"], 1, L, True, "%")}',
                          t("sube" if m["colcap_12m"] > 5 else ("baja" if m["colcap_12m"] < -5 else "estable"), L),
-                         "neutral", "mercados"))
+                         "neutral", "mercados", sp["bolsa"]))
 
     tecnico = mt.veredicto(s, L)
     fase = am.FASES[c["fase"]][0 if L == "es" else 1]
@@ -1155,7 +1304,7 @@ def pagina(d, s, lang, generado):
         f=fecha(ult["fecha"], "d", L), c=num(ult["tes_pesos_1y"], 2, L), l=num(ult["tes_pesos_10y"], 2, L),
         p=num(pend, 2, L, True), forma=t(forma, L), d=num(ult["tes_pesos_10y"] - ant["tes_pesos_10y"], 2, L, True))
     s_curva = (f'<section id="curva" class="section"><div class="sec-head"><span class="sec-num">4</span>'
-               f'<h2>{t("q_curva", L)}</h2></div><p class="answer">{resp_curva}</p>{explorador_curva(L)}'
+               f'<h2>{t("q_curva", L)}</h2></div>{respuesta_html(resp_curva, L)}{explorador_curva(L)}'
                f'<details class="tech"><summary>{t("detalle_tecnico", L)}</summary><div class="tech-body">'
                f'<p>{t("x_curva", L)}</p></div></details></section>')
 
@@ -1214,21 +1363,37 @@ def pagina(d, s, lang, generado):
 <title>{t("titulo_pagina", L)}</title>
 <meta name="description" content="{esc(t('meta_desc', L))}">
 <link rel="icon" href="{raiz}assets/favicon.svg">
+<meta name="color-scheme" content="dark light">
+<script>(function(){{var t=null;try{{t=localStorage.getItem('cm-tema')}}catch(e){{}}document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="{raiz}assets/estilo.css?v={VERSION_ACTIVOS[0]}">
 <script src="{raiz}assets/plotly.min.js?v={VERSION_ACTIVOS[1]}" defer></script>
 <script src="{raiz}assets/app.js?v={VERSION_ACTIVOS[0]}" defer></script>
 </head><body>
+<div class="bg" aria-hidden="true"><div class="bg-grid"></div><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="bg-glow g3"></div>{fondo_svg(d)}<div class="bg-vignette"></div></div>
+<div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
 <header class="top"><div class="wrap top-in">
   <a class="brand" href="#inicio"><img src="{raiz}assets/logo_usb.png" alt="USB Cali"><span><b>ColombiaMacro</b><small>{t("sub_marca", L)}</small></span></a>
   <nav class="menu" id="menu"><a href="#ciclo">{t("nav_ciclo", L)}</a><a href="#crecimiento">{t("nav_crec", L)}</a><a href="#sectores">{t("nav_sectores", L)}</a><a href="#capacidad">{t("nav_cap", L)}</a><a href="#informalidad">{t("nav_informal", L)}</a><a href="#precios">{t("nav_precios", L)}</a><a href="#banco">{t("nav_banco", L)}</a><a href="#curva">{t("nav_curva", L)}</a><a href="#mercados">{t("nav_mercados", L)}</a><a href="#empresas">{t("nav_empresas", L)}</a><a href="#indicadores">{t("nav_todos", L)}</a><a href="#noticias">{t("nav_noticias", L)}</a></nav>
   <button class="menu-toggle" id="menu-toggle" aria-controls="menu" aria-expanded="true" title="{t("menu_ocultar", L)}" data-ocultar="{t("menu_btn_ocultar", L)}" data-mostrar="{t("menu_btn_mostrar", L)}"><span class="mt-ico" aria-hidden="true">☰</span><span class="mt-txt">{t("menu_btn_ocultar", L)}</span></button>
+  <button class="theme-btn" id="theme-btn" type="button" aria-label="{t("tema_btn", L)}" title="{t("tema_btn", L)}" data-oscuro="{t("tema_oscuro", L)}" data-claro="{t("tema_claro", L)}">
+    <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+    <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 0 1 9.4 3.8a8.4 8.4 0 1 0 10.8 10.8z"/></svg>
+  </button>
   <a class="lang" href="{otro}">{t("otro_idioma", L)}</a>
-</div></header>
+</div>{cinta(d, s, L)}</header>
 <main id="inicio" class="wrap">
 <section class="hero">
+  <p class="term"><span class="live"><i></i>{t("en_vivo", L)}</span><span class="term-cmd">{t("terminal", L)} <b>&lt;GO&gt;</b></span></p>
   <p class="kicker">{t("kicker", L)} · {t("datos_al", L)} {fecha(generado, "d", L)} · {t("construido", L)} {construido}</p>
-  <h1>{t("h1", L)}</h1>
-  <p class="summary">{esc(mt.resumen_simple(s, L))}</p>
+  <div class="hero-grid">
+    <div class="hero-text"><h1>{t("h1", L)}</h1>
+      <p class="summary">{esc(mt.resumen_simple(s, L))}</p></div>
+    <div class="phase-box ph-{c["fase"]}">
+      <span class="phase-k">{t("ck_fase", L)}</span><b class="phase-v">{esc(fase)}</b>
+      <span class="phase-q">{fecha(c["fecha"], "q", L)}</span><a class="phase-go" href="#ciclo">{t("nav_ciclo", L)} →</a></div>
+  </div>
   <div class="cards">{"".join(cards)}</div>
   <p class="disclaimer">{t("aviso_estados", L)}</p>
 </section>
@@ -1237,10 +1402,10 @@ def pagina(d, s, lang, generado):
   <button data-years="3">{t("h3", L)}</button><button data-years="5">{t("h5", L)}</button><button data-years="10" class="on">{t("h10", L)}</button><button data-years="0">{t("htodo", L)}</button></div>
 {s1}{s_sec}{s_cap}{s_inf}{s2}{s3}{s_curva}{s4}{s_emp}{s5}
 <section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">8</span><h2>{t("q_todos", L)}</h2></div>
-<p class="answer">{t("resp_todos", L)}</p>{tabla}</section>
+{respuesta_html(t("resp_todos", L), L)}{tabla}</section>
 {bloque_noticias(d, s, L)}
 <section id="fuentes" class="section"><div class="sec-head"><span class="sec-num">9</span><h2>{t("q_fuentes", L)}</h2></div>
-<p class="answer">{t("resp_fuentes", L)}</p>{fuentes}
+{respuesta_html(t("resp_fuentes", L), L)}{fuentes}
 <p class="downloads"><b>{t("descargar", L)}:</b> {descargas}</p>
 <p class="downloads"><b>{t("documentos", L)}:</b> <a href="{REPO_URL}/blob/main/docs/METODOLOGIA.md">{t("metodologia", L)}</a> · <a href="{REPO_URL}/raw/main/docs/Manual_ColombiaMacro.pdf">{t("manual", L)}</a> · <a href="{REPO_URL}">GitHub</a></p>
 <details class="tech"><summary>{t("glosario", L)}</summary><dl class="gloss">{gloss}</dl></details>
@@ -1253,7 +1418,7 @@ def pagina(d, s, lang, generado):
 def numerar_secciones(html_: str) -> str:
     """Numera las secciones en el orden en que aparecen (1, 2, 3...)."""
     contador = iter(range(1, 100))
-    return re.sub(r'<span class="sec-num">\d+</span>', lambda m: f'<span class="sec-num">{next(contador)}</span>', html_)
+    return re.sub(r'<span class="sec-num">\d+</span>', lambda m: f'<span class="sec-num">{next(contador):02d}</span>', html_)
 
 
 def tabla_indicadores(d, s, L):

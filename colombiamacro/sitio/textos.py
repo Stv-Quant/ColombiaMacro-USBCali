@@ -264,8 +264,8 @@ T = {
     "resp_sec_neg": ("Se contrajeron: {lista}.", "Contracting: {lista}."),
     "resp_sec_todos": ("Ningún sector se contrajo.", "No sector contracted."),
     "g_sec_barras": ("Crecimiento anual por sector ({q})", "Annual growth by sector ({q})"),
-    "h_sec_barras": ("Barras: cuánto creció cada sector frente al mismo trimestre del año anterior (azul crece, naranja cae). La raya negra es el dato de hace un año: si la barra la supera, el sector se aceleró. Pase el cursor para ver su peso en la economía y cuántos puntos aportó.",
-                     "Bars: each sector's growth versus the same quarter a year earlier (blue grows, orange falls). The black tick is the figure a year ago: if the bar goes past it, the sector accelerated. Hover to see its weight in the economy and how many points it contributed."),
+    "h_sec_barras": ("Barras: cuánto creció cada sector frente al mismo trimestre del año anterior (azul crece, naranja cae). La raya vertical es el dato de hace un año: si la barra la supera, el sector se aceleró. Pase el cursor para ver su peso en la economía y cuántos puntos aportó.",
+                     "Bars: each sector's growth versus the same quarter a year earlier (blue grows, orange falls). The vertical tick is the figure a year ago: if the bar goes past it, the sector accelerated. Hover to see its weight in the economy and how many points it contributed."),
     "g_sec_mapa": ("Mapa del crecimiento por sector, trimestre a trimestre", "Growth map by sector, quarter by quarter"),
     "h_sec_mapa": ("Cada casilla es un sector en un trimestre: azul intenso, crecimiento alto; naranja, caída. Los sectores están ordenados por tamaño (los más grandes arriba). Se ve de un vistazo qué sectores cayeron en 2020 y cuáles lideran hoy. Haga clic en cualquier casilla para ver ese trimestre en las barras.",
                    "Each cell is a sector in a quarter: deep blue, strong growth; orange, contraction. Sectors are ordered by size (largest at the top). At a glance you can see which sectors fell in 2020 and which lead today. Click any cell to see that quarter in the bar chart."),
@@ -290,8 +290,8 @@ T = {
     "h_informal": ("Porcentaje de las personas ocupadas que trabajan sin seguridad social o en negocios no registrados (definición del DANE). Cada punto es un trimestre móvil. Abajo, el cambio frente a un año antes: barras naranjas = la informalidad bajó.",
                    "Share of employed people working without social security or in unregistered businesses (DANE definition). Each point is a rolling quarter. Below, the change versus a year earlier: orange bars = informality fell."),
     "g_inf_ramas": ("Informalidad por sector ({p})", "Informality by sector ({p})"),
-    "h_inf_ramas": ("Porcentaje de los ocupados de cada sector que son informales. La raya negra es el dato de hace un año. Pase el cursor para ver cuántas personas son.",
-                    "Share of each sector's workers who are informal. The black tick is the figure a year earlier. Hover to see how many people that is."),
+    "h_inf_ramas": ("Porcentaje de los ocupados de cada sector que son informales. La raya vertical es el dato de hace un año. Pase el cursor para ver cuántas personas son.",
+                    "Share of each sector's workers who are informal. The vertical tick is the figure a year earlier. Hover to see how many people that is."),
     "m_informal": ("Método: DANE, Gran Encuesta Integrada de Hogares, medición de empleo informal y seguridad social (resolución 0203 de 2023, basada en la OIT). Trimestres móviles desde 2021, total nacional y 13 ciudades con áreas metropolitanas. La tasa por sector = ocupados informales / ocupados del sector. No es comparable con la serie anterior a 2021 (otra definición y marco muestral).",
                    "Method: DANE, Integrated Household Survey, informal employment and social security (Resolution 0203 of 2023, ILO-based). Rolling quarters since 2021, national total and 13 cities with metro areas. Sector rate = informal workers / sector workers. Not comparable with the pre-2021 series (different definition and sample frame)."),
     "inf_nal": ("Total nacional", "National total"), "inf_13": ("13 ciudades (promedio)", "13 cities (average)"),
@@ -360,8 +360,8 @@ T = {
     "sec_ver": ("Ver el trimestre:", "Show quarter:"),
     "inf_13c": ("13 ciudades principales", "13 main cities"), "inf_23c": ("Otras ciudades (23 en total)", "Other cities (23 in total)"),
     "g_inf_ciudades": ("Informalidad por ciudad ({p})", "Informality by city ({p})"),
-    "h_inf_ciudades": ("Porcentaje de los ocupados que son informales en cada ciudad. En azul, las 13 ciudades principales; en gris, las otras 10 capitales que completan las 23. La raya negra es el dato de hace un año.",
-                       "Share of workers who are informal in each city. In blue, the 13 main cities; in grey, the other 10 capitals that complete the 23. The black tick is the figure a year earlier."),
+    "h_inf_ciudades": ("Porcentaje de los ocupados que son informales en cada ciudad. En azul, las 13 ciudades principales; en gris, las otras 10 capitales que completan las 23. La raya vertical es el dato de hace un año.",
+                       "Share of workers who are informal in each city. In blue, the 13 main cities; in grey, the other 10 capitals that complete the 23. The vertical tick is the figure a year earlier."),
     "x_informal": ("Las 13 ciudades principales son: {lista}. «A.M.» significa área metropolitana (la ciudad y sus municipios vecinos). La informalidad es mayor en el campo y en las ciudades más pequeñas porque allí predominan el trabajo por cuenta propia y los negocios sin registro; por eso el total nacional (que incluye zonas rurales) supera al de las ciudades.",
                    "The 13 main cities are: {lista}. \"A.M.\" means metropolitan area (the city and its neighbouring municipalities). Informality is higher in rural areas and smaller cities, where self-employment and unregistered businesses dominate; that is why the national total (which includes rural areas) exceeds the cities'."),
 
@@ -395,6 +395,15 @@ T = {
     "tes_pend": ("Pendiente 10 años − 1 año", "Slope 10y − 1y"),
     "m_curva": ("Método: tasas cero cupón de los TES publicadas a diario por el Banco de la República (series 15272–15277) para plazos de 1, 5 y 10 años, en pesos (nominales) y en UVR (reales). La comparación por años usa el último día hábil de cada año. El cambio se mide en puntos porcentuales frente a la observación más cercana un año antes de la fecha elegida.",
                 "Method: TES zero-coupon yields published daily by Banco de la República (series 15272–15277) for 1-, 5- and 10-year tenors, in pesos (nominal) and UVR (real). Year comparisons use each year's last business day. Changes are in percentage points against the closest observation one year before the selected date."),
+    # --- interfaz v12 (terminal de vidrio)
+    "lo_clave": ("Lo clave", "Key points"),
+    "tema_btn": ("Cambiar entre tema oscuro y claro", "Switch between dark and light theme"),
+    "tema_oscuro": ("Oscuro", "Dark"),
+    "tema_claro": ("Claro", "Light"),
+    "cinta": ("Indicadores principales: último dato y cambio", "Key indicators: latest value and change"),
+    "en_vivo": ("Actualización automática", "Auto-updated"),
+    "terminal": ("COLOMBIA · MONITOR MACRO", "COLOMBIA · MACRO MONITOR"),
+    "ir_a": ("Ir a la sección", "Go to section"),
 }
 
 GLOSARIO = {

@@ -1,6 +1,108 @@
 // ColombiaMacro: dibuja los graficos y aplica el horizonte temporal en el navegador.
 (function () {
   var CONFIG = { displayModeBar: false, responsive: true, scrollZoom: false };
+
+  // ---------------------------------------------------------------- tema oscuro / claro para los graficos
+  // Los graficos se definen con la paleta clara; en tema oscuro cada color conocido se cambia por su par.
+  // El fondo de todos los graficos es transparente: se ve el vidrio de la tarjeta.
+  var PARES = [
+    ['#0b0b0b', '#eaf0f8'], ['#52514e', '#b7c3d4'], ['#7a7974', '#8796ab'], ['#a3a19b', '#6f7d92'], ['#6b6a66', '#9aa7ba'],
+    ['#dcdad4', 'rgba(148,170,205,0.26)'], ['#eeede8', 'rgba(148,170,205,0.10)'], ['#b9b7b0', 'rgba(148,170,205,0.45)'],
+    ['#c9c7c0', 'rgba(148,170,205,0.34)'], ['#fff', '#0c1527'], ['#ffffff', '#0c1527'], ['#f7f6f2', '#17233a'],
+    ['#f3c9b3', '#7a3a1c'], ['#bfd7f3', '#1d4475'], ['#9ec5f0', '#2c5d9c'], ['#5b9be3', '#4f8fe0'],
+    ['#2a78d6', '#5aa6ff'], ['#1f4f8f', '#9cc8ff'], ['#4a3aa7', '#a397ff'], ['#1a7f4b', '#3fdc9a'], ['#b7791f', '#ffbd4a'],
+    ['#c0392b', '#ff7070'], ['#2b6cb0', '#7cc0ff'], ['#b3261e', '#ff6b6b'], ['#b04a17', '#ff9a5c'], ['#127a55', '#36d39a'],
+    ['#8a6d3b', '#d6b27a'], ['rgba(11,11,11,0.07)', 'rgba(255,255,255,0.08)'], ['rgba(82,81,78,0.13)', 'rgba(183,195,212,0.14)']
+  ];
+  function nrm(c) { return String(c).replace(/\s+/g, '').toLowerCase(); }
+  var A_OSCURO = {}, A_CLARO = {};
+  PARES.forEach(function (p) { A_OSCURO[nrm(p[0])] = p[1]; if (!(nrm(p[1]) in A_CLARO)) A_CLARO[nrm(p[1])] = p[0]; });
+  function tema() { return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+  function esColor(v) { return typeof v === 'string' && (v.charAt(0) === '#' || v.slice(0, 3) === 'rgb'); }
+  function convertir(o, mapa, prof) {
+    if (!o || typeof o !== 'object' || prof > 9 || ArrayBuffer.isView(o)) return o;
+    if (Array.isArray(o)) {
+      if (o.length > 40 && !esColor(o[0]) && !(o[0] && typeof o[0] === 'object')) return o;   // series de datos
+      for (var i = 0; i < o.length; i++) {
+        var v = o[i];
+        if (esColor(v)) { var r = mapa[nrm(v)]; if (r) o[i] = r; } else if (v && typeof v === 'object') convertir(v, mapa, prof + 1);
+      }
+      return o;
+    }
+    for (var k in o) {
+      if (!Object.prototype.hasOwnProperty.call(o, k) || k.charAt(0) === '_') continue;
+      var w = o[k];
+      if (k === 'paper_bgcolor' || k === 'plot_bgcolor') { o[k] = 'rgba(0,0,0,0)'; continue; }
+      if (esColor(w)) { var rr = mapa[nrm(w)]; if (rr) o[k] = rr; } else if (w && typeof w === 'object') convertir(w, mapa, prof + 1);
+    }
+    return o;
+  }
+  function tematizar(obj) { return convertir(obj, tema() === 'dark' ? A_OSCURO : A_CLARO, 0); }
+  if (window.Plotly) {
+    ['newPlot', 'react'].forEach(function (fn) {
+      var orig = Plotly[fn];
+      Plotly[fn] = function (el, data, layout, cfg) {
+        layout = layout || {}; layout.paper_bgcolor = 'rgba(0,0,0,0)'; layout.plot_bgcolor = 'rgba(0,0,0,0)';
+        tematizar(data); tematizar(layout);
+        return orig.call(Plotly, el, data, layout, cfg);
+      };
+    });
+    var origRelayout = Plotly.relayout;
+    Plotly.relayout = function (el, upd, val) {
+      if (upd && typeof upd === 'object') tematizar(upd);
+      return origRelayout.apply(Plotly, arguments);
+    };
+  }
+  function retematizarGraficos() {
+    document.querySelectorAll('.js-plotly-plot').forEach(function (el) {
+      if (!el.data || !el.layout) return;
+      try { Plotly.react(el, el.data, el.layout, CONFIG); } catch (e) { if (window.console) console.error(e); }
+    });
+  }
+  function botonTema() {
+    var btn = document.getElementById('theme-btn');
+    if (!btn) return;
+    function pintar() {
+      var t = tema();
+      btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+      btn.title = btn.getAttribute('aria-label') + ' (' + (t === 'dark' ? btn.dataset.oscuro : btn.dataset.claro) + ')';
+    }
+    btn.addEventListener('click', function () {
+      var nuevo = tema() === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nuevo);
+      try { localStorage.setItem('cm-tema', nuevo); } catch (e) {}
+      pintar(); retematizarGraficos();
+    });
+    pintar();
+  }
+
+  // ---------------------------------------------------------------- barra de lectura, seccion activa y aparicion suave
+  function lectura() {
+    var bar = document.getElementById('progress-bar');
+    var enlaces = Array.prototype.slice.call(document.querySelectorAll('.menu a[href^="#"]'));
+    var secciones = enlaces.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+    var pendiente = false;
+    function actualizar() {
+      pendiente = false;
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      if (bar) bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, window.scrollY / h) : 0) + ')';
+      var activo = -1, lim = window.innerHeight * 0.35;
+      secciones.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < lim) activo = i; });
+      enlaces.forEach(function (a, i) { a.classList.toggle('activo', i === activo); });
+    }
+    window.addEventListener('scroll', function () { if (!pendiente) { pendiente = true; requestAnimationFrame(actualizar); } }, { passive: true });
+    window.addEventListener('resize', actualizar);
+    actualizar();
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.card, .answer, .section .chart, .curve-app, .notes, .table-wrap').forEach(function (el, i) {
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight) return;           // lo que ya se ve no se anima
+      el.classList.add('rv'); io.observe(el);
+    });
+  }
   var plots = [];
 
   function toDate(v) { return new Date(v).getTime(); }
@@ -344,8 +446,7 @@
       var nivel = (p.x >= 0 ? X.ck_encima : X.ck_debajo).replace('{v}', fmt(Math.abs(p.x), 1));
       var dir = (p.y >= 0 ? X.ck_mejora : X.ck_empeora).replace('{v}', fmt(Math.abs(p.y), 1));
       document.getElementById('ciclo-stats').innerHTML =
-        '<div class="stat"><span class="stat-n">' + X.ck_fase + '</span><span class="stat-v"><span class="phase-pill" style="background:' +
-        tinte(f.color, 0.12) + ';color:' + f.color + '">' + f.nombre + '</span></span><span class="stat-f">' + p.q + '</span><span class="stat-c">' + f.desc + '</span></div>' +
+        '<div class="stat"><span class="stat-n">' + X.ck_fase + '</span><span class="stat-v"><span class="phase-pill ph-' + p.fase + '">' + f.nombre + '</span></span><span class="stat-f">' + p.q + '</span><span class="stat-c">' + f.desc + '</span></div>' +
         bloque(X.ck_brecha, fmt(p.x, 1, true) + '%', nivel) +
         bloque(X.ck_dir, '<span class="chg ' + (p.y >= 0 ? 'up' : 'down') + '">' + (p.y >= 0 ? '▲ ' : '▼ ') + fmt(p.y, 1, true) + ' pp</span>', dir) +
         bloque(X.ck_racha, String(racha(idx)), racha(idx) === 1 ? X.ck_trim1 : X.ck_trim);
@@ -561,6 +662,8 @@
 
   function init() {
     seguro(cabecera);   // primero: el menu funciona aunque falle algun grafico
+    seguro(botonTema);
+    seguro(lectura);
     document.querySelectorAll('script[data-for]').forEach(function (s) {
       var el = document.getElementById(s.getAttribute('data-for'));
       if (!el) return;

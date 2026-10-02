@@ -47,10 +47,10 @@ FICHAS = {
                      "previous 12 months. Usual pace: annual average of trend (HP) growth. Reference: simple 2010–2019 average.")),
     "g-sec-barras": (DANE_PIB,
                      ("12 agrupaciones CIIU Rev. 4 (volúmenes encadenados, año base 2015, datos originales). Crecimiento anual "
-                      "frente al mismo trimestre del año anterior; la raya negra es el dato de un año antes. Aporte = cambio del "
+                      "frente al mismo trimestre del año anterior; la raya vertical es el dato de un año antes. Aporte = cambio del "
                       "nivel del sector en un año / valor agregado total de hace un año.",
                       "12 ISIC Rev. 4 groupings (chain-linked volumes, base 2015, original data). Annual growth versus the "
-                      "same quarter a year earlier; the black tick is the figure a year before. Contribution = one-year change "
+                      "same quarter a year earlier; the vertical tick is the figure a year before. Contribution = one-year change "
                       "of the sector's level / total value added a year earlier.")),
     "g-sec-mapa": (DANE_PIB,
                    ("Crecimiento anual de cada sector por trimestre. La escala de color se recorta en ±12% para que 2020 no "
@@ -62,8 +62,8 @@ FICHAS = {
                     "unidades no registradas. Trimestres móviles desde 2021; no comparable con la serie anterior.",
                     "Share of informal workers (DANE 2023 definition, ILO-aligned): no social security or unregistered units. "
                     "Rolling quarters since 2021; not comparable with the earlier series.")),
-    "g-inf-ramas": (DANE_INF, ("Informales / ocupados de cada rama, total nacional. La raya negra es el dato de un año antes.",
-                               "Informal / employed in each sector, national total. The black tick is the figure a year before.")),
+    "g-inf-ramas": (DANE_INF, ("Informales / ocupados de cada rama, total nacional. La raya vertical es el dato de un año antes.",
+                               "Informal / employed in each sector, national total. The vertical tick is the figure a year before.")),
     "g-inf-ciudades": (DANE_INF, ("Proporción de ocupados informales en cada una de las 23 ciudades y áreas metropolitanas "
                                   "(A.M.); en azul las 13 principales. La raya es el dato de un año antes.",
                                   "Share of informal workers in each of the 23 cities and metropolitan areas (A.M.); the 13 "

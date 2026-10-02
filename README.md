@@ -33,6 +33,13 @@ recuadro flotante indica el cambio de cada punto. Las escalas se ajustan al peri
 (brecha del producto HP/Hamilton, reloj del ciclo, tasa real, 5y5y) están en los paneles
 "Detalle técnico", siempre explicados.
 
+**Interfaz (v12, terminal de vidrio).** Tema oscuro tipo terminal financiera por defecto y tema
+claro con un botón (☀/☾, se recuerda en el navegador). Fondo con rejilla, luces de color y las
+**velas mensuales reales del COLCAP** y la tasa TES a 10 años (muy tenues). Debajo del menú corre
+una **cinta de cotizaciones** con los 16 indicadores y su cambio; las tarjetas muestran una
+mini-serie de tendencia; cada sección abre con **"Lo clave"**: la respuesta en puntos, con las cifras
+resaltadas. Se respeta `prefers-reduced-motion` (sin animaciones) y funciona desde 375 px de ancho.
+
 ## Estructura
 
 ```
