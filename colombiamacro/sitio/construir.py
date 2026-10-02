@@ -1102,6 +1102,52 @@ CLAVE_SENAL = {  # nombre en ingles de tabla_senales -> clave de la portada
 }
 
 
+def curva_portada(d, L):
+    """Curva TES de hoy frente a hace un ano, en SVG liviano (la portada no carga Plotly)."""
+    tc = d.tasas.dropna(subset=["tes_pesos_1y", "tes_pesos_5y", "tes_pesos_10y"])
+    if tc.empty:
+        return ""
+    u = tc.iloc[-1]
+    a = tc[tc["fecha"] <= u["fecha"] - pd.DateOffset(years=1)]
+    a = a.iloc[-1] if not a.empty else None
+    plazos = (1, 5, 10)
+    hoy = [float(u[f"tes_pesos_{p}y"]) for p in plazos]
+    ant = [float(a[f"tes_pesos_{p}y"]) for p in plazos] if a is not None else None
+    vals = hoy + (ant or [])
+    lo, hi = min(vals), max(vals)
+    pad = max((hi - lo) * 0.25, 0.4)
+    lo, hi = lo - pad, hi + pad
+    W, H, ml, mr, mt_, mb = 320, 170, 34, 10, 24, 24
+    X = lambda p: ml + (p - 1) / 9 * (W - ml - mr)
+    Y = lambda v: mt_ + (hi - v) / (hi - lo) * (H - mt_ - mb)
+    def trazo(ys, cls):
+        return f'<polyline class="{cls}" points="{" ".join(f"{X(p):.1f},{Y(v):.1f}" for p, v in zip(plazos, ys))}"/>'
+    grid = ""
+    paso = 1.0 if hi - lo < 6 else 2.0
+    v = np.ceil(lo / paso) * paso
+    while v <= hi:
+        grid += (f'<line class="tc-g" x1="{ml}" x2="{W - mr}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
+                 f'<text class="tc-y" x="{ml - 6}" y="{Y(v) + 3.5:.1f}" text-anchor="end">{num(v, 0, L)}%</text>')
+        v += paso
+    ejes = "".join(f'<text class="tc-x" x="{X(p):.1f}" y="{H - 6}" text-anchor="middle">{p}{"a" if L == "es" else "y"}</text>' for p in plazos)
+    anclas = {1: ("start", 7), 5: ("middle", 0), 10: ("end", 2)}
+    puntos = "".join(f'<circle class="tc-p" cx="{X(p):.1f}" cy="{Y(v_):.1f}" r="3.6"/>'
+                     f'<text class="tc-v" x="{X(p) + anclas[p][1]:.1f}" y="{Y(v_) - 9:.1f}" text-anchor="{anclas[p][0]}">{num(v_, 2, L)}%</text>'
+                     for p, v_ in zip(plazos, hoy))
+    svg = (f'<svg class="tc-svg" viewBox="0 0 {W} {H}" role="img" aria-label="{esc(t("tes_g_curva", L))}">{grid}{ejes}'
+           f'{trazo(ant, "tc-a") if ant else ""}{trazo(hoy, "tc-h")}{puntos}</svg>')
+    pend = hoy[2] - hoy[0]
+    forma = "tc_normal" if pend > 0.3 else ("tc_invertida" if pend < 0 else "tc_plana")
+    ley = (f'<span class="tc-l"><i class="tc-lh"></i>{fecha(u["fecha"], "d", L)}</span>'
+           + (f'<span class="tc-l"><i class="tc-la"></i>{fecha(a["fecha"], "d", L)}</span>' if a is not None else ""))
+    dl = (f'<span><small>{t("pend_corta", L)}</small>{num(pend, 2, L, True, " pp")}</span>'
+          f'<span><small>{t("tc_forma", L)}</small>{t(forma, L)}</span>'
+          + (f'<span><small>TES 10{"a" if L == "es" else "y"} · {t("en_12m", L)}</small>{num(hoy[2] - ant[2], 2, L, True, " pp")}</span>' if ant else ""))
+    return (f'<a class="tc-box" href="curva-tes/"><span class="phase-k">{t("tc_titulo", L)}</span>'
+            f'<span class="tc-ley">{ley}</span>{svg}<span class="phase-dl">{dl}</span>'
+            f'<span class="phase-go">{t("tc_cta", L)} →</span></a>')
+
+
 def tabla_portada(d, s, L):
     """Ultimo dato y cambio de cada indicador que muestra la portada (mismas cifras que la tabla completa)."""
     filas = []
@@ -1587,7 +1633,7 @@ def pagina(d, s, lang, generado):
       <span class="phase-dl"><span><small>{t("ph_brecha", L)}</small>{num(ult_c["x"], 1, L, True, "%")}</span><span><small>{t("ph_dir", L)}</small><em class="{"up" if ult_c["y"] >= 0 else "down"}">{num(ult_c["y"], 1, L, True, " pp")}</em></span><span><small>{t("ph_racha", L)}</small>{racha_c} {t("ck_trim1" if racha_c == 1 else "ck_trim", L)}</span></span>
       <span class="phase-go">{t("cta_ciclo", L)} →</span></a>
   </div>
-  <div class="cards">{"".join(cards)}</div>
+  <div class="kpi-row"><div class="cards">{"".join(cards)}</div>{curva_portada(d, L)}</div>
   <p class="disclaimer"><span>{t("fuentes_corto", L)}</span><span>{t("aviso_estados", L)}</span></p>
 </section>
 <section class="bloque" id="lectura" aria-labelledby="lectura-t">

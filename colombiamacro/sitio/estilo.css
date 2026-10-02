@@ -485,3 +485,30 @@ figure.chart.expandida .exp-btn{opacity:1}
   .bloque-h{grid-template-columns:1fr}.bloque-h p{grid-column:1}
 }
 @media (max-width:480px){.brand .logos{display:none}.brand-t{border-left:0;padding-left:0}}
+
+/* curva TES en la portada (SVG, sin Plotly), junto a las tarjetas */
+.kpi-row{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(300px,1fr);gap:16px;align-items:stretch}
+[data-theme="dark"] .hero-grid{align-items:start}
+[data-theme="dark"] .kpi-row .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+.tc-box{display:flex;flex-direction:column;padding:18px 22px 16px;color:var(--ink);
+  background:var(--glass);border:1px solid var(--line);border-radius:var(--radius);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi);transition:background .2s,border-color .2s}
+.tc-box:hover{text-decoration:none;background:var(--glass-hover);border-color:var(--acc)}
+.tc-ley{display:flex;flex-wrap:wrap;gap:4px 16px;margin:6px 0 2px;font-size:11.5px;color:var(--muted)}
+.tc-l{display:inline-flex;align-items:center;gap:6px}
+.tc-l i{display:inline-block;width:16px;height:0;border-top:2px solid var(--acc)}
+.tc-l i.tc-la{border-top:1.5px dashed var(--faint)}
+.tc-svg{width:100%;height:auto;display:block;margin:4px 0 10px;overflow:visible;flex:1}
+.tc-g{stroke:var(--hair);stroke-width:1}
+.tc-y,.tc-x{fill:var(--muted);font-family:var(--f-ui);font-size:10px}
+.tc-a{fill:none;stroke:var(--faint);stroke-width:1.5;stroke-dasharray:4 3}
+.tc-h{fill:none;stroke:var(--acc);stroke-width:2.4;stroke-linejoin:round}
+.tc-p{fill:var(--acc);stroke:var(--bg);stroke-width:2}
+.tc-v{fill:var(--ink);font-family:var(--f-ui);font-size:11px;font-weight:600}
+.tc-box .phase-dl{font-size:14px;margin-top:auto}
+.tc-box .phase-dl small{min-height:2.4em}
+@media (max-width:1180px){.kpi-row{grid-template-columns:1fr}.tc-box{max-width:560px}}
+.kpi-row .card{grid-template-columns:1fr;align-items:start}
+.kpi-row .card-top{flex-direction:column;align-items:flex-start;gap:3px}
+.kpi-row .pill{text-align:left}
+.kpi-row .card-value{font-size:clamp(30px,2.7vw,40px)}
+.kpi-row .spark{height:30px;margin-top:12px}
