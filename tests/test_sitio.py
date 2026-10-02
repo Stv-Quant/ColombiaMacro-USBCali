@@ -43,7 +43,7 @@ class TestSitio(unittest.TestCase):
         cls.tmp.cleanup()
 
     PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento", "crec-medidas", "crec-velocidad", "crec-precios", "crec-quien", "crec-demanda", "crec-inversion", "crec-hogares", "crec-persona", "crec-amplitud", "crec-nivel", "crec-literatura", "sectores"),
-               "capacidad": ("capacidad", "cap-medidas", "cap-sectores", "cap-laboral", "cap-regiones", "cap-estructura", "cap-literatura"), "empleo": ("informalidad", "emp-medidas", "emp-ramas", "emp-posicion", "emp-genero", "emp-jovenes", "emp-area", "emp-ciudades", "emp-literatura"), "inflacion": ("precios",), "tasas": ("banco",),
+               "capacidad": ("capacidad", "cap-medidas", "cap-sectores", "cap-laboral", "cap-regiones", "cap-estructura", "cap-literatura"), "empleo": ("informalidad", "emp-medidas", "emp-ramas", "emp-posicion", "emp-genero", "emp-jovenes", "emp-area", "emp-ciudades", "emp-literatura"), "inflacion": ("precios", "inf-medidas", "inf-aportes", "inf-bienes", "inf-difusion", "inf-ingresos", "inf-ciudades", "inf-literatura"), "tasas": ("banco",),
                "curva-tes": ("curva", "curva-app"), "mercados": ("mercados",), "empresas": ("empresas",),
                "externo": ("externo",), "comercio": ("comercio-cifras", "comercio-flujos", "comercio-vende", "comercio-compra", "comercio-socios"), "indicadores": ("indicadores", "fuentes", "noticias")}
 

@@ -358,6 +358,21 @@ FICHAS = {
                           "Unemployment rate in urban centres and in villages and dispersed rural areas, rolling quarter, not seasonally adjusted.")),
     "g-emp-fuera": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"), ("Población fuera de la fuerza de trabajo según su actividad principal (estudiando, oficios del hogar, otros), total nacional, promedio de 12 meses, en millones.",
                            "Population outside the labour force by main activity (studying, household work, other), national total, 12-month average, in millions.")),
+    # --- inflacion ampliada
+    "g-inf-aportes": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Aporte de cada división (COICOP) a la variación anual del IPC total, calculado por el DANE con las ponderaciones de la canasta 2018 y la evolución de precios relativos.",
+                             "Each COICOP division's contribution to the annual change in total CPI, computed by DANE with the 2018 basket weights and the evolution of relative prices.")),
+    "g-inf-divisiones": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Variación anual del índice de cada división de gasto, total nacional.", "Annual change in each spending division's index, national total.")),
+    "g-inf-bienes-servicios": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Índices del DANE por durabilidad (servicios, bienes durables, semidurables y no durables), base diciembre 2018 = 100; variación frente al mismo mes del año anterior.",
+                                      "DANE indices by durability (services, durable, semi-durable and non-durable goods), base December 2018 = 100; change versus the same month a year earlier.")),
+    "g-inf-energia": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("IPC de energéticos (gas, energía eléctrica y combustibles) e IPC total sin alimentos ni energéticos, publicados por el DANE; variación anual.",
+                             "Energy CPI (gas, electricity and fuel) and total CPI excluding food and energy, published by DANE; annual change.")),
+    "g-inf-difusion": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Histograma de la variación anual de las 188 subclases de la canasta (sin ponderar), en intervalos de 1 pp; valores extremos agrupados en −10% y 20%.",
+                              "Histogram of the annual change in the 188 basket subclasses (unweighted), in 1 pp bins; extreme values grouped at −10% and 20%.")),
+    "g-inf-subclases": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Contribución de cada subclase a la variación anual del IPC total (DANE), en puntos porcentuales.", "Each subclass's contribution to the annual change in total CPI (DANE), in percentage points.")),
+    "g-inf-ingresos": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("IPC calculado con la canasta de cada nivel de ingreso definido por el DANE (pobres, vulnerables, clase media e ingresos altos, según la línea de pobreza).",
+                              "CPI computed with the basket of each income level defined by DANE (poor, vulnerable, middle class and high income, based on the poverty line).")),
+    "g-inf-ciudades": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Variación anual del IPC total en las 23 ciudades capitales con canasta propia.", "Annual change in total CPI in the 23 capital cities with their own basket.")),
+    "g-inf-ciudad-division": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Variación anual por ciudad y división de gasto (cuadro 6 del anexo).", "Annual change by city and spending division (table 6 of the annex).")),
 }
 
 

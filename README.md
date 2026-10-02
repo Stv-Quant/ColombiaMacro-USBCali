@@ -23,7 +23,7 @@ Páginas de análisis (menú agrupado):
 | | `/sectores/` | Redirige a `/crecimiento/#sectores` (los 12 sectores ahora viven dentro de Crecimiento) |
 | | `/capacidad/` | Seis medidas de holgura; PIB frente a su capacidad; brecha de los 12 sectores (mapa de calor y hoy); holgura laboral (desempleo, subempleo y subutilización OIT; desempleo vs tendencia); mapa esquemático de los 33 departamentos (crecimiento, tamaño vs 2019, PIB por persona, desempleo de la capital); ranking regional; estructura productiva y diversificación (Herfindahl); literatura |
 | | `/empleo/` | Ocho medidas; desempleo e informalidad (nacional, por sector y por ciudad); empleos creados por rama y frente a 2019; posición ocupacional y asalarización; brechas mujeres–hombres; jóvenes (desempleo y NiNi); campo y ciudad; población fuera de la fuerza de trabajo; desempleo en 32 capitales; literatura |
-| Precios y tasas | `/inflacion/` | Inflación vs. meta, qué precios suben más, inflación esperada y trayectoria a 10 años |
+| Precios y tasas | `/inflacion/` | Ocho medidas; inflación vs. meta, qué precios suben más, inflación esperada y trayectoria; aportes por división; bienes vs. servicios y energéticos; difusión entre 188 subclases; inflación por nivel de ingreso; 23 ciudades (ranking y mapa de calor por división); literatura |
 | | `/tasas/` | Tasa del Banco de la República y tasa real |
 | | `/curva-tes/` | Curva cero cupón TES interactiva desde 2003 |
 | Mercados y cuentas | `/mercados/` | Dólar (TRM) y COLCAP |

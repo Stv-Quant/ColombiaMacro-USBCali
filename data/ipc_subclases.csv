@@ -1,0 +1,189 @@
+fecha,codigo,subclase,var_mensual,var_anual,contrib_anual
+2026-08-01,01110100,Arroz,1.1100,-3.6200,-0.0400
+2026-08-01,01110200,Pastas Alimenticias,1.0000,2.0500,0.0000
+2026-08-01,01110300,Avena Y Sus Derivados,0.1500,2.0800,0.0000
+2026-08-01,01110500,Trigo Y Sus Derivados,0.2500,0.5200,0.0000
+2026-08-01,01110600,Maíz Y Sus Derivados,0.3600,4.4600,0.0000
+2026-08-01,01110800,Pan,-0.0200,6.8100,0.0500
+2026-08-01,01119800,"Otras Harinas, Cereales Y Almidones",0.2000,8.7600,0.0300
+2026-08-01,01119900,Otros Productos De Panadería,0.3800,4.8500,0.0200
+2026-08-01,01120100,Carne De Res Y Derivados,0.3600,14.0900,0.3400
+2026-08-01,01120200,Carne De Cerdo Y Derivados,-0.5700,-6.0400,-0.0300
+2026-08-01,01120300,Carne De Aves,0.2000,3.6500,0.0500
+2026-08-01,01120500,"Carnes Preparadas, Charcutería Y Otros Productos Conteniendo Carne",0.2300,7.8000,0.0400
+2026-08-01,01130300,Productos de rio y mar (incluye pescados y camarones frescos o congelados y pescado enlatado como sardinas y atún),-0.2600,1.5700,0.0100
+2026-08-01,01140100,Leche,0.1500,8.7600,0.1200
+2026-08-01,01140200,Quesos Y Productos Afines,0.7800,8.3400,0.0400
+2026-08-01,01140500,Huevos,-0.4700,-1.5000,-0.0100
+2026-08-01,01149900,Otros Derivados De La Leche,0.5500,11.0700,0.0300
+2026-08-01,01150100,Aceites Comestibles,0.1300,0.4500,0.0000
+2026-08-01,01150200,Mantequilla De Vaca,0.1800,9.0500,0.0100
+2026-08-01,01150500,Margarinas y grasas animales y vegetales,0.2600,4.4200,0.0000
+2026-08-01,01160200,Frutas Congeladas O En Pulpa,0.5300,5.1400,0.0000
+2026-08-01,01160300,"Frutos Secos Y Nueces, Cáscaras De Frutas Y Semillas Comestibles",0.2600,4.9300,0.0000
+2026-08-01,01160500,Naranjas,9.1900,30.6800,0.0300
+2026-08-01,01160600,Bananos,1.2000,-2.6900,0.0000
+2026-08-01,01160700,Tomate de árbol,0.7100,23.5300,0.0200
+2026-08-01,01160800,Moras,1.5900,20.8500,0.0200
+2026-08-01,01160900,Frutas frescas,4.9500,18.3100,0.2600
+2026-08-01,01170200,Legumbres Secas,-0.5600,-9.5700,-0.0300
+2026-08-01,01170300,Legumbres Y Hortalizas En Conserva Y Deshidratadas,-0.2000,3.5900,0.0000
+2026-08-01,01170400,Plátanos,-2.9000,-3.0200,-0.0100
+2026-08-01,01170500,Papas,4.3200,63.4500,0.1900
+2026-08-01,01170600,Yuca Para Consumo En El Hogar,-0.2200,20.7300,0.0200
+2026-08-01,01171100,"Productos Derivados De Los Tubérculos, Raíces Y Plátanos",0.4800,3.8000,0.0000
+2026-08-01,01171200,"Arracacha, ñame y otros tubérculos",5.7000,60.4300,0.0200
+2026-08-01,01171300,Tomate,2.0300,-11.7700,-0.0300
+2026-08-01,01171400,Cebolla,-2.5700,5.4100,0.0200
+2026-08-01,01171500,Zanahoria,-7.1400,-29.2600,-0.0200
+2026-08-01,01171600,Hortalizas y legumbres frescas,3.2700,-0.3400,0.0000
+2026-08-01,01180100,Azúcar Y Otros Endulzantes,0.0000,-8.3800,-0.0200
+2026-08-01,01180200,Panela Cruda Para Consumo En El Hogar,-0.4800,1.2300,0.0000
+2026-08-01,01180300,"Jaleas, Mermeladas, Miel Y Similares",0.1200,4.1600,0.0000
+2026-08-01,01180500,"Dulces, Confites, Caramelos, Bombones, Chocolatinas, Chicles, Masmelos, Cocadas Para Consumo En El Hogar",0.3600,-17.4000,-0.0200
+2026-08-01,01180600,"Helados, Conos, Paletas, Vasitos, Refrescos Congelados Y Tortas Heladas Para Consumo En El Hogar",0.4000,7.0700,0.0100
+2026-08-01,01180700,"Gelatinas, Flanes Y Pudines En Polvo Para Preparar",0.0800,4.2100,0.0000
+2026-08-01,01190100,"Salsas, Pastas Y Aderezos",0.8700,2.9500,0.0100
+2026-08-01,01190200,Sal,0.6700,12.6600,0.0000
+2026-08-01,01190500,"Sopas, Cremas, Caldos Y Consomés",0.4700,4.9400,0.0000
+2026-08-01,01190600,"Frituras: papas fritas, chitos, maizitos, patacones, besitos, etc., para consumo en el hogar",0.8200,7.2500,0.0100
+2026-08-01,01190800,Condimentos y hierbas culinarias,-1.4100,4.5800,0.0000
+2026-08-01,01191100,Leche En Polvo Para Lactantes,0.2500,6.0000,0.0000
+2026-08-01,01199900,"Otros Alimentos Precocidos Y Preparados: Ajiaco, Lenteja, Frijol, Lechona Enlatada Y Similares",1.2100,2.9300,0.0000
+2026-08-01,01210100,Café Y Productos A Base De Café,-1.1800,-0.2000,0.0000
+2026-08-01,01210200,Chocolate Y Productos A Base De Chocolate,-0.8500,-2.3400,-0.0100
+2026-08-01,01210300,Té E Infusiones (Para Bebidas Calientes),0.5000,14.7600,0.0000
+2026-08-01,01220100,Agua Mineral (Con Y Sin Gas) Para Consumo En El Hogar,1.0100,4.7700,0.0100
+2026-08-01,01220600,"Refrescos Líquidos Empacados (Jugos, Té Fríos Y Bebidas Hidratantes)",0.4400,4.3000,0.0100
+2026-08-01,01220700,Concentrados Para Preparar Refrescos,-0.0300,3.1100,0.0000
+2026-08-01,01221100,Gaseosas y maltas para consumo en el hogar,0.8500,3.0700,0.0200
+2026-08-01,01221200,"Bebidas energizantes y a base de arroz, soya, coco y similares",0.0200,4.0700,0.0000
+2026-08-01,02110100,Aguardiente,0.1800,8.1500,0.0100
+2026-08-01,02110500,"Whisky, ron, brandy, vodka, ginebra, coñac, tequila, cremas de licor y aperitivos",0.0900,4.2500,0.0100
+2026-08-01,02120100,"Vino, Champaña, Jerez Y Aperitivos A Base De Vino Para Consumo En El Hogar",0.0100,5.2800,0.0000
+2026-08-01,02130100,Cerveza Y Refajo,0.6000,6.8200,0.0700
+2026-08-01,02210100,"Cigarrillos, tabaco y derivados",0.3600,13.0600,0.0200
+2026-08-01,03120100,Prendas De Vestir Para Hombre,-0.2800,3.3500,0.0300
+2026-08-01,03120200,Prendas De Vestir Para Mujer,-0.5400,2.1300,0.0200
+2026-08-01,03120500,Prendas De Vestir Para Bebés,0.3100,2.0300,0.0000
+2026-08-01,03120600,Uniformes,0.0000,6.0400,0.0100
+2026-08-01,03120700,Prendas de vestir para niña y niño,0.1300,3.1800,0.0100
+2026-08-01,03131000,"Otros artículos y accesorios de vestir para hombre y mujer, incluyendo artículos de vestir para adulto y bebé y materiales",0.2100,2.3700,0.0000
+2026-08-01,03140200,Lavado Y Planchado De Ropa,0.1200,9.3600,0.0100
+2026-08-01,03210100,Calzado Para Hombre,0.3500,2.4900,0.0100
+2026-08-01,03210200,Calzado Para Mujer,0.0300,2.8700,0.0100
+2026-08-01,03210700,Calzado para niño y niña,-0.0500,2.4100,0.0000
+2026-08-01,04130100,Arriendo efectivo,0.3800,5.0100,0.4700
+2026-08-01,04230100,Arriendo imputado,0.3900,4.9300,0.6300
+2026-08-01,04310100,Materiales Para La Conservación Y La Reparación De La Vivienda,-0.1200,3.5400,0.0000
+2026-08-01,04410100,Suministro De Agua,-4.0400,1.2600,0.0200
+2026-08-01,04420100,Recogida De Basuras,0.1400,19.4400,0.0900
+2026-08-01,04430100,Alcantarillado,7.1300,13.7900,0.0700
+2026-08-01,04440100,Servicios Relacionados Con La Copropiedad,0.6500,17.1000,0.2200
+2026-08-01,04510100,Electricidad,2.3300,7.5900,0.2600
+2026-08-01,04520300,Gas,-1.2900,1.4000,0.0200
+2026-08-01,05110100,Muebles,0.0300,3.9200,0.0200
+2026-08-01,05110200,Equipo De Iluminación,0.1700,4.7400,0.0000
+2026-08-01,05119900,Otros Artículos De Decoración,0.5400,-4.6700,0.0000
+2026-08-01,05210200,Ropa confeccionada para cama,0.0200,1.7500,0.0000
+2026-08-01,05210700,Ropa de tocador y productos textiles del hogar,0.0700,2.9600,0.0000
+2026-08-01,05310100,"Neveras, Refrigeradores Y Congeladores",-0.7300,-4.7000,-0.0100
+2026-08-01,05310200,"Lavadoras, Secadoras Y Lava-Vajillas",-0.8900,-7.2300,-0.0100
+2026-08-01,05310300,"Estufas, Hornos Y Pipetas De Gas",0.0300,2.3300,0.0000
+2026-08-01,05320100,Aparatos Eléctricos Pequeños Para El Hogar,-0.6100,-2.9000,0.0000
+2026-08-01,05410100,"Cristalería y vajilla Artículos, vajillas y utensilios de vidrio, cristal, porcelana y cerámica para el hogar",0.4500,2.8800,0.0000
+2026-08-01,05410300,Utensilios de cocina y menaje no eléctricos,0.5100,4.4300,0.0000
+2026-08-01,05520300,Accesorios Eléctricos Pequeños,0.1300,0.0800,0.0000
+2026-08-01,05610100,Productos De Limpieza Y Mantenimiento,0.9500,6.0200,0.0800
+2026-08-01,05610200,Elementos De Aseo,0.2400,4.3000,0.0100
+2026-08-01,05610400,"Artículos De Ferretería: Puntillas, Clavos, Tornillos, Tuercas, Brocas, Brochas, Pinceles, Lijas Y Otros.",-2.0200,-3.1600,0.0000
+2026-08-01,05610600,Productos desechables y no duraderos para el hogar,0.3200,6.9900,0.0100
+2026-08-01,05620100,Servicio Doméstico,0.2600,14.0100,0.1500
+2026-08-01,06110300,Productos farmacéuticos y dermatológicos,0.4500,8.0800,0.0800
+2026-08-01,06120100,Elementos Implementos Médicos,0.1500,5.9900,0.0000
+2026-08-01,06130100,Artefactos Y Equipo Terapéutico Y Su Reparación,0.0700,6.4600,0.0100
+2026-08-01,06210100,Consulta Médica General Con Médico Particular,-0.0400,10.4100,0.0100
+2026-08-01,06210500,"Consulta médica con médico especialista particular (incluye ortodoncia): pediatría, oftalmología, ginecología, siquiatría, traumatología, cardiología y otros especialistas",0.9200,10.0600,0.0200
+2026-08-01,06220100,"Servicios Odontológicos Con Odontólogos Particulares: Consultas, Profilaxis, Exodoncias (Extracción), Amalgamas, Sellantes, Fluorización.",0.0700,10.3100,0.0200
+2026-08-01,06230100,"Servicios Para Particulares En Centros De Rayos X: Radiografías (Incluyendo Las Dentales), Urografías, Mamografías, Electrocardiogramas Y Otras Imágenes Diagnósticas",-0.0300,7.2900,0.0000
+2026-08-01,06230200,"Exámenes De Laboratorio Para Particulares: De Sangre, Bacteriológicos, Etc.",0.2300,7.1100,0.0000
+2026-08-01,06230300,Servicios Médicos Auxiliares No Hospitalarios,0.0300,7.9000,0.0000
+2026-08-01,06310300,"Servicios médicos menores (pequeña cirugía, cirugía ambulatoria, urgencias, etc.)",0.4600,4.9100,0.0000
+2026-08-01,07110100,Vehículo Particular Nuevo O Usado,-0.3200,-1.7900,-0.0400
+2026-08-01,07120100,Motos Y Bicicletas Con Motor Nuevas O Usadas,-0.0800,0.6400,0.0000
+2026-08-01,07130100,Compra De Bicicletas Nuevas O Usadas (Excepto Para Niños),0.8100,-0.4900,0.0000
+2026-08-01,07210100,"Llantas Y Neumáticos, Rines Para Vehículo",-0.2200,-2.9400,0.0000
+2026-08-01,07210300,"Productos Para La Limpieza Y Conservación Del Vehículo: Pintura, Limpiadores, Selladores, Shampoo, Ceras, Ambientadores, Eliminador De Olores, Pañitos Húmedos Para Vehículos, Etc.",-1.2200,3.0900,0.0000
+2026-08-01,07210600,"Piezas Para Bicicleta: Llantas, Neumáticos, Rines, Manzanas, Cadenas, Cambios, Piñones, Guallas, Sillines, Candados Y Cable Candado, Luces, Etc.",-0.1100,3.6100,0.0000
+2026-08-01,07219900,Otras Piezas De Repuesto Para Vehículo,-0.3200,-1.0500,0.0000
+2026-08-01,07220400,"Aditivos, Valvulinas, Líquido Para Frenos, Refrigerantes, Agua Para Batería, Etc.",0.3300,1.8700,0.0000
+2026-08-01,07220500,Combustibles para vehículos,-0.2000,1.1600,0.0400
+2026-08-01,07230100,"Mantenimiento Y Reparaciones Efectuadas En El Taller: Engrase, Sincronización, Revisiones Técnicas, Instalaciones De Partes Y Accesorios, Balanceo De Ruedas, Despinchada, Lavado Y Polichado, Servicios De Grúa, Etc.",0.7000,10.7900,0.0500
+2026-08-01,07230200,Compra Y Cambio De Aceite,0.3200,4.5300,0.0100
+2026-08-01,07230300,Servicios De Latonería Y Pintura,0.7100,5.6000,0.0000
+2026-08-01,07240100,Parqueaderos,0.2000,8.8600,0.0300
+2026-08-01,07240200,Peajes,0.0000,7.0800,0.0100
+2026-08-01,07240300,"Gastos Reglamentarios Relacionados Con La Propiedad, Manejo Y Alquiler De Vehículos",0.2200,8.5800,0.0100
+2026-08-01,07330100,Transporte De Pasajeros Y Equipaje En Avión (Incluye Pagos Por Exceso De Equipaje),4.8900,4.5300,0.0100
+2026-08-01,07371000,Transporte urbano (incluye tren y metro),0.0200,10.6600,0.5100
+2026-08-01,07372000,"Transporte intermunicipal, interveredal e interIPC",0.3000,12.9600,0.0500
+2026-08-01,07373000,Transporte escolar,0.0000,8.5400,0.0300
+2026-08-01,08210200,"Equipos de telefonía móvil, similares y reparación",-1.9500,-8.0100,-0.0100
+2026-08-01,08310400,Servicios de comunicación fija y móvil y provisión a internet,0.9200,6.6000,0.1600
+2026-08-01,09110100,"Equipo Para La Recepción, Grabación Y Reproducción De Sonido Únicamente",0.0900,-7.4200,0.0000
+2026-08-01,09110200,"Equipo Para La Grabación, Recepción Y Reproducción De Imagen Y Sonido",-2.0700,-11.3000,-0.0100
+2026-08-01,09130100,Aparatos De Procesamiento De Información Y Hardware,0.4500,-2.4600,0.0000
+2026-08-01,09310200,Juegos Y Juguetes Infantiles,0.8800,0.8400,0.0000
+2026-08-01,09310300,"Artículos, Adornos Y Prendas De Vestir Para Fiestas",0.6700,4.8600,0.0100
+2026-08-01,09330200,"Plantas Naturales: Ramos De Flores, Matas, Arbustos",0.9700,11.2600,0.0000
+2026-08-01,09340200,Alimentos Para Animales Domésticos Y Mascotas,0.8300,2.8900,0.0100
+2026-08-01,09340300,"Productos Para Animales Domésticos Y Mascotas, Productos De Veterinaria, Artículos Para El Cuidado E Higiene (Shampoo, Jabón, Desodorantes) Y Accesorios Para Mascotas (Collares, Perrera, Jaula, Acuarios Y Otros)",0.2500,6.2000,0.0000
+2026-08-01,09350100,"Servicios De Veterinaria Y De Otro Tipo Para Animales Domésticos: Cuidado, Salón De Belleza, Alojamiento, Entrenamiento, Paseadores De Perros Y Colegios Para Mascotas Etc.",0.0800,11.3200,0.0100
+2026-08-01,09410100,Servicios Recreativos,0.1600,11.2200,0.0200
+2026-08-01,09410200,Servicios Prestados Por Escenarios Deportivos,0.3000,9.7600,0.0100
+2026-08-01,09420100,Cines Y Teatros,-0.0900,8.7800,0.0200
+2026-08-01,09420600,Suscripción y servicio de televisión por redes y cable,3.0200,5.4300,0.0400
+2026-08-01,09510100,Libros Y Lista De Útiles Escolares Completa,1.0100,1.7300,0.0000
+2026-08-01,09510200,"Libros de texto: textos guías para clase (incluye libros de literatura, poesía, etc., requeridos en clase)",0.0000,4.4500,0.0100
+2026-08-01,09520400,Compra de periódicos,0.0000,9.1300,0.0100
+2026-08-01,09530100,Material Impreso Diverso,0.3200,3.1000,0.0000
+2026-08-01,09540100,"Artículos De Papelería: Cuadernos, Agendas, Papel Suelto Y En Resmas",-0.0700,-0.0400,0.0000
+2026-08-01,09540200,Artículos Para Escribir,0.1100,2.4700,0.0000
+2026-08-01,09540300,Artículos Para Pintura Y Dibujo,-0.3200,-0.1600,0.0000
+2026-08-01,09610300,"Paquetes turísticos completos, incluye paquetes de viajes de excursión realizados durante un día (sin pernoctar)",1.0100,5.1400,0.0200
+2026-08-01,10110400,Educación preescolar y básica primaria,0.0000,8.2600,0.1300
+2026-08-01,10210100,Educación Secundaria,0.0000,8.6800,0.0900
+2026-08-01,10410100,"Inscripciones y matrículas en carreras técnicas, tecnológicas y universitarias",0.2400,6.7900,0.0600
+2026-08-01,10410200,"Inscripciones y matrículas en postgrados (especialización, maestría, doctorado)",0.2300,2.6800,0.0100
+2026-08-01,10419900,Otros gastos en educación superior,-0.0200,7.5100,0.0100
+2026-08-01,10510100,Cursos de educación no formal,0.0000,5.4100,0.0100
+2026-08-01,10510400,"Diplomados, educación continuada, preicfes, preuniversitarios",-9.4800,-4.3900,0.0000
+2026-08-01,10510800,Pagos por asesorías de tareas y clases dictadas por particulares,0.0000,6.6400,0.0000
+2026-08-01,11110100,"Comidas en establecimientos de servicio a la mesa y autoservicio, medios de transporte, máquinas expendedoras, puestos móviles, y lugares de esparcimiento; se incluyen también las contratadas por encargo, para llevar y por servicio a domicilio",0.2600,9.4300,0.7100
+2026-08-01,11110200,"Bebidas calientes : tinto, café con leche, chocolate, té, bebida achocolatada caliente, leche, agua de panela, agua aromática, avena caliente y similares para consumo inmediato, en establecimientos de servicio a la mesa y autoservicio.",2.3300,12.0700,0.0300
+2026-08-01,11110300,"Gaseosa Y Otros Refrescos En Establecimientos De Servicio A La Mesa Y Autoservicio, Medios De Transporte, Maquinas Expendedoras, Puestos Moviles, Y Lugares De Esparcimiento; Se Incluyen Tambien Las Adquiriudas Para Llevar Y Servicio A Domicilio",0.1100,8.5800,0.0300
+2026-08-01,11110400,"Comidas preparadas fuera del hogar para consumo inmediato, en establecimientos de servicio a la mesa y autoservicio, puestos móviles, lugares de esparcimiento, para llevar y por servicio a domicilio",0.4500,9.2600,0.2200
+2026-08-01,11110700,"Gastos en discotecas, bares, griles, tabernas, fondas y tiendas dentro y al aire libre (comida, bebidas, cover)",0.4700,9.5700,0.0400
+2026-08-01,11120100,Pago Por Alimentación En Comedores,0.0000,7.7600,0.0100
+2026-08-01,11210100,"Servicios de alojamiento en hoteles, pensiones, posadas, hostales y moteles; alojamiento en centros de vacaciones y por motivo de enseñanza: internados",-0.3800,5.7800,0.0100
+2026-08-01,12110100,Servicios Prestados En Salones De Peluquería Y Establecimientos De Cuidado Personal,0.6400,11.1500,0.0900
+2026-08-01,12120100,Aparatos Eléctricos Para El Cuidado Personal Y Su Reparación,-1.3400,-6.4400,0.0000
+2026-08-01,12130100,Artículos Para El Cuidado Y La Atención Personal,0.3600,3.6300,0.0000
+2026-08-01,12130200,Artículos Para Higiene Corporal,1.4500,3.8500,0.0600
+2026-08-01,12130300,Artículos Para La Higiene Oral,0.0800,3.6900,0.0100
+2026-08-01,12130400,Productos De Belleza,0.8300,5.7000,0.0200
+2026-08-01,12139900,Otros Productos Para El Aseo Personal,-0.0400,4.8000,0.0400
+2026-08-01,12310100,"Artículos En Oro, Plata Y Piedras Preciosas Y Su Reparación",-1.3000,19.5500,0.0300
+2026-08-01,12310200,"Relojes, Cronómetros, Termómetros, Barómetros Y Su Reparación",-0.5800,2.1500,0.0000
+2026-08-01,12310300,Artículos De Fantasía Y Su Reparación,0.3300,1.2000,0.0000
+2026-08-01,12320100,Artículos De Viaje Y Otros Artículos Para El Transporte De Efectos Personales,-0.2300,0.8000,0.0000
+2026-08-01,12320200,Artículos Para Bebés Y Su Reparación,0.3800,-10.0100,0.0000
+2026-08-01,12320400,"Artículos personales varios como: gafas de sol, lentes de contacto cosméticos, bastones, paraguas y sombrillas, abanicos, llaveros, etc.",0.2300,-3.7800,0.0000
+2026-08-01,12410100,Servicios de protección social dentro y fuera del hogar,0.1300,9.1300,0.0000
+2026-08-01,12410200,"Guarderías, salacunas, cuidado de niños fuera del hogar y servicios de adopción",0.1200,10.1600,0.0300
+2026-08-01,12410300,Cuotas moderadoras a EPS,0.0000,5.3400,0.0000
+2026-08-01,12530100,"Seguros médicos, de accidentes y medicina prepagada",0.0000,9.2500,0.0100
+2026-08-01,12540100,Seguros De Vehículos Y Otros Relacionados Con El Transporte,-0.5100,-6.3900,-0.0100
+2026-08-01,12620400,Servicios auxiliares y financieros prestados a cambio de una comisión explicita,0.0000,5.5400,0.0100
+2026-08-01,12710500,"Certificados, documentos administrativos y pago de honorarios",0.0000,5.0600,0.0000
+2026-08-01,12719900,Otros pagos por servicios,0.8800,15.0300,0.0100
