@@ -1,4 +1,4 @@
-Actualizacion ColombiaMacro — 2026-10-01 23:05 UTC (rapida: series diarias de BanRep y mercado)
+Actualizacion ColombiaMacro — 2026-10-02 02:09 UTC (rapida: series diarias de BanRep y mercado)
 
 ============================================================
   Curvas TES — BanRep
@@ -36,7 +36,7 @@ Ultimos 5 dias:
 ============================================================
   COLCAP — BanRep
 ============================================================
-COLCAP oficial: 4548 dias hasta 2026-10-01
+COLCAP: sin cambios
 
 ============================================================
   Politica, TRM, inflacion basica, externo — BanRep
@@ -57,7 +57,7 @@ tpm                        id 59      10457 obs hasta 2026-10-01
   ied_musd                   id 15133     106 obs hasta 2026-06-30
   deuda_bruta_gnc_pct_pib    id 15328      31 obs hasta 2025-12-01
   salario_minimo_var         id 15418      42 obs hasta 2026-12-31
-series_banrep.csv: sin cambios (16 de 16 series)
+series_banrep.csv: actualizado (16 de 16 series)
 
 RESUMEN
   [OK] Curvas TES — BanRep
