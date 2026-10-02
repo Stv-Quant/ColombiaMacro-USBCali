@@ -42,7 +42,7 @@ class TestSitio(unittest.TestCase):
     def tearDownClass(cls):
         cls.tmp.cleanup()
 
-    PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento",), "sectores": ("sectores",),
+    PAGINAS = {"ciclo": ("ciclo-app", "ciclo-datos"), "crecimiento": ("crecimiento", "crec-medidas", "crec-velocidad", "crec-precios", "crec-quien", "crec-amplitud", "crec-nivel", "crec-literatura"), "sectores": ("sectores",),
                "capacidad": ("capacidad",), "empleo": ("informalidad",), "inflacion": ("precios",), "tasas": ("banco",),
                "curva-tes": ("curva", "curva-app"), "mercados": ("mercados",), "empresas": ("empresas",),
                "externo": ("externo",), "comercio": ("comercio-cifras", "comercio-flujos", "comercio-vende", "comercio-compra", "comercio-socios"), "indicadores": ("indicadores", "fuentes", "noticias")}

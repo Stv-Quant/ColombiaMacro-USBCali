@@ -543,3 +543,13 @@ a.lec:hover{text-decoration:none;background:var(--glass-hover)}
 .tr-e td:first-child,.tr-r td:first-child{white-space:nowrap}
 @media (max-width:1180px){.lecturas{grid-template-columns:repeat(3,minmax(0,1fr))}.sq-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:560px){.lecturas{grid-template-columns:1fr 1fr}.sq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rib-row{height:26px}}
+/* crecimiento ampliado: seis medidas y literatura */
+.lecturas.seis{grid-template-columns:repeat(6,minmax(0,1fr))}
+.lecturas.seis .lec-v{font-size:26px}
+@media (max-width:1180px){.lecturas.seis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.lecturas.seis{grid-template-columns:1fr 1fr}}
+.refs{margin:0;padding:6px 22px 6px 42px;display:grid;gap:12px;background:var(--glass);border:1px solid var(--line);border-radius:var(--radius);
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);counter-reset:r}
+.refs li{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-bottom:1px solid var(--hair);font-size:14px;line-height:1.5;color:var(--ink)}
+.refs li:last-child{border-bottom:0}
+.refs .ref-u{font-size:12.5px;color:var(--muted)}

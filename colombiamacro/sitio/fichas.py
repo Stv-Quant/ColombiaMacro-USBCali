@@ -232,6 +232,47 @@ FICHAS = {
     "g-origenes": (DANE_IMPO,
                    ("Anexo de importaciones por principales países de origen (valor CIF). Participación de la suma de 12 meses sobre las importaciones totales publicadas.",
                     "Imports annex by main country of origin (CIF value). Share of the 12-month sum over total published imports.")),
+    # --- crecimiento ampliado
+    "g-velocidades": (DANE_PIB,
+                      ("Anual: PIB real original frente al mismo trimestre del año anterior. 12 meses: suma de los últimos 4 trimestres frente a los 4 anteriores. "
+                       "Trimestre anualizado: ((PIB desestacionalizado t / t−1)^4 − 1) × 100, la convención de la Oficina de Análisis Económico de EE. UU. (BEA).",
+                       "Annual: original real GDP versus the same quarter a year earlier. 12 months: sum of the last 4 quarters versus the previous 4. "
+                       "Annualised quarter: ((seasonally adjusted GDP t / t−1)^4 − 1) × 100, the US Bureau of Economic Analysis (BEA) convention.")),
+    "g-periodos": (DANE_PIB,
+                   ("Tasa compuesta anual: (PIB del último año / PIB del año previo al periodo)^(1/años) − 1, con PIB real anual (suma de trimestres). "
+                    "Los periodos siguen hitos conocidos: auge del petróleo (2010–2014), caída del precio y ajuste (2015–2019), pandemia (2020–2021).",
+                    "Compound annual rate: (GDP in the final year / GDP in the year before the period)^(1/years) − 1, using annual real GDP (sum of quarters). "
+                    "Periods follow known milestones: oil boom (2010–2014), price slump and adjustment (2015–2019), pandemic (2020–2021).")),
+    "g-real-nominal": (DANE_PIB,
+                       ("Variación anual del PIB a precios corrientes (billones de pesos) y a precios constantes de 2015 (series originales).",
+                        "Annual change of GDP at current prices (trillion pesos) and at constant 2015 prices (original series).")),
+    "g-deflactor": (("DANE (PIB nominal y real) y DANE-IPC; cálculo propio", "DANE (nominal and real GDP) and DANE CPI; own calculation"),
+                    ("Deflactor implícito = PIB nominal / PIB real; se muestra su variación anual. El IPC es el promedio trimestral de la inflación anual. "
+                     "La diferencia refleja sobre todo los términos de intercambio: el deflactor incluye exportaciones y excluye importaciones (Kohli, 2004).",
+                     "Implicit deflator = nominal GDP / real GDP; its annual change is shown. CPI is the quarterly average of annual inflation. "
+                     "The gap mostly reflects the terms of trade: the deflator includes exports and excludes imports (Kohli, 2004).")),
+    "g-aportes-grupos": (("DANE, PIB por actividad económica; cálculo propio", "DANE, GDP by economic activity; own calculation"),
+                         ("Aporte del sector = variación anual × participación en el valor agregado del año anterior (precios constantes); los 12 sectores se agrupan en 4. "
+                          "Los aportes suman el valor agregado, no el PIB: falta el aporte de los impuestos netos de subvenciones, y el encadenamiento genera pequeñas diferencias.",
+                          "Sector contribution = annual change × share of the previous year's value added (constant prices); the 12 sectors are grouped into 4. "
+                          "Contributions add up to value added, not GDP: net taxes are missing, and chain-linking creates small differences.")),
+    "g-sin-gobierno": (("DANE, PIB por actividad económica; cálculo propio", "DANE, GDP by economic activity; own calculation"),
+                       ("Crecimiento sin el sector X = (suma de aportes − aporte de X) / (suma de participaciones − participación de X). "
+                        "El sector «Gobierno, educación y salud» (secciones O, P y Q del CIIU) incluye también educación y salud privadas: es una aproximación al sector público.",
+                        "Growth excluding sector X = (sum of contributions − contribution of X) / (sum of shares − share of X). "
+                        "The 'Government, education and health' sector (ISIC sections O, P and Q) also includes private education and health: it approximates the public sector.")),
+    "g-sectores-crecen": (("DANE, PIB por actividad económica; cálculo propio", "DANE, GDP by economic activity; own calculation"),
+                          ("Índice de difusión (Burns y Mitchell, 1946): número de los 12 sectores con variación anual positiva en cada trimestre.",
+                           "Diffusion index (Burns and Mitchell, 1946): number of the 12 sectors with positive annual change in each quarter.")),
+    "g-sector-historia": (("DANE, PIB por actividad económica; cálculo propio", "DANE, GDP by economic activity; own calculation"),
+                          ("Promedio simple de la variación anual de cada sector en 2015T1–2019T4 frente al promedio de los últimos 4 trimestres publicados.",
+                           "Simple average of each sector's annual change in 2015Q1–2019Q4 versus the average of the latest 4 published quarters.")),
+    "g-nivel": (("DANE, PIB real desestacionalizado; cálculo propio", "DANE, seasonally adjusted real GDP; own calculation"),
+                ("Índice T4 2019 = 100. Camino previo: regresión log-lineal del PIB desestacionalizado de 2015T1–2019T4, prolongada con la misma pendiente. "
+                 "Es un contrafactual descriptivo, no un pronóstico. Ver Cerra y Saxena (2008) sobre pérdidas permanentes de nivel tras las crisis.",
+                 "Index 2019 Q4 = 100. Earlier path: log-linear regression of seasonally adjusted GDP over 2015Q1–2019Q4, extended with the same slope. "
+                 "A descriptive counterfactual, not a forecast. See Cerra and Saxena (2008) on permanent level losses after crises.")),
+
 }
 
 

@@ -19,7 +19,7 @@ Páginas de análisis (menú agrupado):
 | Grupo | Página | Contenido |
 |-------|--------|-----------|
 | Actividad | `/ciclo/` | Reloj del ciclo interactivo y recorrido trimestral desde 2014 |
-| | `/crecimiento/` | PIB trimestral, ISE mensual y crecimiento real por año |
+| | `/crecimiento/` | Seis medidas (anual, trimestre anualizado, año corrido, sin Gobierno, deflactor, tamaño vs 2019), PIB e ISE, crecimiento por año y por periodo, real vs nominal, deflactor vs IPC, aportes por grandes grupos, economía sin Gobierno y sin minería, difusión sectorial, sectores vs su historia, nivel vs camino 2015–2019 y literatura |
 | | `/sectores/` | Los 12 sectores del PIB en cualquier trimestre desde 2010 y mapa de calor |
 | | `/capacidad/` | Producción frente a su capacidad (brecha del producto) |
 | | `/empleo/` | Desempleo e informalidad nacional, por sector y por ciudad |

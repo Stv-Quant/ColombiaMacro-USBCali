@@ -1445,6 +1445,9 @@ def pagina(d, s, lang, generado):
 
     from colombiamacro.sitio.ciclo_extra import construir_ciclo
     ciclo_antes, ciclo_despues = construir_ciclo(d, s, L)
+    from colombiamacro.sitio.crecimiento_extra import construir_crecimiento
+    crec_antes, crec_despues, _ = construir_crecimiento(d, s, L)
+    LANG_ACTUAL[0] = L
     from colombiamacro.sitio import comercio_extra as cx
     datos_com = cx.cargar()
     s_com, R_com = "", None
@@ -1483,7 +1486,7 @@ def pagina(d, s, lang, generado):
     # --- paginas de detalle, agrupadas para el menu
     P = {
         "ciclo": (t("nav_ciclo", L), t("pg_ciclo", L), t("pl_ciclo", L), [ciclo_antes, explorador_ciclo(d, L), ciclo_despues], True),
-        "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [s1], True),
+        "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [crec_antes, s1, crec_despues], True),
         "sectores": (t("nav_sectores", L), t("pg_sectores", L), t("pl_sectores", L), [s_sec], True),
         "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [s_cap], True),
         "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [s_inf], True),
