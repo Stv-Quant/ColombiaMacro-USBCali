@@ -63,13 +63,20 @@ DESCRIPCION_CSV = {
     "pib_departamentos_ramas.csv": ("Valor agregado por departamento y sector (DANE)", "Value added by department and sector (DANE)"),
     "laboral_ciudades.csv": ("Mercado laboral de 32 capitales (DANE)", "Labour market in 32 capital cities (DANE)"),
     "laboral_subutilizacion.csv": ("Subutilización de la fuerza de trabajo (DANE)", "Labour underutilisation (DANE)"),
+    "empleo_ramas.csv": ("Ocupados por rama de actividad (DANE)", "Employment by sector (DANE)"),
+    "empleo_posicion.csv": ("Ocupados por posición ocupacional (DANE)", "Employment by status (DANE)"),
+    "empleo_sexo.csv": ("Mercado laboral por sexo (DANE)", "Labour market by sex (DANE)"),
+    "empleo_jovenes.csv": ("Mercado laboral de los jóvenes (DANE)", "Youth labour market (DANE)"),
+    "empleo_area.csv": ("Mercado laboral urbano y rural (DANE)", "Urban and rural labour market (DANE)"),
+    "empleo_fuera_ft.csv": ("Población fuera de la fuerza de trabajo (DANE)", "Population outside the labour force (DANE)"),
     "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
 }
 DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "exportaciones_mensuales.csv", "exportaciones_destinos.csv",
              "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "pib_gasto.csv", "pib_inversion.csv",
              "pib_consumo_hogares.csv", "poblacion.csv", "pib_departamentos.csv", "pib_departamentos_ramas.csv", "laboral_ciudades.csv",
-             "laboral_subutilizacion.csv", "estado_fuentes.csv"]
+             "laboral_subutilizacion.csv", "empleo_ramas.csv", "empleo_posicion.csv", "empleo_sexo.csv", "empleo_jovenes.csv",
+             "empleo_area.csv", "empleo_fuera_ft.csv", "estado_fuentes.csv"]
 
 
 # ------------------------------------------------------------------ formato
@@ -1466,7 +1473,9 @@ def pagina(d, s, lang, generado):
     crec_antes, crec_oferta, crec_resto, _ = construir_crecimiento(d_es, s, L)
     LANG_ACTUAL[0] = L
     from colombiamacro.sitio.capacidad_extra import construir_capacidad
-    cap_antes, cap_despues = construir_capacidad(d_es, s, L)
+    cap_antes, cap_despues, s_ciudades = construir_capacidad(d_es, s, L)
+    from colombiamacro.sitio.empleo_extra import construir_empleo
+    emp_antes, emp_despues = construir_empleo(d_es, L, s_ciudades)
     LANG_ACTUAL[0] = L
     from colombiamacro.sitio import comercio_extra as cx
     datos_com = cx.cargar()
@@ -1508,7 +1517,7 @@ def pagina(d, s, lang, generado):
         "ciclo": (t("nav_ciclo", L), t("pg_ciclo", L), t("pl_ciclo", L), [ciclo_antes, explorador_ciclo(d, L), ciclo_despues], True),
         "crecimiento": (t("nav_crec", L), t("pg_crec", L), t("pl_crec", L), [crec_antes, s1, crec_oferta, s_sec, crec_resto], True),
         "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [cap_antes, s_cap, cap_despues], True),
-        "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [s_inf], True),
+        "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [emp_antes, s_inf, emp_despues], True),
         "inflacion": (t("nav_inflacion", L), t("pg_inflacion", L), t("pl_inflacion", L), [s2], True),
         "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [s3], True),
         "curva-tes": (t("nav_curva", L), t("pg_curva", L), t("pl_curva", L), [s_curva], False),

@@ -335,6 +335,29 @@ FICHAS = {
     "g-cap-ciudades": (("DANE, Gran Encuesta Integrada de Hogares (GEIH)", "DANE, Integrated Household Survey (GEIH)"),
                        ("Tasa de desocupación de cada una de las 32 ciudades capitales (13 con su área metropolitana), en año móvil de 12 meses, frente al año móvil terminado 12 meses antes.",
                         "Unemployment rate of each of the 32 capital cities (13 with their metropolitan area), as a 12-month rolling year, versus the rolling year ending 12 months earlier.")),
+    # --- empleo ampliado
+    "g-emp-ramas": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"),
+                    ("Población ocupada por rama de actividad (CIIU Rev. 4 A.C., 13 agrupaciones de la GEIH), total nacional, sin desestacionalizar: promedio de los últimos 3 meses menos el promedio de los mismos 3 meses del año anterior. "
+                     "La GEIH agrupa la minería con los servicios públicos.",
+                     "Employed population by sector (ISIC Rev. 4, 13 GEIH groupings), national total, not seasonally adjusted: average of the latest 3 months minus the same 3 months a year earlier. "
+                     "The GEIH groups mining with utilities.")),
+    "g-emp-ramas-2019": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"), ("Promedio de los últimos 12 meses frente al promedio de 2019.", "Average of the latest 12 months versus the 2019 average.")),
+    "g-emp-posicion": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"),
+                       ("Posición ocupacional según la CISE-93 (OIT): participación de cada categoría en los ocupados, con promedios móviles de 12 meses. Se omite la categoría «otro» (menos de 0,1%).",
+                        "Status in employment following ICSE-93 (ILO): share of each category in total employment, 12-month moving averages. The 'other' category (under 0.1%) is omitted.")),
+    "g-emp-posicion-cambio": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"), ("Promedio de los últimos 3 meses menos el mismo periodo del año anterior, en miles de personas.", "Average of the latest 3 months minus the same period a year earlier, in thousands.")),
+    "g-emp-genero-td": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"), ("Tasa de desocupación por sexo, total nacional, promedio móvil de 12 meses (elimina la estacionalidad sin modelos).",
+                               "Unemployment rate by sex, national total, 12-month moving average (removes seasonality without models).")),
+    "g-emp-genero-tgp": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"), ("Tasa global de participación = fuerza de trabajo / población en edad de trabajar (15 años y más), por sexo, promedio móvil de 12 meses.",
+                                "Participation rate = labour force / working-age population (15 and over), by sex, 12-month moving average.")),
+    "g-emp-jovenes": (("DANE, GEIH: mercado laboral de la juventud (15 a 28 años)", "DANE, GEIH: youth labour market (15 to 28)"), ("Tasa de desocupación de las personas de 15 a 28 años (Ley 1622 de 2013), trimestre móvil. La referencia nacional es la serie desestacionalizada mensual.",
+                             "Unemployment rate of 15–28 year-olds (Law 1622 of 2013), rolling quarter. The national reference is the seasonally adjusted monthly series.")),
+    "g-emp-nini": (("DANE, GEIH: mercado laboral de la juventud (15 a 28 años)", "DANE, GEIH: youth labour market (15 to 28)"), ("Jóvenes de 15 a 28 años que no estudian ni están ocupados, como porcentaje del total de jóvenes; la serie de mujeres y la de hombres suman el total.",
+                          "15–28 year-olds who neither study nor are employed, as a share of all young people; the women and men series add up to the total.")),
+    "g-emp-area": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"), ("Tasa de desocupación en cabeceras y en centros poblados y rural disperso, trimestre móvil, sin desestacionalizar.",
+                          "Unemployment rate in urban centres and in villages and dispersed rural areas, rolling quarter, not seasonally adjusted.")),
+    "g-emp-fuera": (("DANE, Gran Encuesta Integrada de Hogares (GEIH), anexo mensual", "DANE, Integrated Household Survey (GEIH), monthly annex"), ("Población fuera de la fuerza de trabajo según su actividad principal (estudiando, oficios del hogar, otros), total nacional, promedio de 12 meses, en millones.",
+                           "Population outside the labour force by main activity (studying, household work, other), national total, 12-month average, in millions.")),
 }
 
 

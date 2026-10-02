@@ -302,7 +302,7 @@ def construir_capacidad(d, s, L):
     s_lab = seccion("cap-laboral", tx("s_laboral", L), r2, f'<div class="grid">{g3}{g4}</div>')
 
     if M is None:
-        return antes, s_sec + s_lab
+        return antes, s_sec + s_lab, ""
 
     # ------------------------------------------------ regiones: mapa esquematico + ranking
     a = M["a"]
@@ -412,4 +412,4 @@ def construir_capacidad(d, s, L):
     items = "".join(f'<li><span class="ref">{ref}</span><span class="ref-u">{es if L == "es" else en}</span></li>' for ref, es, en in LITERATURA)
     s_lit = (f'<section id="cap-literatura" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_lit", L)}</h2></div>'
              f'<ol class="refs">{items}</ol></section>')
-    return antes, s_sec + s_lab + s_reg + s_est + s_ciu + s_lit
+    return antes, s_sec + s_lab + s_reg + s_est + s_lit, s_ciu.replace('id="cap-ciudades"', 'id="emp-ciudades"')

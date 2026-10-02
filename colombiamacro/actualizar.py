@@ -28,6 +28,7 @@ PASOS = [
     ("Informalidad laboral — DANE", "colombiamacro.fuentes.informalidad", []),
     ("PIB por el gasto y poblacion — DANE", "colombiamacro.fuentes.demanda", []),
     ("PIB por departamento y mercado laboral regional — DANE", "colombiamacro.fuentes.regional", []),
+    ("Mercado laboral en detalle (ramas, posicion, sexo, jovenes) — DANE", "colombiamacro.fuentes.empleo", []),
     ("Comercio exterior — DANE (DIAN-DANE)", "colombiamacro.fuentes.comercio", []),
     ("Canasta COLCAP (iShares) y acciones (Yahoo Finance)", "colombiamacro.fuentes.acciones", []),
 ]
