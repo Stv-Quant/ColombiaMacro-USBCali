@@ -71,6 +71,10 @@ DESCRIPCION_CSV = {
     "empleo_fuera_ft.csv": ("Población fuera de la fuerza de trabajo (DANE)", "Population outside the labour force (DANE)"),
     "ipc_divisiones.csv": ("IPC por divisiones: variación y aporte (DANE)", "CPI by division: change and contribution (DANE)"),
     "ipc_subclases.csv": ("IPC por 188 subclases (DANE)", "CPI by 188 subclasses (DANE)"),
+    "empresas_10000_agregados.csv": ("10.000 empresas más grandes: totales por año, sector, región y supervisor, y concentración (Supersociedades)", "10,000 largest companies: totals by year, sector, region and supervisor, and concentration (Supersociedades)"),
+    "empresas_10000_top.csv": ("Las 25 empresas con más ingresos de cada año (Supersociedades)", "The 25 companies with most revenue each year (Supersociedades)"),
+    "empresas_registro.csv": ("Matrículas y cancelaciones mensuales del registro mercantil (Confecámaras, RUES)", "Monthly business register registrations and cancellations (Confecámaras, RUES)"),
+    "empresas_banrep.csv": ("Posición financiera neta por sector institucional y deuda externa privada (BanRep)", "Net financial position by institutional sector and private external debt (BanRep)"),
     "cambiario.csv": ("Otras monedas, tasa de cambio real bilateral, balanza cambiaria, subastas de reservas (BanRep), dólar global y Brent (Reserva Federal/EIA vía FRED)", "Other currencies, bilateral real exchange rate, FX balance, reserve auctions (BanRep), global dollar and Brent (Federal Reserve/EIA via FRED)"),
     "tasas_mercado.csv": ("IBR por plazos, tasa interbancaria, DTF y CDT, tasas de colocación por modalidad, cartera y liquidez del Banco (BanRep)", "IBR by tenor, interbank rate, DTF and CDT, lending rates by type, loan book and Bank liquidity (BanRep)"),
     "ipc_ponderaciones.csv": ("Ponderaciones oficiales de las 188 subclases por nivel de ingreso (DANE, canasta 2018)", "Official weights of the 188 subclasses by income level (DANE, 2018 basket)"),
@@ -79,7 +83,7 @@ DESCRIPCION_CSV = {
     "ipc_clasificaciones.csv": ("IPC de servicios, bienes y energéticos (DANE)", "CPI for services, goods and energy (DANE)"),
     "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
 }
-DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "tasas_mercado.csv", "cambiario.csv", "colcap_oficial.csv",
+DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "tasas_mercado.csv", "cambiario.csv", "empresas_10000_agregados.csv", "empresas_10000_top.csv", "empresas_registro.csv", "empresas_banrep.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "exportaciones_mensuales.csv", "exportaciones_destinos.csv",
              "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "pib_gasto.csv", "pib_inversion.csv",
              "pib_consumo_hogares.csv", "poblacion.csv", "pib_departamentos.csv", "pib_departamentos_ramas.csv", "laboral_ciudades.csv",
@@ -1504,6 +1508,8 @@ def pagina(d, s, lang, generado):
     from colombiamacro.sitio.curva_extra import construir_curva
     from colombiamacro.sitio.cambio_extra import construir_cambio
     from colombiamacro.sitio.tasas_extra import construir_tasas
+    from colombiamacro.sitio.empresas_extra import construir_empresas
+    em_antes, em_medio, em_despues = construir_empresas(d_es, L)
     ts_antes, ts_despues = construir_tasas(d_es, L)
     tc_antes, tc_despues = construir_cambio(d_es, L)
     cv_antes, cv_despues = construir_curva(d_es, L)
@@ -1556,7 +1562,7 @@ def pagina(d, s, lang, generado):
         "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [ts_antes, s3, ts_despues], True),
         "curva-tes": (t("nav_curva", L), t("pg_curva", L), t("pl_curva", L), [cv_antes, s_curva, cv_despues], False),
         "mercados": (t("nav_mercados", L), t("pg_mercados", L), t("pl_mercados", L), [tc_antes, s4, tc_despues], True),
-        "empresas": (t("nav_empresas", L), t("pg_empresas", L), t("pl_empresas", L), [s_emp], True),
+        "empresas": (t("nav_empresas", L), t("pg_empresas", L), t("pl_empresas", L), [em_antes, em_medio, s_emp, em_despues], True),
         "externo": (t("nav_externo", L), t("pg_externo", L), t("pl_externo", L), [s5], True),
         "comercio": (t("nav_comercio", L), t("pg_comercio", L), t("pl_comercio", L), [s_com], True),
         "indicadores": (t("nav_datos", L), t("pg_indicadores", L), t("pl_indicadores", L), [s_ind], False),

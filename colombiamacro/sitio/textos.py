@@ -194,7 +194,7 @@ T = {
     "panel_cambio": ("Cambio", "Change"),
 
     # --- bolsa por dentro
-    "nav_empresas": ("Empresas", "Companies"),
+    "nav_empresas": ("Sector empresarial", "Corporate sector"),
     "q_empresas": ("¿Qué empresas mueven la bolsa?", "Which companies move the market?"),
     "resp_empresas": ("Las 7 Magníficas de la bolsa colombiana —las siete empresas de mayor peso en el COLCAP: {n}— suman {p}% del índice. En los últimos doce meses el COLCAP varió {c}%, un índice donde todas las acciones pesan igual {e}% y las 7 Magníficas {m}%.",
                       "Colombia's Magnificent 7 —the seven largest companies in the COLCAP: {n}— make up {p}% of the index. Over the past twelve months the COLCAP moved {c}%, an equal-weighted index of all its stocks {e}% and the Magnificent 7 {m}%."),
@@ -484,9 +484,8 @@ T = {
     "pg_curva": ("Curva de rendimientos TES", "TES yield curve"),
     "pl_curva": ("Lo que cobra el mercado por prestarle al Gobierno a 1, 5 y 10 años, cualquier día desde 2003.",
                  "What the market charges to lend to the government at 1, 5 and 10 years, any day since 2003."),
-    "pg_empresas": ("Empresas de la bolsa", "Listed companies"),
-    "pl_empresas": ("Qué empresas mueven el COLCAP: el índice frente a uno equiponderado y frente a las 7 de mayor peso.",
-                    "Which companies move the COLCAP: the index versus an equal-weighted one and versus the 7 largest weights."),
+    "pg_empresas": ("Las empresas de Colombia", "Colombia's companies"),
+    "pl_empresas": ("Tamaño, rentabilidad, endeudamiento y concentración de las 10.000 empresas más grandes, sus sectores y regiones, la bolsa, el crédito a empresas y cuántas empresas nacen y cierran.", "Size, profitability, leverage and concentration of the 10,000 largest companies, their sectors and regions, the stock market, credit to firms and how many companies are born and close."),
 }
 
 GLOSARIO = {
