@@ -33,6 +33,7 @@ PASOS = [
     ("Tasas de mercado, credito y liquidez — BanRep", "colombiamacro.fuentes.tasas_mercado", []),
     ("Tasa de cambio: otras monedas, ITCR bilateral, balanza cambiaria, dolar global y petroleo — BanRep y Reserva Federal", "colombiamacro.fuentes.cambiario", []),
     ("Sector empresarial: 10.000 empresas (Supersociedades), registro mercantil (RUES) y cuentas financieras — datos.gov.co y BanRep", "colombiamacro.fuentes.empresas", []),
+    ("Cuentas externas y fiscales: balanza de pagos, deuda externa, PII y balance fiscal — BanRep", "colombiamacro.fuentes.externo_fiscal", []),
     ("Comercio exterior — DANE (DIAN-DANE)", "colombiamacro.fuentes.comercio", []),
     ("Canasta COLCAP (iShares) y acciones (Yahoo Finance)", "colombiamacro.fuentes.acciones", []),
 ]

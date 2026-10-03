@@ -169,7 +169,7 @@ def meses_completos(reg: pd.DataFrame) -> pd.DataFrame:
 
 
 def construir_empresas(d, L):
-    """Devuelve (antes, medio, despues): medidas; empresas grandes; bolsa, financiacion y registro."""
+    """Devuelve (antes, medio, despues): medidas; la bolsa por dentro (va despues del COLCAP); empresas, financiacion y registro."""
     from colombiamacro import modelo as mt
     from colombiamacro.fuentes import empresas as fe
     from colombiamacro.fuentes import tasas_mercado as tmk
@@ -461,7 +461,7 @@ def construir_empresas(d, L):
     items = "".join(f'<li><span class="ref">{ref}</span><span class="ref-u">{es if L == "es" else en}</span></li>' for ref, es, en in LITERATURA)
     s_lit = (f'<section id="em-literatura" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{tx("s_lit", L)}</h2></div>'
              f'<ol class="refs">{items}</ol></section>')
-    return antes, s_gr + s_se + s_re + s_co, s_ac + s_fi + s_rg + s_lit
+    return antes, s_ac, s_gr + s_se + s_re + s_co + s_fi + s_rg + s_lit
 
 
 # ====================================================================== ventana explicativa

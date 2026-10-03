@@ -440,7 +440,7 @@ T = {
     "pg_mercados": ("El peso colombiano", "The Colombian peso"),
     "pl_mercados": ("El peso frente al dólar y a otras monedas, la tasa de cambio real y lo que mueve al peso: el dólar global, el petróleo y los flujos de divisas.", "The peso against the dollar and other currencies, the real exchange rate and what moves the peso: the global dollar, oil and foreign-currency flows."),
     "pg_externo": ("Cuentas externas y fiscales", "External and fiscal accounts"),
-    "pl_externo": ("Lo que el país necesita financiar del exterior y la deuda del Gobierno.", "What the country must finance from abroad and government debt."),
+    "pl_externo": ("La balanza de pagos por componentes, cómo se financia, la inversión extranjera y las remesas, la deuda externa, y los ingresos, gastos, intereses, financiamiento y deuda del Gobierno.", "The balance of payments by component, how it is financed, foreign investment and remittances, external debt, and government revenue, spending, interest, financing and debt."),
     "nav_comercio": ("Comercio exterior", "Foreign trade"),
     "pg_comercio": ("Comercio exterior: qué vende y qué compra Colombia", "Foreign trade: what Colombia sells and buys"),
     "pl_comercio": ("Exportaciones e importaciones de bienes con las cifras oficiales del DANE y la DIAN: cuánto, qué, para qué y con quién.",
