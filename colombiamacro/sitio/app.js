@@ -649,6 +649,9 @@
       hueco.className = 'exp-hueco' + (fig.classList.contains('wide') ? ' wide' : '');
       hueco.style.height = fig.offsetHeight + 'px';
       fig.parentNode.insertBefore(hueco, fig);
+      // Se lleva la figura a <body>: un ancestro con transform, filter o backdrop-filter (vidrio,
+      // revelado) convierte position:fixed en relativa a el y el fondo difuminado la tapaba.
+      document.body.appendChild(fig);
       activo = { fig: fig, hueco: hueco, btn: btn, y: y };
       fig.classList.add('expandida');
       document.body.classList.add('con-expandida');
@@ -675,7 +678,7 @@
         if (el._altoOrig) Plotly.relayout(el, { height: el._altoOrig, width: null }).then(function () { Plotly.Plots.resize(el); });
         delete el._altoOrig; delete el._estiloOrig;
       });
-      a.hueco.parentNode && a.hueco.parentNode.removeChild(a.hueco);
+      if (a.hueco.parentNode) { a.hueco.parentNode.insertBefore(a.fig, a.hueco); a.hueco.parentNode.removeChild(a.hueco); }
       fijarScroll(a.y);
       requestAnimationFrame(function () { fijarScroll(a.y); document.documentElement.style.overflowAnchor = ''; });
     }

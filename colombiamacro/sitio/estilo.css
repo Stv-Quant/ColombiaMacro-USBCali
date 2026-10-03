@@ -352,7 +352,7 @@ figure.chart{position:relative}
 [data-theme="dark"] .exp-fondo{background:rgba(4,8,15,.62)}
 body.con-expandida{overflow:hidden}
 body.con-expandida .exp-fondo{display:block}
-figure.chart.expandida{position:fixed;top:4vh;left:max(3vw,calc(50vw - 660px));right:max(3vw,calc(50vw - 660px));max-height:92vh;overflow:auto;z-index:1001;margin:0;padding:24px 26px 18px;background:var(--glass-strong);box-shadow:0 40px 90px rgba(0,0,0,.35);animation:exp-in .22s var(--ease)}
+figure.chart.expandida{opacity:1;transform:none;position:fixed;top:4vh;left:max(3vw,calc(50vw - 660px));right:max(3vw,calc(50vw - 660px));max-height:92vh;overflow:auto;z-index:1001;margin:0;padding:24px 26px 18px;background:var(--glass-strong);box-shadow:0 40px 90px rgba(0,0,0,.35);animation:exp-in .22s var(--ease)}
 figure.chart.expandida figcaption{font-size:18px}
 figure.chart.expandida .exp-btn{opacity:1}
 /* ventana explicativa (?) */
@@ -384,6 +384,7 @@ dialog.explica::backdrop{background:rgba(40,36,26,.35);-webkit-backdrop-filter:b
 .ex-barras li i{display:block;height:10px;justify-self:start;border-radius:2px;background:var(--acc);max-width:100%}
 .ex-barras li b{text-align:right;font-weight:600;font-size:12px;font-variant-numeric:tabular-nums}
 .ex-fuentes{font-size:13.5px;padding-left:18px}
+.ex-lista{padding-left:18px;margin:8px 0}.ex-lista li{margin:5px 0}
 .ex-fuentes li{margin:4px 0}
 .ex-formas{list-style:none;margin:12px 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .ex-formas li{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius)}

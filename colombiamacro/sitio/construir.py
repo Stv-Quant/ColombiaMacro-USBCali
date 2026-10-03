@@ -71,6 +71,7 @@ DESCRIPCION_CSV = {
     "empleo_fuera_ft.csv": ("Población fuera de la fuerza de trabajo (DANE)", "Population outside the labour force (DANE)"),
     "ipc_divisiones.csv": ("IPC por divisiones: variación y aporte (DANE)", "CPI by division: change and contribution (DANE)"),
     "ipc_subclases.csv": ("IPC por 188 subclases (DANE)", "CPI by 188 subclasses (DANE)"),
+    "cambiario.csv": ("Otras monedas, tasa de cambio real bilateral, balanza cambiaria, subastas de reservas (BanRep), dólar global y Brent (Reserva Federal/EIA vía FRED)", "Other currencies, bilateral real exchange rate, FX balance, reserve auctions (BanRep), global dollar and Brent (Federal Reserve/EIA via FRED)"),
     "tasas_mercado.csv": ("IBR por plazos, tasa interbancaria, DTF y CDT, tasas de colocación por modalidad, cartera y liquidez del Banco (BanRep)", "IBR by tenor, interbank rate, DTF and CDT, lending rates by type, loan book and Bank liquidity (BanRep)"),
     "ipc_ponderaciones.csv": ("Ponderaciones oficiales de las 188 subclases por nivel de ingreso (DANE, canasta 2018)", "Official weights of the 188 subclasses by income level (DANE, 2018 basket)"),
     "ipc_ciudades.csv": ("IPC por ciudad y división (DANE)", "CPI by city and division (DANE)"),
@@ -78,7 +79,7 @@ DESCRIPCION_CSV = {
     "ipc_clasificaciones.csv": ("IPC de servicios, bienes y energéticos (DANE)", "CPI for services, goods and energy (DANE)"),
     "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
 }
-DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "tasas_mercado.csv", "colcap_oficial.csv",
+DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "tasas_mercado.csv", "cambiario.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "exportaciones_mensuales.csv", "exportaciones_destinos.csv",
              "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "pib_gasto.csv", "pib_inversion.csv",
              "pib_consumo_hogares.csv", "poblacion.csv", "pib_departamentos.csv", "pib_departamentos_ramas.csv", "laboral_ciudades.csv",
@@ -1097,7 +1098,7 @@ def inf_13_lista(d):
 
 
 PAGINA_DE = {"crecimiento": "crecimiento/", "precios": "inflacion/", "banco": "tasas/", "informalidad": "empleo/", "curva": "curva-tes/",
-             "mercados": "mercados/", "externo": "externo/", "ciclo": "ciclo/", "comercio": "comercio/"}
+             "mercados": "mercados/", "empresas": "empresas/", "externo": "externo/", "ciclo": "ciclo/", "comercio": "comercio/"}
 RESPUESTAS = {}   # id de seccion -> texto de respuesta (lo usa la portada para resumir)
 
 
@@ -1285,7 +1286,7 @@ def pagina(d, s, lang, generado):
     cards.append(tarjeta(t("c_bolsa", L), num(m["colcap"], 0, L) + " pts",
                          f'{t("bolsa_detalle", L)} · {fecha(m["fecha"], "d", L)}<br>{t("en_un_ano", L)}: {num(m["colcap_12m"], 1, L, True, "%")}',
                          t("sube" if m["colcap_12m"] > 5 else ("baja" if m["colcap_12m"] < -5 else "estable"), L),
-                         "neutral", "mercados", sp["bolsa"]))
+                         "neutral", "empresas", sp["bolsa"]))
 
     tecnico = mt.veredicto(s, L)
     fase = am.FASES[c["fase"]][0 if L == "es" else 1]
@@ -1427,12 +1428,12 @@ def pagina(d, s, lang, generado):
     s4_det = "".join(filter(None, [
         f'<p>{t("x_mercados", L)}</p>',
         bloque_grafico(t("g_itcr", L), fig_html(*g.itcr(), "g-itcr"), t("h_itcr", L))]))
-    resp4 = t("resp_bolsa", L).format(v=num(m["colcap_12m"], 1, L, True))
+    resp4 = t("pendiente", L)
     if m.get("trm") is not None:
-        resp4 = t("resp_dolar", L).format(v=num(m["trm"], 0, L), c=num(m["trm_12m"], 1, L, True)) + " " + resp4
+        resp4 = t("resp_dolar", L).format(v=num(m["trm"], 0, L), c=num(m["trm_12m"], 1, L, True))
     s4 = seccion("mercados", "5", t("q_mercados", L), resp4,
-                 [bloque_grafico(t("g_dolar", L), fig_html(fdol, mdol, "g-dolar"), t("h_dolar", L)),
-                  bloque_grafico(t("g_bolsa", L), fig_html(fb, mb, "g-bolsa"), t("h_bolsa", L))],
+                 [bloque_grafico(t("g_dolar", L), fig_html(fdol, mdol, "g-dolar"), t("h_dolar", L), ancho=True).replace(
+                     "</figcaption>", f' <button type="button" class="ex-q" data-dialog="exp-peso" aria-haspopup="dialog" title="{t("tc_q", L)}">?</button></figcaption>', 1)],
                  s4_det, L)
 
     # --- 6. bolsa por dentro
@@ -1444,13 +1445,14 @@ def pagina(d, s, lang, generado):
         nombres = ", ".join(b["magnificas"]["emisor"])
         conc = "resp_conc_si" if r12["colcap"] - r12["equiponderado"] > 2 else (
             "resp_conc_no" if r12["equiponderado"] - r12["colcap"] > 2 else "resp_conc_igual")
-        resp_emp = t("resp_empresas", L).format(
+        resp_emp = t("resp_bolsa", L).format(v=num(m["colcap_12m"], 1, L, True)) + " " + t("resp_empresas", L).format(
             n=nombres, p=num(b["peso_magnificas"], 0, L), c=num(r12["colcap"], 1, L, True),
             e=num(r12["equiponderado"], 1, L, True), m=num(r12["magnificas"], 1, L, True)) + " " + t(conc, L)
         fbi, mbi = g.bolsa_indices(b)
         fpe, mpe = g.pesos(b)
         s_emp = seccion("empresas", "6", t("q_empresas", L), resp_emp,
-                        [bloque_grafico(t("g_indices", L), fig_html(fbi, mbi, "g-indices"), t("h_indices", L)),
+                        [bloque_grafico(t("g_bolsa", L), fig_html(fb, mb, "g-bolsa"), t("h_bolsa", L), ancho=True),
+                         bloque_grafico(t("g_indices", L), fig_html(fbi, mbi, "g-indices"), t("h_indices", L)),
                          bloque_grafico(t("g_pesos", L).format(f=fecha(b["fecha_canasta"], "d", L)),
                                         fig_html(fpe, mpe, "g-pesos"), t("h_pesos", L))],
                         f'<h3 class="sub">{t("t_magnificas", L)}</h3>{tabla_magnificas(b, L)}'
@@ -1484,6 +1486,8 @@ def pagina(d, s, lang, generado):
     cap_antes, cap_despues, s_ciudades = construir_capacidad(d_es, s, L)
     from colombiamacro.sitio.inflacion_extra import construir_inflacion
     from colombiamacro.sitio.curva_extra import construir_curva
+    from colombiamacro.sitio.cambio_extra import construir_cambio
+    tc_antes, tc_despues = construir_cambio(d_es, L)
     cv_antes, cv_despues = construir_curva(d_es, L)
     inf_antes, inf_despues = construir_inflacion(d_es, L)
     from colombiamacro.sitio.empleo_extra import construir_empleo
@@ -1533,7 +1537,7 @@ def pagina(d, s, lang, generado):
         "inflacion": (t("nav_inflacion", L), t("pg_inflacion", L), t("pl_inflacion", L), [inf_antes, s2, inf_despues], True),
         "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [s3], True),
         "curva-tes": (t("nav_curva", L), t("pg_curva", L), t("pl_curva", L), [cv_antes, s_curva, cv_despues], False),
-        "mercados": (t("nav_mercados", L), t("pg_mercados", L), t("pl_mercados", L), [s4], True),
+        "mercados": (t("nav_mercados", L), t("pg_mercados", L), t("pl_mercados", L), [tc_antes, s4, tc_despues], True),
         "empresas": (t("nav_empresas", L), t("pg_empresas", L), t("pl_empresas", L), [s_emp], True),
         "externo": (t("nav_externo", L), t("pg_externo", L), t("pl_externo", L), [s5], True),
         "comercio": (t("nav_comercio", L), t("pg_comercio", L), t("pl_comercio", L), [s_com], True),
@@ -1672,7 +1676,8 @@ def pagina(d, s, lang, generado):
         ("inflacion", "precios", ["ipc", "ipc_basica"], (t(f"ei_{ei}", L), tono_i)),
         ("tasas", "banco", ["tpm", "tpm_real"], (t(f"ep_{post}", L), {"restrictiva": "warn", "neutral": "ok", "expansiva": "warn"}.get(post, "neutral")) if post else None),
         ("curva-tes", "curva", ["tes10", "pendiente"], None),
-        ("mercados", "mercados", ["trm", "colcap"], None),
+        ("mercados", "mercados", ["trm"], None),
+        ("empresas", "empresas", ["colcap"], None),
         ("externo", "externo", ["cc", "deuda"], None),
         ("comercio", "comercio", ["expo12", "bal12"], None),
     ]
