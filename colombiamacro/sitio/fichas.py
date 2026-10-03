@@ -460,6 +460,41 @@ FICHAS = {
     "g-fi-balance": (("Banco de la República (balance fiscal de caja, empalme DNP–MinHacienda); DANE (PIB nominal)", "Banco de la República (cash fiscal balance, DNP–MinHacienda splice); DANE (nominal GDP)"), ("Balance total = déficit/superávit de caja; primario = balance total + intereses.", "Total balance = cash deficit/surplus; primary = total balance + interest.")),
     "g-fi-deuda": (("Banco de la República (deuda bruta del GNC, % del PIB)", "Banco de la República (central government gross debt, % of GDP)"), ("Saldo anual; en naranja los años por encima de 60% del PIB.", "Annual balance; orange for years above 60% of GDP.")),
     "g-fi-financiamiento": (("Banco de la República (balance fiscal de caja, empalme DNP–MinHacienda); DANE (PIB nominal)", "Banco de la República (cash fiscal balance, DNP–MinHacienda splice); DANE (nominal GDP)"), ("Financiamiento interno y externo, suma de 4 trimestres sobre el PIB; intereses sobre ingresos de los mismos 4 trimestres.", "Domestic and external financing, 4-quarter sum over GDP; interest over revenue for the same 4 quarters.")),
+    # --- comercio ampliado
+    "g-com-pq-expo": (("DANE (exportaciones FOB) y Banco de la República (índice de precios de exportación en dólares)",
+                       "DANE (FOB exports) and Banco de la República (export price index in dollars)"),
+                      ("Valor: variación anual de la suma de 12 meses de las exportaciones FOB. Precio: variación anual del promedio de 12 meses del índice de precios "
+                       "de exportación en dólares. Volumen implícito = (1 + valor) / (1 + precio) − 1; es un residuo, no una medida directa de cantidades.",
+                       "Value: annual change in the 12-month sum of FOB exports. Price: annual change in the 12-month average of the export price index in dollars. "
+                       "Implied volume = (1 + value) / (1 + price) − 1; it is a residual, not a direct measure of quantities.")),
+    "g-com-pq-impo": (("DANE (importaciones CIF) y Banco de la República (índice de precios de importación en dólares)",
+                       "DANE (CIF imports) and Banco de la República (import price index in dollars)"),
+                      ("Igual que el gráfico de exportaciones, con importaciones CIF totales y el índice de precios de importación. "
+                       "Volumen implícito = (1 + valor) / (1 + precio) − 1.",
+                       "Same as the export chart, with total CIF imports and the import price index. Implied volume = (1 + value) / (1 + price) − 1.")),
+    "g-com-canasta": (DANE_EXPO,
+                      ("Sumas móviles de 12 meses de las exportaciones FOB por grupo del DANE (café, carbón, petróleo y derivados, ferroníquel y no tradicionales), "
+                       "apiladas. La altura total es el total exportado en miles de millones de dólares.",
+                       "12-month moving sums of FOB exports by DANE group (coffee, coal, oil and derivatives, ferronickel and non-traditional), stacked. "
+                       "Total height is total exports in US$ billions.")),
+    "g-com-bilateral": (DANE_EXPO_IMPO,
+                        ("Exportaciones FOB al país menos importaciones CIF desde el país, últimos 12 meses. Como las importaciones incluyen flete y seguro, "
+                         "el saldo es algo más negativo que en la balanza de pagos. Socios con información en los anexos de destinos y orígenes del DANE.",
+                         "FOB exports to the country minus CIF imports from the country, last 12 months. Because imports include freight and insurance, "
+                         "the balance is somewhat more negative than in the balance of payments. Partners available in DANE destination and origin annexes.")),
+    "g-com-china": (DANE_IMPO,
+                    ("Importaciones CIF desde cada país (suma de 12 meses) sobre las importaciones totales publicadas por el DANE en el mismo periodo.",
+                     "CIF imports from each country (12-month sum) over total imports published by DANE for the same period.")),
+    "g-com-apertura": (("DANE: exportaciones, importaciones y PIB nominal; Banco de la República: TRM", "DANE: exports, imports and nominal GDP; Banco de la República: TRM"),
+                       ("Exportaciones FOB e importaciones CIF de los últimos 4 trimestres completos sobre el PIB nominal de los mismos 4 trimestres, "
+                        "convertido a dólares con la TRM promedio de cada trimestre. Áreas apiladas: la altura total es la apertura (X + M) / PIB.",
+                        "FOB exports and CIF imports over the last 4 complete quarters divided by nominal GDP for the same 4 quarters, converted to dollars "
+                        "at each quarter's average TRM. Stacked areas: total height is openness (X + M) / GDP.")),
+    "g-com-diversificacion": (DANE_EXPO,
+                              ("Número equivalente = 1 / índice de Herfindahl (suma de participaciones al cuadrado), con sumas de 12 meses. Destinos: países del anexo "
+                               "de destinos del DANE (sin el total). Productos: los cinco grupos del DANE, por lo que su máximo posible es 5.",
+                               "Equivalent number = 1 / Herfindahl index (sum of squared shares), using 12-month sums. Destinations: countries in DANE's destination "
+                               "annex (excluding the total). Products: DANE's five groups, so the maximum possible is 5.")),
 }
 
 

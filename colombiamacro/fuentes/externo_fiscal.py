@@ -52,6 +52,8 @@ SERIES = {
     "spnf_ingresos": (16728, T, COP), "spnf_gastos": (16729, T, COP), "spnf_intereses": (16730, T, COP), "spnf_balance": (16731, T, COP),
     "spnf_fin_interno": (16732, T, COP), "spnf_fin_externo": (16733, T, COP), "spnf_empresas_publicas": (16734, T, COP),
     "deuda_gnc_pib": (15328, A, "% PIB"),
+    # precios del comercio exterior en dolares (indices encadenados de los terminos de intercambio)
+    "precio_exportaciones": (15361, M, "índice"), "precio_importaciones": (15362, M, "índice"),
 }
 
 

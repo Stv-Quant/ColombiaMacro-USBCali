@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 from colombiamacro.config import DATA_DIR
 
 TX = {
-    "s_cifras": ("El comercio exterior en cinco cifras", "Foreign trade in five figures"),
+    "s_cifras": ("El comercio exterior en doce cifras", "Foreign trade in twelve figures"),
     "s_flujos": ("¿Cuánto vende y cuánto compra Colombia?", "How much does Colombia sell and buy?"),
     "s_vende": ("¿Qué vende Colombia?", "What does Colombia sell?"),
     "s_compra": ("¿Qué compra y para qué?", "What does it buy, and for what?"),
@@ -195,7 +195,9 @@ def construir_comercio(c, L):
                                   ve=pct(R["expo_var"], 1, True), vi=pct(R["impo_var"], 1, True),
                                   sm=pct(R["min_sh"], 0), sm0=pct(R["min_sh0"], 0), bk=pct(R["bk_var"], 1),
                                   p=periodo, a=R["anio"])
-    sec("comercio-cifras", tx("s_cifras", L), r0, f'<div class="lecturas">{lecturas}</div>')
+    from colombiamacro.sitio.comercio_mas import construir_mas
+    extra_tiles, extra_secs = construir_mas(c, R, L)
+    sec("comercio-cifras", tx("s_cifras", L), r0, f'<div class="lecturas ocho">{lecturas}{extra_tiles}</div>')
 
     # ------------------------------------------------ 1. flujos y balanza
     e12, i12 = R["e12"].dropna(), R["i12"].dropna()
@@ -346,4 +348,5 @@ def construir_comercio(c, L):
                                   o1=oo[0][0], p1=pct(oo[0][1], 0), o2=oo[1][0], p2=pct(oo[1][1], 0))
     sec("comercio-socios", tx("s_socios", L), r4, f'<div class="grid">{g7}{g8}</div>')
 
+    secs.append(extra_secs)
     return "".join(secs), r0, R
