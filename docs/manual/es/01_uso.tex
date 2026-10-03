@@ -1,0 +1,577 @@
+% =====================================================================
+% CODEX ColombiaMacro · Parte I · Cómo usar ColombiaMacro (español)
+% Fragmento para \input: sin preámbulo.
+% =====================================================================
+\providecommand{\cmsym}[1]{{\fontspec{DejaVu Sans}#1}}
+\providecommand{\cmexp}{{\fontspec{DejaVu Serif}⤢}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\part{Cómo usar ColombiaMacro}
+
+% ---------------------------------------------------------------------
+\chapter{La pregunta que responde el sitio}
+\label{es:u:pregunta}
+
+ColombiaMacro es un tablero académico e institucional sobre la economía colombiana, construido
+exclusivamente con datos oficiales. Todo el sitio está organizado alrededor de una sola pregunta:
+
+\begin{center}
+\sffamily\large ¿En qué fase del ciclo está la economía colombiana\\
+y qué implica para los precios, la política monetaria y los activos?
+\end{center}
+
+La pregunta se descompone en preguntas encadenadas, una por página de análisis. El orden no es casual:
+sigue la secuencia con la que un banco central y un inversionista institucional leen una economía:
+\emph{actividad} (¿cuánto produce el país y frente a qué capacidad?) $\rightarrow$ \emph{precios}
+(¿qué presión genera esa actividad sobre la inflación?) $\rightarrow$ \emph{reacción de política}
+(¿qué hace el Banco de la República con su tasa?) $\rightarrow$ \emph{precios de los activos} (curva de
+los TES, tasa de cambio, bolsa) $\rightarrow$ \emph{restricciones} (cuentas externas, cuentas fiscales y
+comercio exterior).
+
+\section{Principios con los que se construye cada cifra}
+
+\begin{enumerate}
+\item \textbf{Solo datos oficiales.} DANE, Banco de la República (BanRep), Ministerio de Hacienda,
+  Superintendencia Financiera, Superintendencia de Sociedades, DIAN (vía DANE), BVC/MSCI (vía BanRep) y,
+  para la composición de la bolsa, el fondo que replica el índice COLCAP. Ninguna cifra se digita a mano.
+\item \textbf{Sin proyecciones propias.} El sitio describe lo observado. Cuando muestra algo que mira hacia
+  adelante (por ejemplo, la inflación que descuentan los bonos del Gobierno), es una lectura \emph{del
+  mercado}, calculada con precios observados, y se identifica como tal.
+\item \textbf{Frases con respaldo.} Cada frase automática (resúmenes, etiquetas de estado, el veredicto) sale
+  de una regla explícita con umbrales fijos, y cita el dato que la sustenta. Las reglas están en el
+  capítulo~\ref{es:i:estados}.
+\item \textbf{Un eje, una unidad.} Cada gráfico usa una sola escala vertical, salvo excepciones rotuladas en
+  las que una misma magnitud se muestra en otra unidad.
+\item \textbf{Incertidumbre visible.} Lo que se estima (la capacidad de la economía, la tasa neutral, la
+  inflación implícita) se presenta con su rango o con su advertencia, no como una cifra exacta.
+\item \textbf{Sin información futura.} Los cálculos ``en tiempo real'' solo usan la información que existía en
+  cada fecha.
+\end{enumerate}
+
+\section{Para quién es}
+\begin{itemize}
+\item \textbf{Inversionistas extranjeros}: una lectura en inglés o en español con las variables que importan
+  para una asignación en Colombia (tasas reales, expectativas de inflación, tasa de cambio, bolsa en dólares,
+  cuentas externas y fiscales).
+\item \textbf{Inversionistas, analistas y empresarios locales}: un tablero con la disciplina metodológica de
+  un informe de banco central.
+\item \textbf{Comunidad académica}: todas las fórmulas son explícitas (Parte~II) y cada gráfico declara su
+  fuente y su método.
+\end{itemize}
+
+\begin{alerta}[Lo que el sitio no es]
+ColombiaMacro no es una recomendación de inversión ni un pronóstico. Las etiquetas (``Alta'', ``Peso más
+fuerte'', ``Expansión''\ldots) \emph{describen} cada dato frente a una regla; no dicen qué hacer. Las
+magnitudes estimadas (brecha del producto, tasa neutral, inflación implícita) tienen incertidumbre
+documentada en el capítulo~\ref{es:r:limitaciones}.
+\end{alerta}
+
+% ---------------------------------------------------------------------
+\chapter{Mapa del sitio}
+\label{es:u:mapa}
+
+El sitio tiene una \textbf{portada} (el tablero), \textbf{once páginas de análisis} agrupadas en tres
+bloques del menú y una página de \textbf{Datos}. La versión en español vive en la raíz del sitio y la versión
+en inglés en \texttt{/en/}; ambas tienen exactamente la misma estructura.
+
+\section{El menú}
+La barra superior muestra el logotipo (que lleva a la portada), tres menús desplegables y el enlace a Datos:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Grupo del menú} & \textbf{Páginas}\\\midrule
+Actividad & Ciclo · Crecimiento · Capacidad · Empleo\\
+Precios y tasas & Inflación · Tasas · Curva TES\\
+Mercados y cuentas & Tasa de cambio · Sector empresarial · Externo y fiscal · Comercio exterior\\
+Datos & Todos los indicadores · publicaciones oficiales · fuentes · descargas CSV\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+A la derecha están el enlace de idioma (\emph{English}/\emph{Español}), el botón de tema claro u oscuro y, en
+pantallas pequeñas, el botón \cmsym{☰} \emph{Secciones}, que abre el menú. Cada página de análisis lleva
+además una ruta de navegación (\emph{Tablero / Actividad / Ciclo}) y, al final, los enlaces
+\emph{Anterior}, \emph{Volver al tablero} y \emph{Siguiente}, que recorren las páginas en el orden del menú.
+
+\section{Las once páginas de análisis y la pregunta de cada una}
+
+\begin{longtable}{@{}L{0.19\linewidth}L{0.33\linewidth}L{0.40\linewidth}@{}}
+\toprule
+\textbf{Página} & \textbf{Pregunta central} & \textbf{Qué se encuentra}\\\midrule\endhead
+\textbf{Ciclo}\newline\small(\emph{El ciclo económico}) &
+¿En qué fase del ciclo está la economía, cómo llegó ahí y hacia dónde se mueve? &
+Fase trimestral y mensual; consenso de cinco métodos de brecha del producto; reloj del ciclo interactivo;
+amplitud sectorial (cuántos sectores están sobre su tendencia); fechado de expansiones y recesiones; ciclo
+y empleo (ley de Okun).\\
+\textbf{Crecimiento}\newline\small(\emph{Crecimiento, sectores y demanda}) &
+¿Está creciendo la economía, a qué velocidad y por qué? &
+Tres velocidades del PIB (anual, 12 meses, trimestral anualizada); crecimiento real frente a precios
+(deflactor); aportes por sector y por componente de la demanda; los 12 sectores trimestre a trimestre;
+inversión; consumo de los hogares; PIB por persona y productividad; nivel frente al camino previo a 2020.\\
+\textbf{Capacidad}\newline\small(\emph{Capacidad productiva}) &
+¿Produce la economía por encima o por debajo de lo que puede sostener sin generar inflación, y dónde? &
+PIB frente a su capacidad (PIB potencial); brecha por sector; holgura del mercado laboral (desempleo,
+subempleo, subutilización); regiones: crecimiento, tamaño frente a 2019, estructura productiva y
+diversificación de cada departamento.\\
+\textbf{Empleo}\newline\small(\emph{Empleo e informalidad}) &
+¿Cuántos trabajan, dónde y cómo? &
+Desempleo e informalidad (nacional, 13 y 23 ciudades, por sector); empleos creados o perdidos por rama;
+tipo de empleo (posición ocupacional); mujeres y hombres; jóvenes; campo y ciudad; población fuera de la
+fuerza de trabajo; desempleo en las 32 capitales.\\
+\textbf{Inflación}\newline\small(\emph{Inflación y precios}) &
+¿Cuánto suben los precios frente a la meta, qué espera el mercado y de dónde viene la inflación? &
+Inflación total y de fondo frente a la meta; grupos de precios; inflación esperada a 1 año y trayectoria a
+10 años (5y5y); aportes por división; bienes frente a servicios; distribución entre 188 subclases;
+inflación por nivel de ingreso y en 23 ciudades.\\
+\textbf{Tasas}\newline\small(\emph{Tasas de interés}) &
+¿Qué está haciendo el Banco de la República y cuánto cuesta de verdad endeudarse? &
+Tasa de política frente a inflación; tasa real ex ante frente a la neutral; ciclos de la tasa desde 2000;
+traspaso a tasas de ahorro y crédito; costo del crédito por modalidad; mercado monetario (IBR);
+crecimiento real del crédito; liquidez del Banco.\\
+\textbf{Curva TES}\newline\small(\emph{Curva de rendimientos}) &
+¿Cuánto cobra el mercado por prestarle al Gobierno a 1, 5 y 10 años? &
+Explorador de la curva cero cupón (pesos y UVR) para cualquier día desde 2003; nivel, pendiente y
+curvatura; episodios de curva invertida; cambios por plazo; descomposición en tasa real y compensación por
+inflación; prima sobre la tasa del Banco; volatilidad.\\
+\textbf{Tasa de cambio}\newline\small(\emph{El peso colombiano}) &
+¿Cómo está el peso, es el peso o es el dólar, y qué lo mueve? &
+TRM; tasa de cambio real (ITCR); el peso frente al dólar global y a monedas vecinas; petróleo y términos de
+intercambio; balanza cambiaria y reservas; volatilidad.\\
+\textbf{Sector empresarial}\newline\small(\emph{Las empresas de Colombia}) &
+¿Qué empresas mueven la bolsa y cómo están las empresas grandes? &
+COLCAP frente a un índice equiponderado y a las 7 Magníficas; peso de cada acción y sector; las 10.000
+empresas más grandes (ingresos, utilidades, rentabilidad, endeudamiento, concentración, sectores y
+regiones); crédito a empresas; empresas que nacen y cierran.\\
+\textbf{Externo y fiscal}\newline\small(\emph{Cuentas externas y fiscales}) &
+¿Cómo están las cuentas con el exterior y del Gobierno, y cómo se financian? &
+Cuenta corriente por componentes; financiamiento (cuenta financiera); inversión extranjera directa y
+remesas; deuda externa y posición de inversión internacional; ingresos, gastos, intereses, balance total y
+primario, financiamiento y deuda del Gobierno.\\
+\textbf{Comercio exterior}\newline\small(\emph{Qué vende y qué compra Colombia}) &
+¿Cuánto, qué, para qué y con quién comercia Colombia? &
+Exportaciones e importaciones en 12 meses; balanza comercial; composición por producto y por uso;
+destinos y orígenes; precio frente a volumen; apertura y diversificación.\\
+\bottomrule
+\end{longtable}
+
+La antigua dirección \texttt{/sectores/} redirige a la sección de sectores dentro de \emph{Crecimiento}.
+
+\begin{leer}[Orden de lectura sugerido]
+Para una primera lectura, siga el menú de izquierda a derecha: Ciclo $\rightarrow$ Crecimiento $\rightarrow$
+Capacidad $\rightarrow$ Empleo $\rightarrow$ Inflación $\rightarrow$ Tasas $\rightarrow$ Curva TES
+$\rightarrow$ Tasa de cambio $\rightarrow$ Sector empresarial $\rightarrow$ Externo y fiscal $\rightarrow$
+Comercio exterior. Es la cadena causal que se desarrolla en la Parte~IV.
+\end{leer}
+
+% ---------------------------------------------------------------------
+\chapter{La portada}
+\label{es:u:portada}
+
+La portada responde en una pantalla \emph{¿Cómo va la economía colombiana?} y sirve de índice para las
+páginas de análisis. Tiene, de arriba abajo, siete bloques.
+
+\section{Encabezado: dos fechas distintas}
+Bajo el título aparecen dos fechas que conviene no confundir:
+\begin{itemize}
+\item \textbf{datos al}: la fecha del dato más reciente incorporado en el sitio (normalmente un dato de
+  mercado diario);
+\item \textbf{página actualizada}: el momento en que se construyó la página.
+\end{itemize}
+Que la página se haya actualizado hoy no significa que todas las cifras sean de hoy: cada cifra lleva su
+propio período de referencia (capítulo~\ref{es:u:actualizacion}).
+
+\section{El resumen en tres frases}
+Un párrafo sin jerga, generado con reglas explícitas, dice: (1) si la economía crece por encima, al ritmo o por
+debajo de su ritmo habitual; (2) si la inflación sube, baja o se mantiene, y dónde está frente a la meta; (3) en
+qué nivel tiene el Banco de la República su tasa y qué busca con él (frenar la inflación, estimular la
+economía o ninguna de las dos). Si la Junta Directiva ya anunció un cambio de tasa que aún no rige, la tercera
+frase lo dice explícitamente. Las reglas exactas están en la sección~\ref{es:i:resumen}.
+
+\section{El recuadro del ciclo}
+Resume la página \emph{Ciclo} en cuatro cifras:
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[Fase] Expansión, Desaceleración, Contracción o Recuperación, con una frase que la describe y el
+  trimestre de referencia.
+\item[Brecha] Cuánto produce la economía por encima ($+$) o por debajo ($-$) de su capacidad estimada, en
+  porcentaje.
+\item[Dirección] El cambio de la brecha en los dos últimos trimestres, en puntos porcentuales: positivo
+  significa que la economía se aleja hacia arriba de su capacidad (o se acerca desde abajo).
+\item[Racha] Cuántos trimestres seguidos lleva en la fase actual.
+\end{description}
+El enlace \emph{Ver el reloj del ciclo} abre la página de análisis.
+
+\section{Las seis tarjetas principales}
+Cada tarjeta tiene un título, una \emph{etiqueta de estado} de color, la cifra principal, su descripción y
+período, una línea de comparación y un minigráfico de los dos últimos años. Toda la tarjeta enlaza a la página
+de análisis correspondiente.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+\textbf{Tarjeta} & \textbf{Cifra} & \textbf{Línea de comparación}\\\midrule
+Crecimiento & PIB real, variación anual (trimestre) & Ritmo habitual (crecimiento potencial)\\
+Inflación & Variación anual del IPC (mes) & Hace un año · meta 3\%\\
+Tasa del Banco & Tasa de política vigente & Hace un año\\
+Desempleo & Tasa de desempleo desestacionalizada (mes) & Hace un año\\
+Dólar & TRM, pesos por dólar (día) & Variación en un año (\%)\\
+Bolsa (COLCAP) & Puntos del índice (día) & Variación en un año (\%)\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{El recuadro de la curva TES}
+Un gráfico pequeño con la curva en pesos a 1, 5 y 10 años en la fecha más reciente y la misma curva un año antes,
+junto con tres cifras: la \textbf{pendiente 10a $-$ 1a} (en puntos porcentuales), la \textbf{forma} de la curva
+(\emph{Normal}, \emph{Plana} o \emph{Invertida}; reglas en la sección~\ref{es:i:estados-tabla}) y el
+\textbf{cambio del TES a 10 años en 12 meses}. El enlace \emph{Explorar la curva día a día} abre la página
+\emph{Curva TES}.
+
+\section{``Lectura en un vistazo''}
+Una tarjeta por tema (Ciclo, Crecimiento, Capacidad, Sectores, Empleo, Inflación, Tasas, Curva TES, Tasa de
+cambio, Sector empresarial, Externo y fiscal, Comercio exterior). Cada una muestra:
+\begin{itemize}
+\item el grupo y el tema (por ejemplo \emph{Precios y tasas · Inflación});
+\item cuando aplica, la \textbf{etiqueta de estado} del tema;
+\item una frase que resume el tema con el dato más reciente;
+\item \textbf{dos cifras clave}, cada una con su cambio (flecha \cmsym{▲} si sube, \cmsym{▼} si baja), la ventana
+  del cambio (por ejemplo \emph{en 12 meses}) y su período de referencia;
+\item el enlace \emph{Ver análisis}.
+\end{itemize}
+
+\subsection{Qué significa cada etiqueta de estado}
+\label{es:u:pildoras}
+Las etiquetas tienen tres tonos: \textcolor{cmgreen}{\textbf{verde}} (situación favorable o normal),
+\textcolor{cmamber}{\textbf{ámbar}} (atención) y \textcolor{cmred}{\textbf{rojo}} (situación desfavorable);
+las del dólar y la bolsa son neutras (gris), porque un peso más fuerte o una bolsa al alza no son, en sí mismos,
+buenos o malos para todos los lectores.
+
+\begin{longtable}{@{}L{0.17\linewidth}L{0.25\linewidth}L{0.50\linewidth}@{}}
+\toprule
+\textbf{Tema} & \textbf{Etiqueta} & \textbf{Regla (exacta)}\\\midrule\endhead
+Crecimiento & Por encima de lo habitual & PIB anual $\ge$ crecimiento potencial $+1$\pp\ (verde)\\
+ & Ritmo normal & entre potencial $-1$\pp\ y potencial $+1$\pp\ (verde)\\
+ & Lento & PIB anual $\ge 0$ pero $<$ potencial $-1$\pp\ (ámbar)\\
+ & En contracción & PIB anual $<0$ (rojo)\\\midrule
+Inflación & En la meta & inflación anual entre 2\% y 4\% (verde)\\
+ & Bajo la meta & inflación $<2\%$ (ámbar)\\
+ & Sobre la meta & inflación $>4\%$ y $\le 5\%$ (ámbar)\\
+ & Alta & inflación $>5\%$ (rojo)\\\midrule
+Tasa del Banco & Alta: frena la economía & tasa real ex ante $>$ techo de la neutral $+0{,}5$\pp\ (ámbar)\\
+ & Neutral & tasa real ex ante dentro de la neutral $\pm0{,}5$\pp\ (verde)\\
+ & Baja: estimula la economía & tasa real ex ante $<$ piso de la neutral $-0{,}5$\pp\ (ámbar)\\
+ & Anunciada: sube / baja & la Junta anunció un cambio que la serie oficial aún no registra\\\midrule
+Desempleo & Mejorando & desempleo $<$ el de hace 12 meses $-0{,}3$\pp\ (verde)\\
+ & Estable & dentro de $\pm0{,}3$\pp\ del de hace 12 meses (verde)\\
+ & Empeorando & desempleo $>$ el de hace 12 meses $+0{,}3$\pp\ (ámbar)\\\midrule
+Dólar & Peso más fuerte & TRM cae más de 5\% en 12 meses\\
+ & Estable & TRM cambia entre $-5\%$ y $+5\%$\\
+ & Peso más débil & TRM sube más de 5\% en 12 meses\\\midrule
+Bolsa & Al alza / Estable / A la baja & COLCAP $>+5\%$, entre $\pm5\%$, $<-5\%$ en 12 meses\\\midrule
+Ciclo & Expansión, Recuperación & verde\\
+ & Desaceleración & ámbar\\
+ & Contracción & rojo\\
+\bottomrule
+\end{longtable}
+
+\begin{alerta}
+Las etiquetas comparan un dato con un umbral fijo; no son juicios sobre la economía ni señales de compra o
+venta. Una etiqueta puede cambiar por una diferencia mínima alrededor del umbral: lea siempre la cifra, no solo
+el color.
+\end{alerta}
+
+\section{``Todos los indicadores''}
+\label{es:u:tabla}
+Una tabla de 16 indicadores (también en la página \emph{Datos}) con cinco columnas: \emph{Indicador},
+\emph{Último dato}, \emph{Período}, \emph{Cambio} y \emph{Frente a su historia}.
+
+\begin{itemize}
+\item \textbf{Cambio.} Para tasas y porcentajes, en \textbf{puntos porcentuales} (pp); para niveles (TRM,
+  tasa de cambio real, COLCAP), en \textbf{porcentaje}. La ventana es de 12 meses, salvo para la inflación que
+  espera el mercado (1 año y largo plazo) y el TES a 10 años, que se comparan con 3 meses antes porque son
+  datos de mercado que se mueven rápido.
+\item \textbf{Frente a su historia.} Una barra con el \textbf{percentil histórico} del último dato frente a
+  todas sus observaciones desde 2010 (fórmula en la sección~\ref{es:f:percentil}), traducido a palabras.
+\end{itemize}
+
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Percentil $p$} & \textbf{Palabra} & \textbf{Lectura}\\\midrule
+$p<10$ & Muy bajo & entre el 10\% de valores más bajos desde 2010\\
+$10\le p<30$ & Bajo & \\
+$30\le p\le 70$ & Normal & en la franja central de su historia\\
+$70< p\le 90$ & Alto & \\
+$p>90$ & Muy alto & entre el 10\% de valores más altos desde 2010\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}\small
+\begin{longtable}{@{}p{0.55\linewidth}ll@{}}
+\toprule
+\textbf{Indicador} & \textbf{Cambio en} & \textbf{Ventana}\\\midrule\endhead
+Crecimiento de la economía (PIB real, anual) & pp & 12 meses\\
+Producción frente a su capacidad (brecha) & pp & 12 meses\\
+Actividad económica mensual (ISE, anual) & pp & 12 meses\\
+Desempleo & pp & 12 meses\\
+Inflación anual & pp & 12 meses\\
+Inflación de fondo (sin alimentos ni regulados) & pp & 12 meses\\
+Inflación que espera el mercado (próximo año) & pp & 3 meses\\
+Inflación que espera el mercado (largo plazo, 5y5y) & pp & 3 meses\\
+Tasa de interés del Banco de la República & pp & 12 meses\\
+Tasa de interés real (descontada la inflación esperada) & pp & 12 meses\\
+Bonos del Gobierno a 10 años (TES) & pp & 3 meses\\
+Dólar (TRM, pesos por dólar) & \% & 12 meses\\
+Tasa de cambio real (2010 = 100) & \% & 12 meses\\
+Bolsa de Colombia (COLCAP) & \% & 12 meses\\
+Cuenta corriente (\% del PIB) & pp & 12 meses\\
+Deuda bruta del Gobierno (\% del PIB) & pp & 12 meses\\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\begin{leer}
+``Muy alto'' no significa ``malo'' ni ``Muy bajo'' significa ``bueno'': un percentil solo ubica el dato dentro de
+su propia historia. Una inflación ``Muy baja'' puede ser una buena noticia; un COLCAP ``Muy alto'' solo dice
+que el índice está cerca de sus máximos desde 2010. Los extremos son los datos que más se alejan de su
+normalidad y merecen una lectura más cuidadosa en su página.
+\end{leer}
+
+\section{Fuentes oficiales y publicaciones}
+La portada termina con la tabla \emph{Fuentes oficiales} (fuente, frecuencia, último dato y estado: \emph{Al
+día}, \emph{Retrasado} o \emph{Pendiente}; véase el capítulo~\ref{es:u:actualizacion}), los enlaces a la
+metodología y al manual, y la nota \emph{Últimas publicaciones oficiales}: tarjetas breves con el dato más
+reciente de cada entidad (por ejemplo, la última decisión de tasa, la TRM, el COLCAP, el desempleo o la tasa del
+TES a 10 años), la fecha de publicación u observación y un enlace a la página oficial. Cuando la fuente no trae
+la fecha de publicación, la tarjeta dice \emph{dato más reciente}. Al pie hay enlaces fijos a las salas de prensa
+del Banco de la República, el DANE, el Ministerio de Hacienda y la Superintendencia Financiera.
+
+\begin{leer}[Regla de oro de la portada]
+Lea siempre el \textbf{período de referencia} junto a la cifra. En una misma pantalla conviven datos diarios
+(tasas, dólar, bolsa), mensuales (inflación, desempleo, ISE), trimestrales (PIB, cuenta corriente) y anuales
+(deuda del Gobierno). El sitio nunca rellena una frecuencia con otra.
+\end{leer}
+
+% ---------------------------------------------------------------------
+\chapter{Anatomía de una página de análisis}
+\label{es:u:anatomia}
+
+Todas las páginas de análisis comparten la misma estructura. Conocerla una vez basta para leer las once.
+
+\section{Encabezado y selector de horizonte}
+El encabezado tiene la ruta de navegación, la fecha \emph{datos al}, el título de la página y un párrafo que
+dice qué se encontrará en ella. Debajo está el \textbf{selector de horizonte}:
+\emph{Ver los gráficos de los últimos 3 años · 5 años · 10 años · Todo} (sección~\ref{es:u:horizonte}).
+
+\section{Secciones numeradas}
+El cuerpo se divide en secciones numeradas (01, 02, \ldots), cada una titulada con una pregunta (por ejemplo
+\emph{¿Qué sectores impulsan la economía?}). Cada sección tiene, en este orden:
+
+\begin{enumerate}
+\item \textbf{``Lo clave''}: de dos a cuatro frases generadas con los datos más recientes, con las cifras
+  resaltadas. Responden la pregunta de la sección antes de mirar cualquier gráfico.
+\item \textbf{Los gráficos} de la sección (o una tabla).
+\end{enumerate}
+
+La \textbf{primera sección} de cada página es un panel de medidas (\emph{La economía en cinco medidas},
+\emph{El crecimiento en ocho medidas}, \emph{Las cuentas externas y fiscales en doce medidas}\ldots): un
+conjunto de mosaicos, cada uno con el nombre de la medida, su valor, una línea de contexto (período,
+comparación, referencia) y, cuando aplica, un tono de color con la misma lógica de las etiquetas. Los
+mosaicos con enlace llevan a la sección donde se analiza esa medida.
+
+La \textbf{última sección} de cada página, \emph{Bases metodológicas y literatura}, lista las referencias
+académicas e institucionales que respaldan los métodos de la página, cada una con una línea que dice para qué
+se usa (todas están compiladas en el capítulo~\ref{es:r:referencias}).
+
+\section{Anatomía de un gráfico}
+\label{es:u:grafico}
+Cada gráfico es un bloque con estas partes:
+
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[Título] Describe qué se mide, a veces con el período entre paréntesis (por ejemplo
+  \emph{Informalidad por sector (may--jul)}).
+\item[Franja de cifras] Encima del gráfico, una cifra por serie principal: nombre, último valor, su fecha y
+  su cambio con flecha (\cmsym{▲}/\cmsym{▼}) frente a un punto de comparación explícito (\emph{vs. hace 1 año},
+  \emph{vs. trimestre anterior}, \emph{vs. hace 1 mes}). Las tasas cambian en pp y los niveles en \%.
+\item[Área del gráfico] Una escala vertical; leyenda arriba o al lado. Las franjas grises verticales, cuando
+  aparecen, marcan recesiones fechadas en la página \emph{Ciclo}.
+\item[Panel de cambios] En muchos gráficos de series de tiempo, un segundo panel debajo muestra, fecha por
+  fecha, el cambio de la serie principal (barras azules cuando sube, naranjas cuando baja). Comparte el eje de
+  fechas con el panel superior.
+\item[Línea de lectura ``?''] Debajo del gráfico, un párrafo precedido de un círculo con ``?'' explica
+  \emph{qué mirar}: qué es cada línea o barra y qué significa que suba o baje.
+\item[Pie de fuente] \emph{Fuente:} entidad y publicación de donde salen los datos.
+\item[Tooltip de metodología] Junto a la fuente, un botón redondo ``?''. Al pasar el cursor (o tocarlo en el
+  teléfono) aparece un recuadro \emph{Metodología.} con la fórmula, los parámetros, la frecuencia y las
+  advertencias del cálculo. La línea de lectura explica \emph{qué} mirar; la metodología, \emph{cómo} se calculó.
+\end{description}
+
+\section{La lupa: cómo leer e interpretar cada gráfico}
+\label{es:u:lupa}
+En la esquina de cada gráfico hay un botón con el icono de una lupa. Al pulsarlo se abre la ventana
+\emph{Lupa · cómo leer este gráfico}, que reúne en un solo lugar todo lo necesario para interpretarlo. Sus
+partes, siempre en el mismo orden, son:
+
+\begin{enumerate}
+\item \textbf{Título}: el del gráfico.
+\item \textbf{Qué nos cuenta}: la idea central del gráfico en una o dos frases.
+\item \textbf{Lo que muestra hoy}: una copia de las frases de ``Lo clave'' de la sección, con las cifras
+  vigentes.
+\item \textbf{Cómo se lee}: ejes, colores, líneas de referencia y convenciones.
+\item \textbf{Por qué importa}: la relevancia económica y para un inversionista.
+\item \textbf{Cómo interpretarlo}: una lista de lecturas típicas (qué significa cada configuración del
+  gráfico) y de cautelas.
+\item \textbf{Fórmulas}: cada fórmula con su nombre, su expresión y, cuando hace falta, una nota.
+\item \textbf{Metodología y fuente}: el mismo texto del tooltip de metodología y la fuente.
+\end{enumerate}
+
+La ventana se cierra con \cmsym{✕}, con la tecla \emph{Esc} o haciendo clic fuera de ella. El contenido de cada
+lupa se reproduce en el atlas de gráficos de este Codex (Parte~III).
+
+\section{Ampliar un gráfico}
+El botón \cmexp\ (\emph{Ampliar gráfico}) lleva el gráfico al centro de la pantalla, con más altura y el fondo
+atenuado, sin mover la página. El gráfico ampliado conserva todos sus controles (selectores, clics, cajas
+emergentes). Se cierra con el mismo botón (que pasa a \cmsym{✕}), con \emph{Esc} o haciendo clic en el fondo.
+
+\section{El selector de horizonte y el rebase}
+\label{es:u:horizonte}
+Los botones \emph{3 años}, \emph{5 años}, \emph{10 años} y \emph{Todo} recortan \textbf{todos} los gráficos de
+series de tiempo de la página a la misma ventana, que termina en el último dato. Detalles que importan:
+
+\begin{itemize}
+\item La opción predeterminada es \emph{10 años}; el navegador recuerda la última elección y la aplica en
+  todas las páginas.
+\item La escala vertical se ajusta a los datos visibles; por eso, con \emph{Todo} o con 10 años, episodios
+  extremos como 2020 se ven completos y comprimen el resto, y con 3 años la escala se abre.
+\item Si una serie empieza después del inicio de la ventana (por ejemplo, la informalidad desde 2021), el
+  gráfico arranca en su primer dato, sin espacio vacío.
+\item Los gráficos que no son series de tiempo (cortes transversales por sector, ciudad o plazo, mapas,
+  tablas, la curva TES de un día) no cambian con el horizonte.
+\item Los gráficos \textbf{base 100} (por ejemplo, COLCAP frente al equiponderado y a las 7 Magníficas, o el
+  peso frente a otras monedas) se \textbf{re-basan}: cada serie vale 100 en el primer dato visible de la ventana,
+  \[
+  \tilde I_t = 100\,\frac{I_t}{I_{t_0}},\qquad t_0=\text{primer dato dentro del horizonte},
+  \]
+  de modo que el valor de cada línea al final es directamente su rendimiento acumulado en la ventana. Cambiar
+  el horizonte cambia los niveles de las líneas, pero no su orden relativo dentro de la ventana.
+\end{itemize}
+
+\begin{alerta}[El horizonte cambia la impresión visual]
+Una misma serie puede verse ``alta'' con 3 años y ``normal'' con \emph{Todo}. Antes de sacar una conclusión
+sobre niveles, revise el horizonte y, si es posible, compárelo con el percentil histórico de la tabla de
+indicadores (que siempre usa la historia desde 2010).
+\end{alerta}
+
+\section{Cajas emergentes (hover)}
+Al pasar el cursor por un punto, barra o casilla aparece una caja con su fecha, su valor y, en muchos gráficos,
+su cambio frente al mismo punto de comparación de la franja (por ejemplo \emph{\cmsym{▲} +0,5 pp vs. trimestre
+anterior}). Así se puede leer el cambio en cualquier fecha histórica, no solo en el último dato. En los gráficos
+con dos paneles, la caja muestra el valor del panel superior y el cambio del inferior en la misma fecha. En los
+mapas de calor, la caja muestra el valor exacto aunque la escala de color esté recortada.
+
+\section{Controles interactivos propios de algunas páginas}
+\begin{itemize}
+\item \textbf{Reloj del ciclo} (\emph{Ciclo}): una barra para elegir el trimestre, botones de recorrido
+  (\emph{1 año}, \emph{2 años}, \emph{3 años}) y \emph{Volver al último dato}; al pasar el cursor por el gráfico de
+  barras del recorrido, el reloj se mueve a ese trimestre.
+\item \textbf{Selector de trimestre de los sectores} (\emph{Crecimiento}): \emph{Ver el trimestre:} muestra
+  cualquier trimestre desde 2010; un clic en el mapa de calor lleva las barras a esa columna.
+\item \textbf{Explorador de la curva TES} (\emph{Curva TES}): interruptor pesos/UVR, barra de fechas desde 2003,
+  años para comparar (\emph{Comparar con el cierre de:}) y la historia de 1, 5 y 10 años (pasar el cursor mueve
+  la curva; un clic fija la fecha).
+\item \textbf{Mapas regionales} (\emph{Capacidad}) y \textbf{listas desplegables} de ciudades (\emph{Empleo}).
+\end{itemize}
+
+\section{La ventana ``Para entender''}
+Varias páginas tienen un botón que abre una ventana explicativa sobre la fuente y los conceptos de la página:
+cómo se miden exportaciones e importaciones (FOB, CIF, CUODE); qué es la curva cero cupón; de dónde salen las cifras
+de las empresas; cómo leer la balanza de pagos y las cuentas del Gobierno; qué son las 188 subclases del IPC;
+cómo se calcula la TRM y qué es la tasa de cambio real; cómo funciona la tasa del Banco y cómo llega a la
+economía. Cada ventana termina con enlaces a las fuentes oficiales.
+
+\section{Idioma, tema y teléfono}
+\begin{itemize}
+\item \textbf{Idioma.} El enlace \emph{English}/\emph{Español} cambia a la misma página en el otro idioma.
+  Cambian los textos y el formato numérico: coma decimal y punto de miles en español (3,5\%; 3.313), punto
+  decimal y coma de miles en inglés (3.5\%; 3,313). Los trimestres se escriben T1--T4 en español y Q1--Q4 en
+  inglés.
+\item \textbf{Tema oscuro.} El botón de tema cambia entre claro y oscuro; los colores de los gráficos se
+  traducen a su par en el otro tema, de modo que el significado de cada color (azul sube, naranja baja; verde,
+  ámbar y rojo en las etiquetas) se mantiene. El navegador recuerda la elección.
+\item \textbf{Teléfono.} Tarjetas y gráficos se apilan en una columna; el menú se abre con \cmsym{☰}; los
+  tooltips de metodología se abren tocando el ``?''.
+\end{itemize}
+
+% ---------------------------------------------------------------------
+\chapter{Frecuencia de actualización y estado de las fuentes}
+\label{es:u:actualizacion}
+
+\section{Cuándo se actualiza el sitio}
+Los datos se descargan automáticamente de las fuentes oficiales: las series diarias (tasas, dólar, bolsa), cada
+hora en días hábiles; todas las fuentes, cada noche. Antes de publicarse, cada tabla pasa controles de
+calidad (identidad de la serie, rangos plausibles, fechas sin huecos ni duplicados, recálculo de fórmulas). Si
+una fuente falla, se conserva su último dato válido y su estado lo refleja.
+
+\section{Período medido frente a fecha de publicación}
+La fecha que acompaña a cada cifra es el \textbf{período medido} (el trimestre del PIB, el mes del IPC, el día
+de la TRM), no el día en que se publicó. Por eso, un PIB fechado en el segundo trimestre puede ser el dato más
+reciente disponible varios meses después de terminado ese trimestre.
+
+\section{Rezagos típicos de publicación}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Variable (fuente)} & \textbf{Frecuencia} & \textbf{Rezago aproximado de publicación}\\\midrule
+PIB y PIB por sectores (DANE) & Trimestral & unos 45 días después del trimestre\\
+ISE (DANE) & Mensual & unos 45--50 días después del mes\\
+IPC (DANE) & Mensual & primera semana del mes siguiente\\
+Desempleo, GEIH (DANE) & Mensual & alrededor de un mes\\
+Informalidad, GEIH (DANE) & Trimestre móvil & alrededor de mes y medio\\
+Comercio exterior (DANE--DIAN) & Mensual & entre uno y dos meses\\
+Tasa de política, TRM, TES, COLCAP, IBR & Diaria & el mismo día o el siguiente\\
+Tasas de crédito y CDT (BanRep) & Semanal & pocos días\\
+Balanza de pagos, deuda externa (BanRep) & Trimestral & unos dos a tres meses\\
+Deuda del Gobierno (MinHacienda vía BanRep) & Anual & varios meses después del cierre\\
+10.000 empresas (Supersociedades) & Anual & a mediados del año siguiente\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Qué significa ``Al día''}
+\label{es:u:aldia}
+La tabla de fuentes asigna a cada una uno de tres estados:
+\begin{description}[style=nextline,leftmargin=0pt]
+\item[Al día] El último período disponible está dentro de la tolerancia esperada para su frecuencia: han
+  pasado menos días que el umbral de la tabla siguiente desde la fecha con la que se registra ese período.
+\item[Retrasado] Han pasado más días que el umbral: la fuente no ha publicado un dato nuevo cuando se esperaba,
+  o la descarga falló y se conserva el último dato válido.
+\item[Pendiente] La fuente aún no se ha descargado por primera vez.
+\end{description}
+
+\begin{center}\small
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Fuente} & \textbf{Umbral (días)}\\\midrule
+Bolsa -- COLCAP (diaria) & 7\\
+Tasas de los TES, tasa de política, TRM (diarias) & 10\\
+Canasta COLCAP y acciones del COLCAP & 10\\
+Inflación -- IPC (mensual) & 45\\
+Inflación básica (mensual) & 75\\
+Desempleo -- GEIH (mensual) & 100\\
+Tasa de cambio real -- ITCR (mensual) & 100\\
+Actividad mensual -- ISE; Informalidad -- GEIH & 110\\
+PIB real (trimestral) & 130\\
+Cuenta corriente (trimestral) & 200\\
+PIB por sectores (trimestral) & 230\\
+Deuda del Gobierno (anual) & 800\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{alerta}[``Al día'' no es ``de hoy'']
+\emph{Al día} significa que la fuente cumple su calendario normal, no que el dato sea reciente en sentido
+absoluto. Un PIB \emph{Al día} puede referirse a un trimestre que terminó hace más de tres meses, y una deuda
+anual \emph{Al día} puede referirse al cierre del año anterior. Los umbrales son amplios porque se cuentan
+desde la fecha con la que se registra el período (normalmente su primer día), no desde su publicación.
+\end{alerta}

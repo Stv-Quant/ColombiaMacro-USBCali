@@ -124,8 +124,8 @@ python -m unittest discover -s tests        # pruebas
 pip install -r requirements-docs.txt && python scripts/generar_figuras.py   # figuras del manual
 ```
 
-Documentación: [Metodología](docs/METODOLOGIA.md) · [Diccionario de datos](docs/DICCIONARIO_DATOS.md) ·
-[Operación](docs/OPERACION.md) · [Manual (PDF)](docs/Manual_ColombiaMacro.pdf) ·
+Documentación: [Metodología (PDF)](docs/METODOLOGIA.pdf) · [Metodología (texto)](docs/METODOLOGIA.md) · [Diccionario de datos](docs/DICCIONARIO_DATOS.md) ·
+[Operación](docs/OPERACION.md) · [Codex de lectura (PDF)](docs/Manual_ColombiaMacro.pdf) ·
 [Guía de presentación (PDF)](docs/Guia_Presentacion_Academica.pdf)
 
 > Tablero académico. No constituye recomendación de inversión.

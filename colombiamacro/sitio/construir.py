@@ -1546,7 +1546,7 @@ def pagina(d, s, lang, generado):
         return f'<div class="dl-grid">{"".join(items)}</div>'
 
     def documentos_html():
-        return (f'<p class="downloads"><b>{t("documentos", L)}:</b> <a href="{REPO_URL}/blob/main/docs/METODOLOGIA.md">{t("metodologia", L)}</a> · '
+        return (f'<p class="downloads"><b>{t("documentos", L)}:</b> <a href="{REPO_URL}/raw/main/docs/METODOLOGIA.pdf">{t("metodologia", L)}</a> · '
                 f'<a href="{REPO_URL}/raw/main/docs/Manual_ColombiaMacro.pdf">{t("manual", L)}</a> · <a href="{REPO_URL}">GitHub</a></p>')
 
     s_ind = (f'<section id="indicadores" class="section"><div class="sec-head"><span class="sec-num">0</span><h2>{t("q_todos", L)}</h2></div>'

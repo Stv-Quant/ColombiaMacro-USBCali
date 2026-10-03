@@ -24,3 +24,7 @@ site/
 *.vrb
 # ...excepto el registro de actualizacion, que se publica para diagnostico
 !data/registro_actualizacion.log
+
+# PDF intermedios de los documentos (los finales viven en docs/)
+docs/manual/manual.pdf
+docs/metodologia/metodologia.pdf

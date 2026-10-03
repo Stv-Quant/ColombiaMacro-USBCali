@@ -181,7 +181,7 @@ T = {
     "fr_semanal": ("Semanal", "Weekly"),
     "st_vigente": ("Al día", "Up to date"), "st_rezagado": ("Retrasado", "Delayed"), "st_pendiente": ("Pendiente", "Pending"),
     "descargar": ("Descargar datos (CSV)", "Download data (CSV)"), "documentos": ("Documentos", "Documents"),
-    "metodologia": ("Metodología", "Methodology"), "manual": ("Manual (PDF)", "Manual (PDF)"),
+    "metodologia": ("Metodología (PDF)", "Methodology (PDF, Spanish)"), "manual": ("Codex de lectura (PDF)", "Reading Codex (PDF, Spanish)"),
     "glosario": ("Glosario", "Glossary"),
 
     # --- cambios en los graficos

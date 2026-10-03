@@ -1,283 +1,1244 @@
 # ColombiaMacro — Nota metodológica
 
-*Versión 9.0 · septiembre de 2026 · documento de trabajo para revisión académica e institucional*
+*Versión 12.18 · octubre de 2026 · documento de trabajo para revisión académica e institucional*
 
-## 1. Propósito y pregunta de investigación
+Esta nota describe las fuentes, las transformaciones, los métodos estadísticos, las reglas de clasificación
+y los controles de calidad que producen cada cifra del sitio ColombiaMacro. Reemplaza a la versión 9
+(septiembre de 2026), que cubría solo las secciones originales del tablero. Todo lo que aquí se describe
+corresponde al código vigente del repositorio; cuando una afirmación depende de un resultado numérico, se
+presenta como ejercicio fechado (sección 8) y no como propiedad permanente del método.
 
-El tablero responde una sola pregunta, en cinco partes: **¿en qué fase del ciclo está la economía
-colombiana y qué implica para precios, política monetaria y activos?**
+## 1. Propósito, preguntas y principios de diseño
 
-| Sección | Pregunta | Indicador principal |
+### 1.1 Propósito
+
+ColombiaMacro es un tablero académico, bilingüe (español e inglés), dirigido a inversionistas, analistas y
+estudiantes que necesitan una lectura ordenada de la economía colombiana a partir de datos oficiales. Su
+pregunta central es **en qué fase del ciclo está la economía colombiana y qué implica para los precios, la
+política monetaria, las cuentas externas y fiscales y los activos**. Cada página responde una pregunta
+específica y abre con un bloque de "lo clave" cuyas frases se generan automáticamente a partir de los datos.
+
+### 1.2 Páginas y preguntas
+
+| Página | Pregunta que responde | Medidas principales |
 | --- | --- | --- |
-| 1. Actividad | ¿Crece la economía por encima de su potencial? | Brecha del producto (HP en tiempo real) |
-| 2. Precios | ¿Converge la inflación a la meta? | IPC total, básica y expectativas implícitas en TES |
-| 3. Política y curva | ¿Cuál es la postura de BanRep? | Tasa real ex ante frente a la neutral |
-| 4. Mercados y sector externo | ¿Cómo lo reflejan los activos? | COLCAP (COP/USD), TRM, ITCR, cuenta corriente, deuda |
-| 5. Señales | ¿Qué tan extremo es cada dato? | Percentil histórico desde 2010 |
+| Portada | ¿Cómo está la economía hoy, en un vistazo? | Fase del ciclo, seis tarjetas con estado, curva TES, resumen por tema |
+| Ciclo | ¿En qué parte del ciclo está la economía? | Brecha del producto (cinco métodos), reloj del ciclo, ciclo mensual del ISE, giros, Okun |
+| Crecimiento | ¿Cuánto crece la economía y por qué? | Tres velocidades del PIB, deflactor, aportes por sector y por componente del gasto, inversión, consumo, PIB por persona, productividad |
+| Capacidad | ¿Produce por encima o por debajo de su capacidad, y dónde? | Brecha agregada y sectorial, holgura laboral, regiones (departamentos), diversificación |
+| Empleo | ¿Cómo está el empleo y cuánto es informal? | Desempleo, informalidad, empleo por rama y posición, brechas por sexo, jóvenes, zonas, 32 capitales |
+| Inflación | ¿Converge la inflación a la meta y de dónde viene? | IPC total y de fondo, breakevens, forward 5y5y, divisiones, bienes y servicios, difusión, ingresos, ciudades |
+| Tasas | ¿Qué hace el Banco de la República y cómo se transmite? | Tasa de política, tasa real ex ante, ciclos, traspaso, crédito, IBR, liquidez |
+| Curva TES | ¿Cuánto cobra el mercado por prestarle al Gobierno? | Curva cero cupón, nivel-pendiente-curvatura, episodios invertidos, Fisher, prima, volatilidad |
+| Mercados | ¿Cómo está el peso y qué lo mueve? | TRM, pares regionales, dólar global, ITCR, petróleo, balanza cambiaria, reservas, volatilidad |
+| Empresas | ¿Cómo están las empresas y qué mueve la bolsa? | COLCAP, bolsa por dentro, 10.000 empresas, crédito empresarial, registro mercantil |
+| Externo | ¿Cómo están las cuentas con el exterior y del Gobierno? | Balanza de pagos (MBP6), financiación, IED, remesas, deuda externa, PII, balance fiscal |
+| Comercio | ¿Qué vende y qué compra Colombia, y con quién? | Exportaciones e importaciones, CUODE, precio y volumen, socios, apertura, concentración |
+| Indicadores / datos | ¿Qué tan extremo es cada dato y de dónde viene? | 16 indicadores con percentil histórico, publicaciones oficiales, estado de las fuentes, descargas |
 
-Principios de diseño:
+### 1.3 Principios de diseño
 
-1. **Solo datos oficiales** (DANE, BanRep, BVC/MSCI vía BanRep, MinHacienda vía BanRep), descargados sin
-   intervención manual y con identidad verificada (número de serie **y** nombre).
-2. **Cada gráfico tiene un solo eje y una sola unidad.** Se eliminaron los ejes dobles del tablero anterior.
-3. **Cada frase del veredicto se deriva de una regla explícita** (sección 7) y cita el dato que la sustenta.
-4. **La incertidumbre se muestra, no se oculta**: la brecha del producto se presenta con el rango entre métodos.
-5. **Sin información futura**: los cálculos en tiempo real solo usan datos disponibles a cada fecha.
+1. **Fuentes oficiales.** Las cifras provienen del DANE, el Banco de la República (BanRep), el Ministerio
+   de Hacienda (vía BanRep), la Superintendencia Financiera (vía BanRep), la Superintendencia de
+   Sociedades y Confecámaras (vía el portal de datos abiertos datos.gov.co) y, para el contexto global,
+   la Reserva Federal de EE. UU. y la Administración de Información Energética (EIA) vía FRED. Las únicas
+   excepciones, explícitamente señaladas como fuentes auxiliares no oficiales, son la composición del
+   fondo iShares MSCI COLCAP y los precios de Yahoo Finance usados en "la bolsa por dentro" (sección 3.4).
+2. **Descarga automática y verificable.** Ninguna cifra se digita a mano, con una sola excepción
+   documentada: el archivo de decisiones anunciadas por la Junta del Banco de la República (sección 3.5).
+   Cada serie del graficador del Banco se acepta solo si su identificador **y** su nombre coinciden con lo
+   esperado.
+3. **Sin proyecciones ni pronósticos.** El sitio describe el presente con datos observados. Las
+   trayectorias "hacia el futuro" que aparecen (por ejemplo, la inflación implícita en los TES) son precios
+   de mercado observados hoy, no pronósticos del tablero.
+4. **Sin información futura en los cálculos "en tiempo real".** La brecha principal se estima con un
+   filtro de una cola que, para cada trimestre, solo usa datos hasta ese trimestre; la tasa real ex post
+   usa la inflación ya publicada en cada fecha. Las medidas que sí usan toda la muestra (filtros de dos
+   colas, coeficientes estimados con la muestra completa) se identifican como tales.
+5. **Incertidumbre visible.** La brecha del producto se presenta con cinco métodos, su mediana y su rango;
+   las inflaciones implícitas se rotulan como compensación por inflación que incluye primas, no como
+   expectativas puras.
+6. **Reglas explícitas.** Cada estado ("expansión", "restrictiva", "por encima de la meta") y cada frase
+   del veredicto se deriva de un umbral escrito en el código (sección 6). Los estados describen; no son
+   recomendaciones de inversión.
+7. **Un eje, una unidad.** Los gráficos principales usan un solo eje; cuando se combinan magnitudes
+   distintas (por ejemplo, saldo en dólares y razón al PIB) el eje secundario se rotula explícitamente.
 
-## 2. Fuentes
+## 2. Convenciones y notación
 
-| Tabla | Variable | Fuente | Serie / archivo | Frecuencia |
+* **Fechas.** Los datos mensuales se fechan el primer día del mes; los trimestrales, el primer día del
+  trimestre; los anuales, el 1 de enero. Los trimestres móviles y años móviles de la GEIH se fechan en su
+  último mes. Las series semanales de acciones se fechan el viernes de la semana (o el día del último dato
+  si la semana está en curso).
+* **Tasas.** Todas las tasas de interés están en porcentaje efectivo anual. Las conversiones entre nominal
+  y real usan la ecuación de Fisher exacta, $(1+i) = (1+r)(1+\pi)$, no la aproximación $i-\pi$.
+* **Variaciones.** Para una serie $x$, la variación anual es $100\,(x_t/x_{t-k}-1)$ con $k=12$ en datos
+  mensuales, $k=4$ en trimestrales y $k=52$ en semanales. Los cambios de tasas se expresan en puntos
+  porcentuales (pp) o puntos básicos (pb, 1 pp = 100 pb).
+* **"Último dato disponible".** Cuando una comparación se hace "frente a hace un año", se toma el último
+  dato disponible en o antes de la fecha de referencia menos el horizonte (365, 364, 91 o 28 días según la
+  medida). En los paneles de cambio de los gráficos se busca el dato más cercano con una tolerancia de 20
+  días (horizontes anual y trimestral) o 12 días (horizonte mensual).
+* **Brechas en logaritmos.** Con $y_t = 100\ln Y_t$ y una tendencia $\tau_t$ en la misma escala, la brecha
+  $g_t = y_t - \tau_t$ se lee como porcentaje aproximado del nivel de tendencia.
+* **Unidades monetarias.** "Billones" designa $10^{12}$ pesos; "miles de millones de dólares", $10^{9}$
+  dólares. Los niveles reales del PIB están en volúmenes encadenados con referencia 2015.
+
+## 3. Fuentes de datos
+
+### 3.1 Tabla de archivos
+
+La tabla enumera cada archivo de `data/` que usa el sitio. "Frecuencia" es la de la serie; "Identificador"
+es el número de serie del graficador SUAMECA del Banco de la República, el identificador del conjunto de
+datos de datos.gov.co, el código FRED o el anexo del DANE que lee el código.
+
+| Archivo | Contenido | Entidad | Identificador | Frecuencia |
 | --- | --- | --- | --- | --- |
-| `pib_colombia.csv` | PIB real original y desestacionalizado, PIB nominal | DANE, anexos PIB por producción | Cuadros 1 y 4, ref. 2015 | Trimestral |
-| `inflacion_clean.csv` | IPC, variación mensual y anual | DANE + BanRep | Serie 15000 | Mensual |
-| `tasas_interes_clean.csv` | Curvas cero cupón TES pesos y UVR (1, 5, 10 años) | BanRep | 15272–15277 | Diaria |
-| `colcap_oficial.csv` | Índice COLCAP | BanRep (BVC/MSCI) | 6 | Diaria |
-| `series_banrep.csv` | Tasa de política | BanRep | 59 | Diaria |
-| | IBR overnight efectiva | BanRep | 15324 | Diaria |
-| | TRM | Superfinanciera vía BanRep | 1 | Diaria |
-| | Inflación sin alimentos / sin alimentos ni regulados / núcleo 15 | BanRep | 15388 / 15390 / 15392 | Mensual |
-| | Inflación de regulados / de alimentos | BanRep / DANE | 15398 / 15404 | Mensual |
-| | Meta de inflación | BanRep | 853 | Anual |
-| | ITCR-IPC ponderaciones totales (2010 = 100) | BanRep | 235 | Mensual |
-| | Términos de intercambio | BanRep | 15360 | Mensual |
-| | Reservas internacionales netas | BanRep | 15051 | Mensual |
-| | Cuenta corriente (% PIB) | BanRep | 15290 | Trimestral |
-| | IED en Colombia (USD mn) | BanRep | 15133 | Trimestral |
-| | Deuda bruta del GNC (% PIB) | MinHacienda vía BanRep | 15328 | Anual |
-| | Salario mínimo, variación anual | MinTrabajo vía BanRep | 15418 | Anual |
-| `ise_mensual.csv` | Indicador de Seguimiento a la Economía | DANE | `anex-ISE-9actividades-*.xlsx`, cuadros 1 y 2 | Mensual |
-| `mercado_laboral.csv` | TGP, TO, TD desestacionalizadas | DANE, GEIH | `anex-GEIH-Desestacionalizado-*.xlsx` | Mensual |
+| `pib_colombia.csv` | PIB real original y desestacionalizado (volúmenes encadenados, ref. 2015) y PIB nominal | DANE | Anexos `anex-ProduccionConstantes` (Cuadros 1 y 4) y `anex-ProduccionCorriente` (Cuadro 1) | Trimestral |
+| `pib_sectores.csv` | Valor agregado real de 12 agrupaciones CIIU Rev. 4: nivel, variación anual, peso y aporte | DANE | `anex-ProduccionConstantes`, Cuadro 1 | Trimestral |
+| `pib_gasto.csv` | PIB por el enfoque del gasto: real original, real desestacionalizado y nominal | DANE | `anex-GastoConstantes` (Cuadros 1, 2, 7 y 8) y `anex-GastoCorriente` (Cuadro 1) | Trimestral |
+| `pib_inversion.csv` | Formación bruta de capital fijo por tipo de activo (real original y desestacionalizada) | DANE | `anex-GastoConstantes`, Cuadros 5 y 6 | Trimestral |
+| `pib_consumo_hogares.csv` | Consumo de los hogares por durabilidad y por finalidad COICOP | DANE | `anex-GastoConstantes`, Cuadros 3 y 4 | Trimestral |
+| `poblacion.csv` | Población total nacional a mitad de año (proyecciones y retroproyecciones, Censo 2018, actualización 2025) | DANE | `PPED-AreaNac-2018-20xx` y `PPED-AreaNac-1950-2017` | Anual |
+| `pib_departamentos.csv` | PIB departamental corriente, real y por habitante | DANE | `anex-PIBDep-TotalDep` (Cuadros 1 a 3) | Anual |
+| `pib_departamentos_ramas.csv` | Valor agregado corriente por departamento y 12 ramas, más impuestos | DANE | `anex-PIBDep-Activecono`, Cuadro 1 | Anual |
+| `ise_mensual.csv` | Indicador de Seguimiento a la Economía, original y desestacionalizado, y tres grandes ramas | DANE | `anex-ISE-9actividades` (Cuadros 1 y 2) | Mensual |
+| `mercado_laboral.csv` | TGP, TO, TD, ocupados, desocupados y población fuera de la fuerza de trabajo, desestacionalizados | DANE (GEIH) | `anex-GEIH-Desestacionalizado`, hoja Total nacional | Mensual |
+| `laboral_subutilizacion.csv` | TD, TS y medidas de subutilización TCSD, TCDFTP y MCSFT (sin desestacionalizar) | DANE (GEIH) | `anex-GEIH-<mes><año>`, hoja Total nacional | Mensual |
+| `laboral_ciudades.csv` | TD, TS, TGP y TO de las 32 capitales | DANE (GEIH) | `anex-GEIH-<mes><año>`, hoja Año móvil 32 ciudades | Año móvil |
+| `empleo_ramas.csv` | Ocupados por rama de actividad | DANE (GEIH) | `anex-GEIH`, hoja Ocupados TN T13 rama | Mensual |
+| `empleo_posicion.csv` | Ocupados por posición ocupacional | DANE (GEIH) | `anex-GEIH`, hoja Ocupados TN posición | Mensual |
+| `empleo_sexo.csv` | TGP, TO, TD, TS, ocupados y fuera de la fuerza de trabajo por sexo | DANE (GEIH) | `anex-GEIH`, hoja Total nacional IML Sexo | Mensual |
+| `empleo_fuera_ft.csv` | Población fuera de la fuerza de trabajo por actividad principal | DANE (GEIH) | `anex-GEIH`, hoja Población fuera de la fuerza de trabajo TN | Mensual |
+| `empleo_area.csv` | Indicadores de cabeceras y de centros poblados y rural disperso | DANE (GEIH) | `anex-GEIH`, hoja Total nacional Trim | Trimestre móvil |
+| `empleo_jovenes.csv` | Desempleo y participación de 15 a 28 años, proporción de jóvenes que no estudian ni están ocupados | DANE (GEIH) | `anex-GEIHMLJ` | Trimestre móvil |
+| `informalidad.csv` | Proporción de ocupados informales: nacional, 13 y 23 ciudades y áreas metropolitanas | DANE (GEIH) | `anex-GEIHEISS` | Trimestre móvil (desde 2021) |
+| `informalidad_ramas.csv` | Ocupados, informales y tasa de informalidad por rama | DANE (GEIH) | `anex-GEIHEISS`, hoja Ramas de actividad | Trimestre móvil |
+| `informalidad_ciudades.csv` | Tasa de informalidad de 23 ciudades y áreas metropolitanas | DANE (GEIH) | `anex-GEIHEISS`, hoja Prop informalidad | Trimestre móvil |
+| `inflacion_clean.csv` | Inflación mensual y anual del IPC total | BanRep (índice) y DANE (variaciones publicadas) | Serie 15000; `anex-IPC` y `anex-IPC-Variacion` | Mensual |
+| `ipc_divisiones.csv` | Ponderación, variaciones y contribuciones de las 12 divisiones | DANE | `anex-IPC`, hoja 2 | Último mes |
+| `ipc_ingresos.csv` | Variaciones por nivel de ingreso del hogar | DANE | `anex-IPC`, hoja 3 | Último mes |
+| `ipc_ciudades.csv` | Variación anual por ciudad y división | DANE | `anex-IPC`, hoja 6 | Último mes |
+| `ipc_subclases.csv` | Variaciones y contribución anual de las 188 subclases | DANE | `anex-IPC`, hoja 8 | Último mes |
+| `ipc_clasificaciones.csv` | Índices de energéticos, sin alimentos ni energéticos, servicios, durables, semidurables y no durables | DANE | `anex-IPC`, hojas 11 a 16 | Mensual (desde 2009) |
+| `ipc_ponderaciones.csv` | Ponderaciones oficiales de las 188 subclases por nivel de ingreso (canasta 2018) | DANE | Página "IPC ponderadores" (actualización metodológica 2019) | Fija |
+| `tasas_interes_clean.csv` | Curvas cero cupón de los TES en pesos y en UVR a 1, 5 y 10 años | BanRep | 15272, 15273, 15274 (pesos); 15275, 15276, 15277 (UVR) | Diaria |
+| `series_banrep.csv` | Política monetaria, TRM, inflación básica, externo y fiscal (detalle en 3.2) | BanRep, Superfinanciera, MinHacienda y MinTrabajo vía BanRep | 16 series SUAMECA | Diaria a anual |
+| `tasas_mercado.csv` | IBR por plazos, TIB, DTF, CDT, tasas de colocación, cartera y operaciones de liquidez (detalle en 3.2) | BanRep (con información de la Superintendencia Financiera, formato 088) | 25 series SUAMECA | Diaria, semanal y mensual |
+| `cambiario.csv` | Otras monedas, ITCR bilaterales y de competitividad, balanza cambiaria, opciones PUT, dólar global, peso mexicano y Brent (detalle en 3.2) | BanRep; Reserva Federal (H.10) y EIA vía FRED | 18 series SUAMECA y 3 series FRED | Diaria, mensual y por evento |
+| `externo_fiscal.csv` | Balanza de pagos, IED por sector, remesas, deuda externa, PII, reservas, balance fiscal del GNC y del SPNF, deuda del GNC, precios del comercio exterior (detalle en 3.2) | BanRep; MinHacienda y DNP vía BanRep | 52 series SUAMECA | Mensual, trimestral y anual |
+| `colcap_oficial.csv` | Índice COLCAP (puntos y base 100 en el 9 de febrero de 2009) | BVC/MSCI vía BanRep | Serie 6 | Diaria |
+| `colcap_canasta.csv` | Composición vigente del COLCAP: acciones, emisor, sector y peso | **Auxiliar no oficial:** iShares MSCI COLCAP (BlackRock) | Archivo de posiciones del fondo | Diaria (última) |
+| `acciones_semanal.csv` | Cierres semanales de cada acción de la canasta | **Auxiliar no oficial:** Yahoo Finance | Símbolos `<TICKER>.CL` | Semanal (desde 2010) |
+| `empresas_10000_agregados.csv` | Totales de las 10.000 empresas más grandes por año, macrosector, región y supervisor, y concentración | Supersociedades vía datos.gov.co | Conjunto `6cat-2gcs` | Anual (cortes a diciembre) |
+| `empresas_10000_top.csv` | Las 25 empresas con más ingresos de cada año | Supersociedades vía datos.gov.co | Conjunto `6cat-2gcs` | Anual |
+| `empresas_registro.csv` | Matrículas y cancelaciones mensuales del registro mercantil por categoría (solo conteos agregados) | Confecámaras/RUES vía datos.gov.co | Conjunto `c82u-588k` | Mensual |
+| `empresas_banrep.csv` | Posición financiera neta por sector institucional (% del PIB) y deuda externa privada | BanRep | 16811, 16812, 16813, 16814 y 15332 | Trimestral y mensual |
+| `exportaciones_mensuales.csv` | Exportaciones FOB: café, carbón, petróleo, ferroníquel, tradicionales, no tradicionales y total | DANE con registros de la DIAN | `anex-EXPORTACIONES-SerieCafeCarbonPetroleoNotradicionales` | Mensual (desde 1992) |
+| `exportaciones_destinos.csv` | Exportaciones FOB por destino principal | DANE con registros de la DIAN | `anex-EXPORTACIONES-SeriePrincipalesDestinos` | Mensual |
+| `importaciones_mensuales.csv` | Importaciones CIF publicadas, de zonas francas y total ampliado | DANE con registros de la DIAN | `anex-IMP`, Cuadro A30 | Mensual |
+| `importaciones_cuode_reciente.csv` | Importaciones por uso o destino económico (CUODE): año corrido y último mes | DANE con registros de la DIAN | `anex-IMP`, Cuadro A13 | Año corrido |
+| `importaciones_cuode_anual.csv` | Importaciones CUODE por año | DANE con registros de la DIAN | `anex-IMP-ImpoClasiCUODE` | Anual |
+| `importaciones_origen.csv` | Importaciones CIF por país de origen | DANE con registros de la DIAN | `anex-IMP-MensPrincPaisesOrigen` | Mensual |
+| `decisiones_banrep.csv` | Última decisión de la Junta Directiva ya anunciada y aún no vigente | Banco de la República (comunicado oficial; registro manual) | — | Por evento |
+| `estado_fuentes.csv` | Última observación y estado (vigente, rezagado, pendiente) de cada fuente | Generado por el control de calidad | — | Cada corrida |
+| `alertas_datos.csv` | Observaciones TES aisladas marcadas como sospechosas | Generado por el control de calidad | — | Cada corrida |
 
-**Vintages.** Cada ejecución guarda la versión vigente de cada fuente. El DANE revisa la historia del PIB y
-del ISE en cada publicación; el tablero no es una base de datos en tiempo real de lo que se conocía en cada
-fecha pasada (limitación conocida, sección 9).
+Los anexos del DANE se descubren en la página oficial de cada operación estadística; el proceso exige que
+exista exactamente un anexo vigente con el patrón esperado y que su dominio sea el del DANE.
 
-**Automatización.** GitHub Actions ejecuta `python -m colombiamacro.actualizar` a diario (19:30 hora Colombia), valida con
-`python -m colombiamacro.validar`, corre las pruebas y publica el sitio en GitHub Pages; una fuente con falla conserva su último dato válido. El servidor de BanRep omite un certificado
-intermedio; `banrep_client.py` completa la cadena con el certificado GeoTrust versionado (sin desactivar la
-verificación TLS).
+### 3.2 Series del Banco de la República por archivo
 
-## 3. Actividad: brecha del producto y reloj del ciclo
+**`series_banrep.csv`.**
 
-Sea $y_t = 100\,\ln(Y_t)$ con $Y_t$ el PIB real desestacionalizado (DANE, Cuadro 4). La brecha es
-$g_t = y_t - \tau_t$, en porcentaje del producto potencial.
+| Serie | Id SUAMECA | Entidad de origen | Frecuencia | Rango de control |
+| --- | --- | --- | --- | --- |
+| Tasa de política monetaria | 59 | BanRep | Diaria | 0 a 40 |
+| IBR overnight, efectiva | 15324 | BanRep | Diaria | 0 a 40 |
+| TRM | 1 | Superintendencia Financiera vía BanRep | Diaria | 500 a 10.000 |
+| Inflación sin alimentos | 15388 | BanRep | Mensual | $-5$ a 40 |
+| Inflación sin alimentos ni regulados | 15390 | BanRep | Mensual | $-5$ a 40 |
+| Inflación núcleo 15 | 15392 | BanRep | Mensual | $-5$ a 40 |
+| Inflación de regulados | 15398 | BanRep | Mensual | $-20$ a 60 |
+| Inflación de alimentos y bebidas | 15404 | DANE vía BanRep | Mensual | $-20$ a 60 |
+| Meta de inflación | 853 | BanRep | Anual | 0 a 40 |
+| ITCR-IPC, ponderaciones totales (2010 = 100) | 235 | BanRep | Mensual | 30 a 250 |
+| Términos de intercambio | 15360 | BanRep | Mensual | 20 a 400 |
+| Reservas internacionales netas | 15051 | BanRep | Mensual | $-1.000$ a 500.000 |
+| Cuenta corriente, % del PIB | 15290 | BanRep | Trimestral | $-20$ a 20 |
+| Inversión extranjera directa en Colombia | 15133 | BanRep | Trimestral | $-20.000$ a 40.000 |
+| Deuda bruta del GNC, % del PIB | 15328 | MinHacienda vía BanRep | Anual | 0 a 200 |
+| Salario mínimo, variación anual | 15418 | MinTrabajo vía BanRep | Anual | $-5$ a 60 |
 
-### 3.1 Estimación principal: filtro HP en tiempo real
+La meta de inflación, la inflación núcleo 15 y la variación del salario mínimo se descargan y publican en el
+archivo, pero no alimentan cálculos del sitio: el rango meta se fija en $3\% \pm 1$ pp (sección 5.6).
 
-$\tau$ minimiza $\sum_t (y_t-\tau_t)^2 + \lambda \sum_t (\Delta^2 \tau_t)^2$ con $\lambda = 1600$
-(Hodrick y Prescott, 1997). El filtro de dos colas usa datos futuros y sufre sesgo de fin de muestra
-(Orphanides y van Norden, 2002). Por eso la estimación principal es **en tiempo real**: para cada $t$ se
-resuelve el problema con $y_1,\dots,y_t$ y se conserva $\tau_{t|t}$. Se exige un mínimo de 20 trimestres.
-La implementación resuelve el sistema $(I+\lambda D'D)\tau=y$ y coincide con `statsmodels.hpfilter` hasta
-$2\times10^{-10}$.
+**`tasas_mercado.csv`.** IBR a 1, 3, 6 y 12 meses (15325, 15326, 16561, 16563); tasa interbancaria TIB (89);
+DTF a 90 días (65); CDT a 90, 180 y 360 días (238, 239, 240); tasas de colocación total (15110), sin
+tesorería (17280), consumo (15111), comercial ordinario (15113), preferencial (15114), tesorería (15115),
+vivienda no VIS (15105) y VIS (15107); cartera bruta en moneda legal total (373), comercial (363), consumo
+(365), vivienda ajustada (371) y microcrédito (367); saldos de repos de expansión a un día (17500), a otros
+plazos (17501) y de la ventanilla de contracción (17503).
 
-### 3.2 Contrastes
+**`cambiario.csv`.** Del Banco de la República: BRL/USD (15638), PEN/USD (15641), COP/EUR (30), COP/GBP (31),
+COP/JPY (33), COP/CNY (28); ITCR bilateral con Estados Unidos (219), China (310), Brasil (213) y México (226);
+ITCR-C (236); balanza cambiaria mensual: cuenta corriente (16700), balanza comercial (16702), servicios y
+transferencias (16704), movimientos netos de capital (16706), capital del sector real y del Gobierno (16708) y
+variación de reservas brutas (16712); monto aprobado en subastas de opciones PUT para acumulación de reservas
+(16670). De FRED: índice amplio del dólar de la Reserva Federal, H.10 (`DTWEXBGS`), pesos mexicanos por dólar,
+H.10 (`DEXMXUS`), y precio del Brent publicado por la EIA (`DCOILBRENTEU`).
 
-* **HP de dos colas** ($\tau_{t|T}$): mejor estimación ex post; se usa también para el crecimiento potencial
-  $\;100\,(e^{(\tau_t-\tau_{t-4})/100}-1)$, porque la versión en tiempo real oscila con el rebote de 2021-22.
-* **Hamilton (2018)**: residuo de $y_{t+8} = \beta_0 + \sum_{k=0}^{3}\beta_k y_{t-k} + v_{t+8}$ (MCO).
+**`externo_fiscal.csv`.** Cuenta corriente (15136), bienes y servicios (15135), bienes (15706), servicios
+(15719), ingreso primario (15140), ingreso secundario (15141), exportaciones (15707) e importaciones (15708)
+de bienes; cuenta financiera total (16142), inversión directa (16143), de cartera (16196), otra inversión
+(16303), activos de reserva (16527), derivados (16271), errores y omisiones (16544); IED en Colombia (15133) e
+IED de Colombia en el exterior (15134); IED por sector: agro (15368), minería (15369), industria (15370),
+electricidad (15371), construcción (15372), comercio (15373), transporte (15374), financiero (15375),
+servicios (15376), petróleo (15377); remesas (15363); deuda externa total (15330), pública (15331), privada
+(15332) y como % del PIB (15329); PII neta (16600), activos (16601) y pasivos (16602); reservas (16850);
+Gobierno nacional central en caja (mensual): ingresos (16722), gastos (16723), intereses (16724), balance
+(16725), financiamiento interno (16726) y externo (16727); sector público no financiero en caja
+(trimestral): 16728 a 16734; deuda del GNC como % del PIB (15328); índices de precios de exportación (15361) e
+importación (15362) en dólares.
 
-### 3.3 Tratamiento del COVID
+### 3.3 Identidad y vigencia de las fuentes
 
-Los trimestres 2020-T2 a 2021-T2 (confinamiento y paro nacional) se reemplazan por interpolación lineal
-**solo para estimar la tendencia y los coeficientes de Hamilton**; la brecha se mide siempre contra el dato
-observado. Sin este tratamiento la tendencia absorbe una caída de 17,6% en un trimestre y deforma la lectura
-de 2019-2023.
+Cada serie del graficador SUAMECA se descarga completa (toda la historia, para incorporar revisiones). El
+cliente verifica que la respuesta contenga una única serie, que su identificador sea el solicitado y,
+cuando el código define un texto esperado, que el nombre de la serie lo contenga (sin distinguir tildes ni
+mayúsculas). Si el Banco reasigna un identificador, la descarga falla en lugar de publicar otra variable.
+Las series de `externo_fiscal.csv` y de `empresas_banrep.csv` se validan por identificador y por número
+mínimo de observaciones, sin texto esperado (sección 9). La conexión al servidor del Banco completa la cadena
+de certificados con el certificado intermedio versionado en el repositorio, sin desactivar la verificación
+TLS.
 
-### 3.4 Reloj del ciclo (OCDE)
+### 3.4 Fuentes auxiliares no oficiales
 
-Con $\Delta_2 g_t = g_t - g_{t-2}$:
+La sección "la bolsa por dentro" (páginas Empresas y Portada) necesita la composición del índice COLCAP y los
+precios de cada acción, que no se obtienen en forma abierta y automatizable desde una fuente oficial. Se usan
+dos fuentes auxiliares, rotuladas como tales en el sitio:
+
+| Fuente | Uso | Limitación |
+| --- | --- | --- |
+| iShares MSCI COLCAP (BlackRock), archivo diario de posiciones del fondo | Canasta y pesos de las acciones; selección de las "7 Magníficas"; peso por sector | Son los pesos del fondo (sin efectivo), una aproximación a los pesos oficiales de la BVC/MSCI, no los pesos oficiales |
+| Yahoo Finance, cierres semanales de `<TICKER>.CL` | Índices equiponderado y "7 Magníficas"; variación de 12 meses de cada acción | Proveedor comercial sin certificación oficial; precios sin ajuste por dividendos ni eventos corporativos; posibles errores puntuales de precio |
+
+El índice COLCAP mismo (nivel, variaciones, base 100) sí es la serie oficial publicada por el Banco de la
+República (serie 6). Ninguna cifra de las demás páginas depende de las fuentes auxiliares.
+
+### 3.5 Registro manual de decisiones anunciadas
+
+La tasa de política del Banco de la República cambia en la serie oficial el día en que empieza a regir, no el
+día del anuncio. Para no mostrar una tasa ya superada durante ese intervalo, `decisiones_banrep.csv` registra
+manualmente la última decisión anunciada (fecha del anuncio, fecha de vigencia, tasa y enlace al comunicado).
+La regla de uso es estricta: la decisión se muestra como "anunciada" solo mientras la serie oficial no tenga
+datos en o después de la fecha de vigencia; en cuanto los tenga, manda la serie oficial, coincida o no con el
+registro manual. El registro no altera ningún cálculo histórico (la tasa real, los ciclos y el traspaso usan
+la serie oficial).
+
+## 4. Transformaciones comunes
+
+Las transformaciones siguientes se usan en varias páginas; la sección 5 indica dónde.
+
+**Variación anual y anualizaciones.**
+$$\%\Delta_{a} x_t = 100\left(\frac{x_t}{x_{t-k}}-1\right),\qquad
+\text{SAAR}_t = 100\left[\left(\frac{S_t}{S_{t-1}}\right)^{4}-1\right],\qquad
+r^{3m}_t = 100\left[\left(\frac{\bar S_{t}}{\bar S_{t-3}}\right)^{4}-1\right],$$
+donde $S$ es una serie desestacionalizada y $\bar S_t = \tfrac13(S_t+S_{t-1}+S_{t-2})$. La inflación
+anualizada de tres meses del IPC se calcula como $100\,[\prod_{j=0}^{2}(1+\pi^m_{t-j}/100)^{4}-1]$ sobre
+variaciones mensuales sin desestacionalizar.
+
+**Sumas y promedios móviles.** Las sumas de 4 trimestres o de 12 meses ($X^{(4)}_t=\sum_{j=0}^{3}X_{t-j}$,
+$X^{(12)}_t=\sum_{j=0}^{11}X_{t-j}$) eliminan la estacionalidad de flujos sin necesidad de modelos y se usan
+para flujos externos, fiscales, de comercio y sectoriales. Los promedios móviles de 3 o 12 meses suavizan
+tasas mensuales de la GEIH no desestacionalizadas. El crecimiento "de 12 meses" compara la suma de los
+últimos cuatro trimestres con la de los cuatro anteriores.
+
+**Tasa de crecimiento compuesta.** Para un periodo de años completos $A_0,\dots,A_1$ con $n=A_1-A_0+1$:
+$c = 100\,[(Y_{A_1}/Y_{A_0-1})^{1/n}-1]$, con $Y_A$ la suma de los cuatro trimestres del año.
+
+**Índices base 100.** $I_t = 100\,X_t/X_{b}$ con base fija (por ejemplo, 2019-T4 = 100 o 2015 = 100). En los
+gráficos marcados como "re-basados", el navegador fija la base en el primer dato visible del horizonte que
+elige el usuario (3, 5, 10 años o toda la historia).
+
+**Deflactación.** Las magnitudes nominales se llevan a términos reales con Fisher exacto:
+$g^{r} = 100\,[(1+g)/(1+\pi/100)-1]$, donde $g$ es la variación nominal anual (en tanto por uno) y $\pi$ la
+inflación anual del IPC del mismo mes. Para ingresos anuales de empresas se usa el promedio de las
+inflaciones anuales mensuales del año.
+
+**Conversión a dólares.** El PIB nominal trimestral se convierte con la TRM promedio del trimestre,
+$Y^{\$}_q = Y_q/\overline{TRM}_q$, y se suma en cuatro trimestres para las razones externas; el PIB anual por
+persona en dólares usa la TRM promedio del año calendario.
+
+**Participaciones y aportes.** Participación: $s_{i,t} = 100\,X_{i,t}/\sum_j X_{j,t}$. Aporte de un componente
+al crecimiento anual de un agregado: $a_{i,t} = 100\,(X_{i,t}-X_{i,t-4})/X_{t-4}$, equivalente a
+$g_{i,t}\,w_{i,t-4}$. Con volúmenes encadenados los aportes no suman exactamente el total; la diferencia se
+muestra (gasto) o se advierte (oferta).
+
+**Herfindahl y número equivalente.** $H=\sum_i s_i^2$ con $s_i$ en tanto por uno y $N^{eq}=1/H$: el número de
+categorías de igual tamaño que daría la misma concentración.
+
+**Volatilidad anualizada.** Desviación estándar móvil de 60 observaciones (mínimo 48) de los cambios diarios,
+multiplicada por $\sqrt{252}$: cambios logarítmicos en porcentaje para tasas de cambio; cambios en puntos
+básicos para tasas de interés.
+
+**Correlación móvil.** Correlación de Pearson de 52 semanas (mínimo 41) entre cambios porcentuales semanales
+(último dato de cada viernes).
+
+**Percentil histórico.** Para cada indicador de la tabla de señales,
+$p = 100\cdot\#\{s\ge 2010: x_s \le x_T\}/\#\{s\ge 2010\}$, con la muestra desde el 1 de enero de 2010.
+
+**Recortes gráficos.** Algunos gráficos recortan la escala visible (por ejemplo, $\pm 12\%$ en el mapa de
+calor sectorial o $-8\%$ en la brecha mensual) para que 2020 no aplaste el resto de la historia; el recuadro
+flotante muestra el valor exacto y ningún cálculo usa el valor recortado.
+
+## 5. Métodos por página
+
+### 5.1 Portada
+
+La portada no dibuja gráficos de Plotly: presenta la fase del ciclo (sección 5.2), seis tarjetas con su
+estado y una minicurva (Crecimiento, Inflación, Tasa del Banco, Desempleo, Dólar y Bolsa), una curva TES de
+hoy frente a hace un año en SVG, un resumen por tema que toma la primera frase de "lo clave" de cada página,
+la tabla de 16 indicadores y las últimas publicaciones oficiales. El párrafo superior es un resumen en
+lenguaje llano generado por reglas (sección 6). La forma de la curva se clasifica con la pendiente
+$S=y_{10}-y_{1}$: "normal" si $S>0{,}3$ pp, "invertida" si $S<0$ y "plana" en otro caso.
+
+### 5.2 Ciclo
+
+**Brecha del producto principal: Hodrick-Prescott en tiempo real.** Sea $y_t=100\ln Y_t$ con $Y_t$ el PIB real
+desestacionalizado del DANE (Cuadro 4). La tendencia de Hodrick y Prescott (1997) resuelve
+$$\min_{\tau}\ \sum_t (y_t-\tau_t)^2+\lambda\sum_t(\Delta^2\tau_t)^2,\qquad \lambda=1600,$$
+cuya solución es el sistema lineal $(I+\lambda D'D)\,\tau = y$, con $D$ la matriz de segundas diferencias. La
+versión **en tiempo real** (una cola) resuelve el problema, para cada trimestre $t$, solo con
+$y_1,\dots,y_t$ y conserva el último punto $\tau_{t\mid t}$; se exige un mínimo de 20 trimestres. Así se evita
+el uso de información futura y el sesgo de fin de muestra del filtro de dos colas (Orphanides y van Norden,
+2002). La brecha es $g_t = y_t-\tau_{t\mid t}$.
+
+**Tratamiento de la pandemia.** Los trimestres 2020-T2 a 2021-T2 (confinamiento a paro nacional) se
+reemplazan por interpolación lineal **solo para estimar tendencias y coeficientes**; la brecha se mide siempre
+contra el dato observado. Sin este tratamiento la tendencia absorbería la caída de 2020 y deformaría la lectura
+de los años siguientes.
+
+**Cinco métodos y consenso.** Además de la brecha principal se calculan:
+
+* **HP de dos colas**: $g^{2c}_t=y_t-\tau_{t\mid T}$, la mejor estimación ex post con toda la muestra.
+* **Hamilton (2018)**: residuo de la regresión por mínimos cuadrados ordinarios
+  $$\tilde y_t = \beta_0+\sum_{k=0}^{3}\beta_{k+1}\,\tilde y_{t-8-k}+v_t,\qquad
+  c^{H}_t = y_t-\Big(\hat\beta_0+\sum_{k=0}^{3}\hat\beta_{k+1}\,\tilde y_{t-8-k}\Big),$$
+  con horizonte de 8 trimestres y 4 rezagos; $\tilde y$ es la serie con la pandemia interpolada y la brecha
+  se mide contra el $y$ observado.
+* **Christiano y Fitzgerald (2003)**: filtro asimétrico de paso de banda para un paseo aleatorio con deriva,
+  que aísla ciclos de 6 a 32 trimestres (1,5 a 8 años, la banda de Baxter y King, 1999). Se retira la deriva
+  lineal, se aplica el filtro sobre la serie interpolada y la tendencia es $\tau^{CF}=\tilde y-CF_{6\text{–}32}(\tilde y)$;
+  la brecha es $y-\tau^{CF}$.
+* **Beveridge y Nelson (1981)**: con un AR(4) estimado por MCO para el crecimiento desviado de su media,
+  $x_t=\Delta\tilde y_t-\mu$, y su matriz compañera $F$, el componente cíclico es
+  $$c^{BN}_t = -\,e_1'\,F\,(I-F)^{-1}X_t,\qquad X_t=(x_t,\dots,x_{t-3})',$$
+  evaluado sobre el crecimiento observado; es menos el crecimiento futuro esperado por encima de la media.
+
+El consenso reporta la mediana, el mínimo, el máximo y el número de métodos con brecha positiva. Solo la
+brecha HP en tiempo real está libre de información futura; los otros cuatro métodos usan coeficientes o
+filtros estimados con toda la muestra.
+
+**Reloj del ciclo.** Siguiendo el reloj del ciclo de la OCDE, la fase combina el nivel de la brecha y su
+dirección, medida como el cambio en dos trimestres $\Delta_2 g_t=g_t-g_{t-2}$ (reduce el ruido de un solo
+dato):
 
 | | $\Delta_2 g_t \ge 0$ | $\Delta_2 g_t < 0$ |
 | --- | --- | --- |
 | $g_t \ge 0$ | Expansión | Desaceleración |
 | $g_t < 0$ | Recuperación | Contracción |
 
-Se usa el cambio en dos trimestres para reducir el ruido de un solo dato.
+La misma regla aplicada a la brecha de Hamilton produce una fase alternativa con la que se mide la
+coincidencia entre métodos. La cinta de fases colorea cada trimestre desde el primero con brecha en tiempo
+real; la "racha" cuenta los trimestres consecutivos en la fase actual.
 
-### 3.5 Robustez (datos al T2 2026, 51 trimestres con los tres métodos, 2013-T4 a 2026-T2)
+**Ciclo mensual.** Con el ISE desestacionalizado, $b_t = 100\ln ISE_t-\tau_t$, con $\tau$ el HP en tiempo
+real de frecuencia mensual con $\lambda=129.600$ (equivalente mensual de 1.600 según Ravn y Uhlig, 2002),
+mínimo 36 meses y los meses de marzo de 2020 a junio de 2021 interpolados para estimar la tendencia. La fase
+mensual usa $\Delta_3 b_t=b_t-b_{t-3}$. El mismo cálculo se aplica a las tres grandes ramas del ISE
+(primarias, secundarias y terciarias), que se muestran junto a su variación anual.
+
+**Motores sectoriales.** Los aportes de los 12 sectores al crecimiento anual del valor agregado son los de la
+sección 5.3. La amplitud cuenta cuántos de los 12 sectores producen por encima de su propia tendencia
+(brecha sectorial de la sección 5.4).
+
+**Ritmo.** Crecimiento anual del ISE desestacionalizado frente al ritmo de los últimos tres meses anualizado
+($r^{3m}$ de la sección 4). Si el segundo supera al primero, el texto dice que la actividad acelera.
+
+**Puntos de giro del ISE.** En la línea de Bry y Boschan (1971), sobre el promedio móvil centrado de tres meses
+$S_t=\tfrac13(ISE_{t-1}+ISE_t+ISE_{t+1})$ se marca un pico (valle) cuando $S_t$ es el máximo (mínimo) de la
+ventana $[t-6,\,t+6]$; los giros se fuerzan a alternar (entre dos picos seguidos se conserva el más alto y entre
+dos valles el más bajo) y se descarta un valle inicial seguido por un pico a menos de seis meses. Una recesión
+va de pico a valle y una expansión de valle a pico (o hasta el último dato si sigue en curso); para cada una se
+reportan duración en meses y variación de $S$. Las recesiones sombrean varios gráficos del sitio. Este fechado
+es descriptivo: el promedio centrado y la ventana usan meses posteriores a cada giro, por lo que los giros más
+recientes pueden cambiar con datos nuevos.
+
+**Empleo y ley de Okun.** El cambio en 12 meses del promedio de tres meses de las tasas de desempleo y ocupación
+desestacionalizadas resume la respuesta laboral. Para Okun (1962) en brechas, el desempleo desestacionalizado
+se promedia por trimestre ($u_q$), se estima su tendencia $u^*_q$ con HP de dos colas ($\lambda=1600$, pandemia
+interpolada) y se define $b^u_q=u_q-u^*_q$; luego
+$$b^u_q = \alpha+\beta\, g^{2c}_q+\varepsilon_q$$
+por MCO excluyendo 2020 y 2021, con $g^{2c}$ la brecha HP de dos colas. Se reportan $\hat\beta$, la correlación
+y el número de trimestres. El gráfico muestra $-b^u$ para que ambas series suban juntas.
+
+### 5.3 Crecimiento (incluye sectores, gasto, inversión, consumo y PIB por persona)
+
+**Tres velocidades.** (i) Variación anual del PIB real original, $100(Y_t/Y_{t-4}-1)$; (ii) crecimiento de 12
+meses, suma de cuatro trimestres frente a los cuatro anteriores; (iii) variación trimestral anualizada del PIB
+desestacionalizado (SAAR). También se informa la variación trimestral sin anualizar.
+
+**Año corrido y crecimiento anual.** El año corrido suma los trimestres publicados del año en curso y los
+compara con los mismos trimestres del año anterior. El crecimiento por año calendario compara la suma de los
+cuatro trimestres de cada año con la del año anterior; si el año en curso está incompleto, se muestra la barra
+de los últimos 12 meses. Se acompaña del "ritmo habitual" (promedio anual del crecimiento de la tendencia HP de
+dos colas, $g^*_t=100\,[e^{(\tau_t-\tau_{t-4})/100}-1]$) y del promedio simple 2010–2019. La tendencia de dos
+colas se usa para el crecimiento potencial porque la de tiempo real oscila con el rebote de 2021–2022.
+
+**Crecimiento por periodos.** Tasas compuestas para "Auge petrolero" (2010–2014), "Ajuste" (2015–2019),
+"Pandemia y rebote" (2020–2021) y "Pospandemia" (2022–2025), más el año corrido. Un periodo se incluye solo si
+sus años están completos.
+
+**Real frente a nominal y deflactor.** El deflactor implícito es $D_t = N_t/Y_t$ (PIB nominal sobre real, datos
+originales) y su inflación es $\pi^D_t=100(D_t/D_{t-4}-1)$, de modo que $(1+n)=(1+g)(1+\pi^D)$. Se compara con
+el IPC promediado por trimestre. La divergencia entre deflactor e IPC se interpreta, siguiendo a Kohli (2004),
+como efecto de los términos de intercambio; el texto reporta su variación anual (promedio trimestral de la serie
+15360).
+
+**Sectores (oferta).** Para las 12 agrupaciones CIIU Rev. 4 (volúmenes encadenados, datos originales):
+variación anual $g_{i,t}$, peso $w_{i,t}=100\,X_{i,t}/VA_t$ y aporte
+$a_{i,t}=100\,(X_{i,t}-X_{i,t-4})/VA_{t-4}$, con $VA$ el valor agregado total. Los aportes se agrupan en
+primario (agro y minería), industria-energía-construcción, servicios de mercado (comercio, transporte y
+turismo; comunicaciones; finanzas; inmobiliarias; servicios profesionales; arte y hogares) y Gobierno,
+educación y salud. El crecimiento "sin el sector $X$" (Gobierno o minería) es
+$$g_{-X,t}=100\,\frac{\sum_i a_{i,t}-a_{X,t}}{\sum_i w_{i,t}-w_{X,t}},$$
+una aproximación que usa los pesos corrientes del trimestre. El índice de difusión cuenta los sectores con
+$g_{i,t}>0$; la comparación con la historia contrasta el promedio de $g_{i,t}$ en 2015–2019 con el de los
+últimos cuatro trimestres. El mapa de calor recorta la escala de color en $\pm 12\%$.
+
+**Nivel frente al camino previo.** Se ajusta por MCO $\ln S_k = b_0+b_1 k$ sobre el PIB desestacionalizado de
+2015-T1 a 2019-T4 y se extiende $\hat S_k=e^{b_0+b_1k}$. El ritmo anual del camino es
+$100\,(e^{4b_1}-1)$ y la distancia es $100\,(S_t/\hat S_t-1)$. El camino es una referencia contrafactual
+descriptiva (Cerra y Saxena, 2008; Blanchard, Cerutti y Summers, 2015), no una proyección.
+
+**Demanda (gasto).** Con los componentes en volúmenes encadenados, datos originales: aportes de consumo de los
+hogares, Gobierno e inversión fija, $a_{k,t}=100\,(C_{k,t}-C_{k,t-4})/PIB_{t-4}$; comercio exterior neto,
+$a_X-a_M$; y un residuo "existencias y discrepancia" igual al crecimiento del PIB menos la suma anterior.
+También se reporta la variación anual de cada componente y de la demanda interna. El proceso verifica que el
+PIB del anexo de gasto coincida con el del anexo de producción (diferencia relativa máxima de 0,2%).
+
+**Inversión.** Tasa de inversión $TI_t=100\,\sum_{j=0}^{3}FBKF^{nom}_{t-j}/\sum_{j=0}^{3}PIB^{nom}_{t-j}$ y, por
+tipo de activo (vivienda, otros edificios y obras, maquinaria y equipo, propiedad intelectual), índice de la
+inversión real desestacionalizada con 2019-T4 = 100.
+
+**Consumo de los hogares.** Variación de 12 meses (suma de cuatro trimestres frente a los cuatro previos) por
+durabilidad (durables, semidurables, no durables, servicios) y por finalidad COICOP (12 grupos); la
+participación aproximada de cada finalidad usa la suma de volúmenes encadenados de los últimos cuatro
+trimestres. La participación del consumo en el PIB usa valores corrientes de 12 meses.
+
+**PIB por persona y productividad.** PIB real anual por persona $y_A=\sum_{q\in A}Y_q/P_A$ (pesos de 2015) con
+$P_A$ la población a mitad de año, solo para años completos; en dólares,
+$\sum_{q\in A}N_q/(P_A\,\overline{TRM}_A)$, que mezcla crecimiento, inflación y tipo de cambio. La
+productividad laboral aparente (OECD, 2001) es el cociente de dos índices 2015 = 100: PIB real de cuatro
+trimestres y promedio de 12 meses de los ocupados desestacionalizados; su variación anual compara el último
+trimestre con el mismo del año anterior.
+
+### 5.4 Capacidad (incluye regiones y departamentos)
+
+**Producción frente a capacidad.** La capacidad (PIB potencial) se obtiene de la brecha HP en tiempo real:
+$Y^*_t=Y_t\,e^{-g_t/100}$. El gráfico muestra ambos niveles en billones de pesos de 2015 por trimestre y colorea
+la distancia (verde por encima, naranja por debajo). Las tarjetas resumen la mediana y el rango de los cinco
+métodos de la sección 5.2.
+
+**Brecha por sectores.** Para cada uno de los 12 sectores, el nivel se anualiza con la suma de cuatro trimestres
+(elimina la estacionalidad de los datos originales sin modelos), $N_{i,t}=\sum_{k=0}^{3}X_{i,t-k}$, y se
+calcula $b_{i,t}=100\ln N_{i,t}-\tau_{i,t}$ con HP en tiempo real ($\lambda=1600$, pandemia interpolada). El
+mapa de calor desde 2016 ordena los sectores por su brecha más reciente.
+
+**Holgura laboral.** Tres medidas de la OIT (2013), promediadas en 12 meses: tasa de desempleo
+$TD=D/FT$; desempleo más subocupación por horas $TCSD=(D+S)/FT$; y la medida compuesta
+$MCSFT=(D+S+FTP)/(FT+FTP)$, con $FTP$ la fuerza de trabajo potencial. La brecha de desempleo frente a su
+tendencia es la de la ley de Okun (sección 5.2). En `laboral_subutilizacion.csv` los ceros del anexo se tratan
+como dato faltante.
+
+**Regiones.** Con el PIB departamental del DANE (base 2015): crecimiento real del último año publicado,
+variación frente a 2019, $100\,(Y_{d,A}/Y_{d,2019}-1)$, y PIB por habitante relativo, $100\,pc_d/pc_{COL}$
+(pesos corrientes). El mapa esquemático asigna cada medida a siete tramos de color con cortes fijos. El desempleo
+de la ciudad capital (año móvil de la GEIH) completa el mapa. El proceso verifica que la suma de los
+departamentos reproduzca el total nacional con una diferencia menor al 1%.
+
+**Estructura y diversificación.** Participación de cada una de las 12 ramas en el valor agregado corriente del
+departamento (sin impuestos) y número equivalente de sectores $1/\sum_i s_{i,d}^2$ (Herfindahl, 1950;
+Hirschman, 1964), que va de 1 a 12.
+
+**Desempleo en las 32 capitales.** Tasa del año móvil más reciente frente al año móvil terminado un año antes
+(se presenta en la página Empleo).
+
+### 5.5 Empleo
+
+**Desempleo e informalidad.** La tasa de desempleo desestacionalizada del DANE se muestra mensual y en promedio
+de tres meses, con su cambio frente a un año antes. La informalidad es la proporción de ocupados informales de
+la GEIH (definición del DANE alineada con la OIT), en trimestres móviles desde 2021, a nivel nacional, en 13 y
+23 ciudades, por rama ($I_r/O_r$) y por ciudad. El lector verifica que la secuencia de trimestres móviles sea
+consecutiva (los rótulos del DANE no siempre traen el año). La serie no es comparable con la medición anterior a
+2021.
+
+**Series sin desestacionalizar.** Los anexos de detalle de la GEIH no están desestacionalizados; por eso las
+comparaciones usan promedios de 12 meses o el mismo periodo del año anterior:
+
+* Empleos creados o perdidos por rama y por posición: $\bar O_t-\bar O_{t-12}$, con $\bar O$ el promedio de tres
+  meses, en miles de personas.
+* Empleo por rama frente a 2019: promedio de los últimos 12 meses frente al promedio de 2019.
+* Composición por posición ocupacional (CISE-93, OIT 1993): participación sobre el promedio de 12 meses de las
+  siete posiciones graficadas; los asalariados suman las posiciones privada y del Gobierno.
+* Brechas por sexo: tasas de desempleo y de participación promediadas en 12 meses; brecha mujeres − hombres en
+  pp.
+* Jóvenes de 15 a 28 años (Ley 1622 de 2013): desempleo por sexo y proporción de jóvenes que no estudian ni
+  están ocupados, en trimestre móvil; la serie de mujeres y la de hombres suman el total.
+* Cabeceras frente a centros poblados y rural disperso: desempleo en trimestre móvil.
+* Población fuera de la fuerza de trabajo por actividad principal: promedio de 12 meses, en millones.
+
+**Ocupados totales.** La tarjeta de ocupados suma las ramas y promedia 12 meses; su cambio compara con el mismo
+promedio un año antes.
+
+### 5.6 Inflación
+
+**Inflación total.** El índice del IPC (serie 15000 del Banco de la República) se descarga completo y se valida
+que no tenga meses faltantes. La inflación anual es $\pi_t=100\,(IPC_t/IPC_{t-12}-1)$ y la mensual
+$100\,(IPC_t/IPC_{t-1}-1)$, redondeadas a dos decimales. Las variaciones mensuales se reemplazan por las
+publicadas por el DANE en su tabla histórica cuando existen (se exige que no difieran más de 0,10 pp del
+cálculo con el índice) y la variación anual y mensual del último mes se reemplaza por la cifra oficial del DANE
+(diferencia máxima tolerada de 0,05 pp; el índice publicado por el Banco tiene dos decimales). El rango meta
+del Banco es $3\% \pm 1$ pp.
+
+**Inflación de fondo y por grupos.** Inflación sin alimentos ni regulados (serie 15390, la medida básica
+principal), sin alimentos (15388), de regulados (15398) y de alimentos (15404), en nivel y frente a un año antes.
+
+**Dirección y momento.** El cambio de la inflación anual en tres meses, $\pi_t-\pi_{t-3}$, define si acelera o
+cede (sección 6). La inflación anualizada de tres meses se calcula sin desestacionalizar y se advierte la
+estacionalidad de enero a marzo.
+
+**Inflación implícita (breakeven).** Con las curvas cero cupón de los TES en pesos ($i_h$) y en UVR ($r_h$):
+$$\pi^{BE}_h = 100\left[\frac{1+i_h/100}{1+r_h/100}-1\right],\qquad h\in\{1,5,10\}.$$
+El rezago de indexación de la UVR (cerca de un mes) se ignora para plazos de un año o más.
+
+**Forward 5y5y.** Con factores forward nominal y real,
+$$F^{\$}=\left[\frac{(1+i_{10})^{10}}{(1+i_5)^{5}}\right]^{1/5},\qquad
+F^{UVR}=\left[\frac{(1+r_{10})^{10}}{(1+r_5)^{5}}\right]^{1/5},\qquad
+\pi^{5y5y}=100\,\big(F^{\$}/F^{UVR}-1\big),$$
+equivalente a $[(1+b_{10})^{10}/(1+b_5)^5]^{1/5}-1$ en términos de los breakevens $b_h$.
+
+**Trayectoria que descuenta el mercado.** Con $b_1,b_5,b_{10}$:
+año 1, $f_{0,1}=b_1$; años 1 a 5, $f_{1,5}=[(1+b_5)^5/(1+b_1)]^{1/4}-1$; años 5 a 10,
+$f_{5,10}=[(1+b_{10})^{10}/(1+b_5)^5]^{1/5}-1$. Los tres tramos encadenan exactamente el breakeven a 10 años,
+$(1+f_{0,1})(1+f_{1,5})^4(1+f_{5,10})^5=(1+b_{10})^{10}$. El gráfico los dibuja hacia adelante desde la última
+fecha, junto a la misma lectura de hace un año. Es un precio observado hoy, no un pronóstico del tablero.
+
+**Aportes por división y subclase.** Las contribuciones a la inflación anual son las que publica el DANE,
+$A_{i,t}=w_i\,(I_{i,t-12}/I_{t-12})\,\pi_{i,t}$, con $w_i$ la ponderación de la canasta 2018; suman la
+inflación total.
+
+**Bienes y servicios.** Variación anual de los índices del DANE de servicios, no durables, semidurables,
+durables, energéticos y sin alimentos ni energéticos (Bryan y Cecchetti, 1994; Baumol, 1967).
+
+**Difusión.** Proporción sin ponderar de las 188 subclases con inflación anual mayor a 4% (techo del rango) y
+mayor a 6%, y la misma proporción ponderada por el peso de cada subclase en la canasta (Cecchetti, 1997). Las
+subclases se unen a sus ponderaciones por posición cuando las dos listas coinciden en al menos 95% de los
+nombres, y por nombre en caso contrario. El histograma usa intervalos de 1 pp con los extremos agrupados en
+$-10\%$ y $20\%$.
+
+**Ingresos y ciudades.** IPC calculado por el DANE con la canasta de cada nivel de ingreso (pobres,
+vulnerables, clase media, ingresos altos; Jaravel, 2021) y por ciudad (23 ciudades más otras áreas urbanas) y
+división.
+
+### 5.7 Tasas de interés
+
+**Tasa real ex ante y ex post.** Con la tasa de política $i^{TPM}$ y el breakeven a un año:
+$$r^{ea}_t = 100\left[\frac{1+i^{TPM}_t/100}{1+\pi^{BE}_{1,t}/100}-1\right],\qquad
+r^{ep}_t = 100\left[\frac{1+i^{TPM}_t/100}{1+\pi^{pub}_t/100}-1\right],$$
+donde $\pi^{pub}_t$ es la inflación anual del último mes **publicado** a la fecha $t$: el IPC del mes $m$ se
+considera disponible desde el día 11 del mes $m+1$ (un mes más diez días, regla conservadora), de modo que no se usa información futura.
+La tasa de política vigente cada día se asigna con el último dato disponible (unión hacia atrás).
+
+**Tasa neutral.** Se usa como parámetro externo el rango de 2,7% a 3,0% real, estimación del equipo técnico del
+Banco de la República (2025, con señal de ajuste al alza hacia 2026); conceptualmente, la tasa que ni frena ni
+estimula la economía (Laubach y Williams, 2003). La clasificación de la postura está en la sección 6.
+
+**Ciclos de la tasa de política.** Una decisión es un día con $\Delta TPM\neq 0$. Un ciclo agrupa decisiones
+consecutivas del mismo signo y termina cuando la siguiente decisión va en sentido contrario (las pausas no lo
+cortan). Para cada ciclo desde 2000 se reportan fechas, número de decisiones, tasa antes y después, cambio
+acumulado y duración en meses, $\text{round}(\text{días}/30{,}44)+1$.
+
+**Traspaso.** Para cada uno de los seis ciclos más recientes desde junio de 2008 y cada tasa de mercado $k$ (IBR
+a un día y a 3 meses, CDT y DTF a 90 días, colocación total, ordinaria, preferencial, consumo y vivienda):
+$$P_k = 100\,\frac{R_{k,t_1}-R_{k,t_0}}{TPM_{t_1}-TPM_{t_0}},$$
+con $t_0$ el día anterior a la primera decisión y $t_1$ tres meses después de la última (o el último dato). Si la
+serie no existía en $t_0$ se muestra "—". El texto compara los cambios en pp del último ciclo completo y del ciclo
+actual.
+
+**Costo del crédito y margen.** Último dato semanal de cada modalidad de colocación y su tasa real con la
+inflación anual más reciente (Fisher exacto). Margen de intermediación: promedio mensual de la colocación total
+menos el del CDT a 90 días; prima del consumo: consumo menos tasa de política.
+
+**Mercado monetario.** Curva del IBR (un día, 1, 3, 6 y 12 meses) hoy, hace tres meses y hace un año, con la tasa
+de política de cada fecha. Diferenciales diarios del IBR a un día y de la TIB frente a la tasa de política, en pb,
+promediados por semana; el texto reporta la desviación absoluta media del último año.
+
+**Cartera y liquidez.** Crecimiento real anual del saldo de cartera en moneda legal por modalidad (deflactado con
+la inflación anual del mes); composición sobre la suma de comercial, consumo, vivienda y microcrédito. Liquidez:
+saldos diarios de repos de expansión (a un día y a plazo) y de contracción, promediados por mes, en billones
+(los días sin operación cuentan como cero).
+
+### 5.8 Curva TES
+
+**Datos.** Tasas cero cupón a 1, 5 y 10 años en pesos y en UVR que estima el Banco de la República con el modelo
+de Nelson y Siegel (1987) sobre operaciones del SEN y del MEC (Arango, Melo y Vásquez, 2002). El explorador
+permite ver la curva de cualquier día desde 2003 y compararla con cierres de años anteriores.
+
+**Factores.** Nivel $N_t=(y_1+y_5+y_{10})/3$; pendiente $S_t=y_{10}-y_1$; curvatura $C_t=2y_5-y_1-y_{10}$
+(Litterman y Scheinkman, 1991). El percentil de la pendiente es la proporción de días desde 2003 con pendiente
+mayor que la actual.
+
+**Episodios de curva invertida.** Tramos de al menos cinco días hábiles consecutivos con $S_t<0$; para cada uno se
+reportan inicio, fin, duración, pendiente mínima y tasa de política al inicio (Estrella y Hardouvelis, 1991).
+
+**Movimientos.** Cambio de cada plazo en 1, 3 y 12 meses (pb). El movimiento de 12 meses se clasifica por el signo
+del cambio de nivel (alza o baja) y de pendiente (empinamiento o aplanamiento); si ambos cambios son menores a
+0,10 pp en valor absoluto se rotula "sin cambio de fondo". El cambio nominal de cada plazo se descompone en el
+cambio de la tasa UVR y el cambio de la diferencia nominal menos real.
+
+**Fisher, prima y volatilidad.** La compensación por inflación exacta es $(1+y^{\$}_n)/(1+r_n)-1$ y se muestra
+junto a la diferencia simple $y^{\$}_n-r_n$. La prima sobre la tasa de política es $y_n-TPM$ para $n=1$ y 10, con
+su promedio desde 2003. La volatilidad anualizada del TES a 10 años es la desviación estándar móvil de 60 días de
+los cambios diarios en pb por $\sqrt{252}$.
+
+### 5.9 Mercados: tasa de cambio y otras monedas
+
+**TRM.** Pesos por dólar certificados por la Superintendencia Financiera; los gráficos usan el último dato de cada
+semana y su variación frente a un año antes. Variaciones de 12 meses: último dato frente al último disponible 12
+meses antes.
+
+**Peso frente al dólar global y sus pares.** Se comparan las variaciones de 12 meses del peso colombiano, el real
+brasileño, el peso mexicano y el sol peruano (unidades por dólar; positivo = la moneda se debilita) con la del
+índice amplio del dólar de la Reserva Federal. La diferencia frente a los pares es
+$d=v_{COP}-\tfrac13(v_{BRL}+v_{MXN}+v_{PEN})$. Se calcula también la correlación de las variaciones anuales
+semanales de la TRM y del dólar global.
+
+**Otras monedas.** Tasas cruzadas $COP/X = TRM/(X\text{ por USD})$ para real, peso mexicano y sol; euro, libra, yen
+y yuan directamente del Banco. Índices re-basados al horizonte elegido y variación de 12 meses (negativo = el peso
+se fortalece).
+
+**Tasa de cambio real.** ITCR-IPC con ponderaciones de comercio total e ITCR-C (competitividad en el mercado de
+EE. UU.), base 2010 = 100, y su promedio desde 2000; aumentos = depreciación real. Las cuatro series bilaterales
+(Estados Unidos, China, Brasil, México) se expresan como distancia porcentual frente a su propio promedio desde
+2000; el sitio las describe como deflactadas con el índice de precios del productor. El Banco advierte que 2010
+es una fecha de comparación, no un nivel de equilibrio.
+
+**Petróleo y términos de intercambio.** Con promedios mensuales, se calculan las variaciones anuales del Brent
+($x$) y de la TRM ($y$) y se estiman por MCO, por separado para 2008–2019 y desde 2020, la recta $\hat y=a+bx$ y
+la correlación; el texto traduce $b$ al efecto de un alza de 10% del Brent. La participación del petróleo y del
+carbón en las exportaciones usa sumas de 12 meses en dólares FOB (Chen y Rogoff, 2003). Correlaciones móviles de
+52 semanas de la TRM con el Brent y con el dólar global.
+
+**Flujos y reservas.** Balanza cambiaria mensual (cuenta corriente, movimientos de capital y variación de
+reservas brutas) en sumas de 12 meses; reservas internacionales netas a fin de mes y monto aprobado en subastas
+de opciones PUT para acumulación, sumado por año.
+
+**Volatilidad.** Desviación estándar móvil de 60 observaciones de los cambios logarítmicos diarios, anualizada,
+para el peso colombiano, el real y el peso mexicano.
+
+### 5.10 Empresas: bolsa, 10.000 empresas y registro mercantil
+
+**COLCAP oficial.** Índice de precios (sin dividendos) de la BVC/MSCI publicado por el Banco de la República. La
+transición del COLCAP de la BVC al MSCI COLCAP el 28 de mayo de 2021 mantuvo la continuidad de niveles. Se
+calculan la variación de 12 meses (último dato frente al último disponible 365 días antes), la caída desde el
+máximo histórico ($100\,(P_t/\max_{s\le t}P_s-1)$) y el COLCAP en dólares, puntos divididos por la TRM del mismo
+día o del último día disponible con tolerancia de siete días.
+
+**La bolsa por dentro (fuentes auxiliares, sección 3.4).**
+
+* *Canasta y emisores.* La canasta vigente del fondo iShares MSCI COLCAP (solo acciones colombianas con peso
+  positivo) se agrupa por emisor uniendo acciones ordinarias y preferenciales; se exige que los pesos sumen
+  entre 80% y 101%.
+* *7 Magníficas.* Las siete empresas de mayor peso agregado en la canasta vigente; para cada una se usa la clase
+  de acción de mayor peso. Se recalculan solas con cada cambio de canasta.
+* *Precios.* Cierres semanales de Yahoo Finance fechados al viernes. Un ticker que cambió (por ejemplo,
+  PFDAVVNDA a PFDAVIGRP) se empalma hacia atrás escalando la serie anterior en la primera semana común.
+* *Índices.* Equiponderado con rebalanceo semanal,
+  $$E_t = E_{t-1}\Big(1+\tfrac{1}{N_t}\textstyle\sum_{i} r_{i,t}\Big),\qquad r_{i,t}=P_{i,t}/P_{i,t-1}-1,$$
+  donde se descartan los retornos con $\lvert r_{i,t}\rvert>0{,}60$ como errores de la fuente y $N_t$ es el
+  número de retornos válidos; el índice de las 7 Magníficas aplica la misma regla a sus siete acciones. Las tres
+  series (COLCAP semanal, equiponderado y 7 Magníficas) se llevan a base 100 en la primera semana común y el
+  navegador las re-basa al horizonte elegido.
+* *Lectura.* Si en 12 meses el COLCAP supera al equiponderado por más de 2 pp, el avance se concentra en las
+  empresas grandes; si el equiponderado supera al COLCAP por más de 2 pp, el avance es amplio.
+* *Acciones y sectores.* Variación de 52 semanas de la acción principal de cada emisor (último cierre frente al
+  último disponible 364 días antes) y suma de pesos por sector.
+
+**Las 10.000 empresas más grandes.** Del conjunto `6cat-2gcs` de Supersociedades (cifras en billones de pesos
+corrientes, cortes a diciembre) se agregan por año, macrosector, región y supervisor los ingresos operacionales,
+la ganancia (pérdida), los activos, los pasivos y el patrimonio; se exige que cada año tenga al menos 9.000
+empresas. Razones sobre sumas agregadas: margen neto $\sum G/\sum I$, rentabilidad del patrimonio $\sum G/\sum
+PAT$ y endeudamiento $\sum P/\sum A$. Concentración: participación de las $N$ mayores en los ingresos del año
+para $N\in\{10,50,100,500,1.000,2.500,5.000,10.000\}$ (Gabaix, 2011). El crecimiento real de los ingresos se
+deflacta con el promedio de las inflaciones anuales mensuales del año. La lista cambia cada año, de modo que las
+comparaciones son entre las 10.000 más grandes de cada año, no entre las mismas empresas.
+
+**Financiación de las empresas.** Crecimiento real de la cartera comercial y total, tasas preferencial y
+ordinaria (promedios mensuales), posición financiera neta por sector institucional (% del PIB, cuentas
+financieras del Banco), deuda externa privada e IED de cuatro trimestres.
+
+**Registro mercantil.** Del conjunto `c82u-588k` se consultan **solo conteos agregados** por fecha y categoría de
+matrícula, nunca registros individuales ni datos personales. Las matrículas se agregan por mes de matrícula y las
+cancelaciones por mes de cancelación, desde 2010. "Sociedades" agrupa las categorías que empiezan por
+"SOCIEDAD"; el resto se reporta como personas naturales y otras categorías. Se descarta el último mes si sus
+matrículas son menores a la mitad de la mediana de los 12 meses anteriores (mes incompleto). Se reportan sumas
+de 12 meses y la variación de las matrículas de sociedades frente a los 12 meses previos.
+
+### 5.11 Externo: balanza de pagos y cuentas fiscales
+
+**Balanza de pagos (MBP6).** Los componentes de la cuenta corriente (bienes, servicios, ingreso primario e
+ingreso secundario) se suman en cuatro trimestres; su suma es la cuenta corriente. La cuenta financiera usa el
+signo del MBP6 (activos netos menos pasivos netos; negativo = entrada neta de capital); para graficar las
+entradas netas por tipo se invierte el signo, $F_i=-CF_i$, y se compara con el déficit corriente a financiar
+$-CC$. Exportaciones e importaciones de bienes de la balanza de pagos (FOB) en cuatro trimestres.
+
+**Razones al PIB en dólares.** $CC^{(4)}/Y^{\$(4)}$, con $Y^{\$(4)}$ la suma de cuatro trimestres del PIB nominal
+del DANE convertido con la TRM promedio de cada trimestre. Se reportan también la cuenta corriente del último
+trimestre sobre el PIB en dólares de ese trimestre, la balanza de bienes, la IED y la PII neta. La tarjeta
+histórica de cuenta corriente de la portada usa la razón publicada por el Banco (serie 15290).
+
+**IED y remesas.** IED de cuatro trimestres y su cobertura del déficit corriente, $100\,IED^{(4)}/\lvert
+CC^{(4)}\rvert$ (si hay déficit); IED por sector, últimos cuatro trimestres frente a los cuatro anteriores. Remesas
+en sumas de 12 meses y como porcentaje del PIB en dólares de los últimos cuatro trimestres disponibles.
+
+**Deuda externa, PII y reservas.** Saldos de deuda externa pública y privada (la razón al PIB es la publicada por el
+Banco), activos y pasivos de la posición de inversión internacional y PII neta sobre el PIB en dólares. Reservas
+en meses de importaciones: reservas internacionales netas sobre la doceava parte de las importaciones de bienes
+de cuatro trimestres.
+
+**Cuentas del Gobierno nacional central.** Las series del GNC son de **caja** (empalme de series del DNP y del
+Ministerio de Hacienda publicado por el Banco), no de causación. Los flujos mensuales se suman por trimestre (solo
+trimestres completos), luego en cuatro trimestres, y se dividen por el PIB nominal en pesos de los mismos cuatro
+trimestres:
+$$\text{Z\%}_q=100\,\frac{\sum_{j=0}^{3}Z_{q-j}}{\sum_{j=0}^{3}PIB_{q-j}},\qquad Z\in\{\text{ingresos, gastos, intereses, balance, financiamiento}\}.$$
+El balance primario es el balance total más los intereses, $BP=BT+INT$. Los intereses se expresan también por cada
+100 pesos de ingresos, $100\,INT^{(4)}/I^{(4)}$. Financiamiento interno y externo neto en % del PIB, con la
+identidad $F^{int}+F^{ext}=-BT$. La deuda bruta del GNC es la razón anual publicada (serie 15328), comparada con
+cinco años antes y con una referencia visual de 60% del PIB. Si la serie de intereses de caja tiene meses
+negativos en los últimos dos años, el texto lo advierte (sección 9). Las series del sector público no financiero
+se descargan pero no alimentan gráficos.
+
+### 5.12 Comercio exterior
+
+**Exportaciones e importaciones.** Exportaciones FOB y totales de importaciones CIF (sistema comercial especial
+ampliado, incluye zonas francas) del DANE con registros de la DIAN. El periodo de referencia común es el último mes
+disponible en ambas series. Sumas de 12 meses, variación frente a los 12 meses anteriores, balanza de 12 meses y
+balanza por año calendario (el último año, hasta el último mes publicado). Cobertura $100\,X^{(12)}/M^{(12)}$.
+
+**Qué se vende.** Valor de 12 meses y participación de no tradicionales, petróleo y derivados, carbón, café y
+ferroníquel; peso minero-energético $(P^{(12)}+C^{(12)})/X^{(12)}$. Se verifica que tradicionales más no
+tradicionales reproduzcan el total con error menor a 1%.
+
+**Precio y volumen.** Con los índices de precios de exportación e importación en dólares del Banco (series 15361 y
+15362): $v$ = variación anual del valor de 12 meses; $p$ = variación anual del promedio de 12 meses del índice de
+precios; volumen implícito $q=100\,[(1+v/100)/(1+p/100)-1]$. Términos de intercambio $IPX/IPM$, variación de 12
+meses (Prebisch, 1950).
+
+**Qué se compra (CUODE).** Variación del año corrido por grupo y subgrupo de uso o destino económico y su
+participación (Cuadro A13); se verifica que los grupos sumen el total con error menor a 2%. Composición anual entre
+bienes de consumo, materias primas y bienes de capital y construcción (el último año es parcial).
+
+**Socios.** Participación de cada destino en las exportaciones de 12 meses (nueve principales y "resto"); de cada
+país de origen en las importaciones de 12 meses (diez principales), con denominador igual a las importaciones
+publicadas (sin zonas francas); balanza bilateral de 12 meses, exportaciones FOB menos importaciones CIF, para 11
+socios; participación de China y de Estados Unidos en las importaciones.
+
+**Apertura y concentración.** Apertura de bienes: exportaciones más importaciones de los últimos cuatro trimestres
+completos sobre el PIB en dólares de los mismos trimestres. Número equivalente de destinos (16 destinos más
+"resto") y de productos (cinco grupos), $1/H$ sobre participaciones de 12 meses (Hausmann, Hwang y Rodrik, 2007;
+Hidalgo et al., 2007).
+
+### 5.13 Indicadores y datos
+
+**Tabla de 16 indicadores.** Para crecimiento del PIB, brecha, ISE (variación anual de la serie
+desestacionalizada), desempleo, inflación total y de fondo, breakeven a 1 año, forward 5y5y, tasa de política,
+tasa real ex ante, TES a 10 años, TRM, ITCR, COLCAP, cuenta corriente y deuda del GNC: último dato, fecha, cambio
+(en pp o en %, según la naturaleza de la serie) frente a hace 365 días (o 91 días para breakevens y TES a 10 años)
+y percentil histórico desde 2010, traducido a palabras con los umbrales de la sección 6.
+
+**Publicaciones oficiales.** Una nota resume el último dato publicado por cada entidad (DANE, Banco de la
+República, BVC) a partir de los datos descargados y enlaza a la página oficial; no copia titulares de prensa.
+Cuando la fecha de publicación no está en el archivo fuente se indica "dato más reciente".
+
+**Estado de las fuentes y descargas.** La tabla de fuentes muestra la última observación y el estado de cada
+fuente (sección 7). Los archivos CSV se publican tal como se usan, para que cualquier cifra pueda reproducirse.
+
+## 6. Reglas de los estados y del veredicto automático
+
+### 6.1 Parámetros del modelo
+
+| Parámetro | Valor | Significado |
+| --- | --- | --- |
+| `NEUTRAL_REAL` | $(2{,}7;\ 3{,}0)$ | Rango de la tasa real neutral (% real) |
+| `UMBRAL_BRECHA` | 0,5 | Brecha "cerca del potencial" si $\lvert g\rvert<0{,}5\%$ |
+| `UMBRAL_POSTURA` | 0,5 | Margen en pp alrededor del rango neutral |
+| `ANCLA_EXPECTATIVAS` | 4,0 | Techo del rango meta para la 5y5y |
+| Meta de inflación | $3 \pm 1$ | Rango meta del Banco de la República |
+| `HP_LAMBDA` | 1.600 / 129.600 | Suavizamiento trimestral / mensual |
+| `MIN_OBS_HP` | 20 trimestres | Historia mínima para la brecha en tiempo real |
+
+### 6.2 Veredicto técnico
+
+El veredicto tiene un titular y cinco párrafos (actividad, precios, política, expectativas, mercados); cada frase
+cita el dato que la sustenta.
+
+| Concepto | Regla | Resultado |
+| --- | --- | --- |
+| Fase | Reloj del ciclo con la brecha HP en tiempo real (sección 5.2) | Expansión, desaceleración, contracción o recuperación |
+| Posición frente al potencial | $g\ge 0{,}5$; $g\le -0{,}5$; en otro caso | Por encima de; por debajo de; cerca de |
+| Dirección de la inflación | $\pi_t-\pi_{t-3}>0{,}1$ pp; $<-0{,}1$ pp; en otro caso | Acelerando; cediendo; estable |
+| Rango meta | $\pi_t>4$ o $\pi_t<2$ | Fuera del rango meta; si no, dentro |
+| Postura monetaria | $r^{ea}>3{,}0+0{,}5$; $r^{ea}<2{,}7-0{,}5$; en otro caso | Restrictiva; expansiva; neutral |
+| Expectativas | $\pi^{5y5y}>4$ | Desancladas; si no, ancladas |
+
+### 6.3 Estados para no especialistas (portada)
+
+| Tarjeta | Regla | Estados |
+| --- | --- | --- |
+| Crecimiento | Con $g^Y$ el PIB anual y $g^*$ el crecimiento potencial (HP de dos colas): $g^Y<0$; $g^Y\ge g^*+1$; $g^Y\ge g^*-1$; en otro caso | Contracción; fuerte; normal; lento |
+| Inflación | $2\le\pi\le4$; $\pi<2$; $\pi>5$; $4<\pi\le5$ | En meta; baja; alta; sobre la meta |
+| Desempleo | Frente a hace 12 meses: $TD<TD_{-12}-0{,}3$; $TD>TD_{-12}+0{,}3$; en otro caso | Mejora; empeora; estable |
+| Tasa del Banco | Postura de la sección 6.2; si hay decisión anunciada pendiente, "sube" o "baja" | Restrictiva, neutral, expansiva |
+| Dólar | Variación de 12 meses de la TRM: $<-5\%$; $>5\%$; en otro caso | Peso fuerte; peso débil; estable |
+| Bolsa | Variación de 12 meses del COLCAP: $>5\%$; $<-5\%$; en otro caso | Sube; baja; estable |
+| Nivel histórico | Percentil $<10$; $<30$; $\le 70$; $\le 90$; $>90$ | Muy bajo; bajo; normal; alto; muy alto |
+
+### 6.4 Señales de color en las tarjetas de cada página
+
+Las tarjetas de "medidas" de cada página llevan un tono (favorable o de alerta) asignado por reglas fijas:
+
+| Página | Regla de alerta (o de tono favorable) |
+| --- | --- |
+| Ciclo | Fase: expansión y recuperación favorables, desaceleración alerta, contracción grave. Consenso favorable si al menos 3 de 5 métodos dan brecha positiva. Amplitud "generalizada" si más de 6 de 12 sectores están sobre su tendencia. Empleo favorable si el desempleo está bajo su tendencia |
+| Capacidad | Alerta si la mediana de la brecha supera 0,5%; sectores favorables si más de 6 de 12 están sobre su tendencia; alerta si el desempleo está bajo su tendencia (mercado apretado); subutilización favorable si no supera la de un año antes; regiones favorables si al menos 25 departamentos superan su nivel de 2019 |
+| Crecimiento | Favorable si el crecimiento anual, el anualizado, el año corrido o el crecimiento sin Gobierno es al menos 2%; el texto atribuye al sector público "una parte grande" del dato si el total supera al crecimiento sin Gobierno en más de 0,5 pp; PIB por persona favorable si crece; inversión favorable si la tasa supera su promedio de 2015 |
+| Empleo | Favorable si suben los ocupados o la tasa de ocupación, si bajan el desempleo, la informalidad o el desempleo juvenil frente a un año antes, si los asalariados superan su participación de diciembre de 2019 y si la proporción de jóvenes que no estudian ni están ocupados no supera su promedio de 2019; la brecha por sexo siempre en alerta |
+| Inflación | Favorable si la inflación (total, servicios, no durables, energéticos) está entre 2% y 4%; durables favorables si no superan 4%; difusión en alerta si más de la mitad de las subclases supera 4% |
+| Tasas | Tasa real en alerta fuera de $[2{,}2;\,3{,}5]$; crédito total en alerta si su crecimiento real es negativo |
+| Curva TES | Pendiente en alerta si es menor a 0,5 pp; compensación a 10 años en alerta si supera 4%; volatilidad en alerta si supera su percentil 80 histórico |
+| Mercados | Movimiento "propio de Colombia" si $\lvert v_{COP}-\bar v_{pares}\rvert>\max(3,\lvert\bar v_{pares}\rvert)$; volatilidad en alerta sobre su percentil 80 |
+| Empresas | Crédito a empresas en alerta si su crecimiento real es negativo |
+| Externo | Cuenta corriente en alerta si el déficit supera 4% del PIB; balance del Gobierno en alerta si el déficit supera 3% del PIB; deuda del GNC en alerta sobre 60% del PIB |
+| Comercio | Exportaciones favorables si crecen; balanza en alerta si es deficitaria; bienes de capital favorables si crecen; balanza con China en alerta si es deficitaria |
+
+### 6.5 Reglas de texto adicionales
+
+* *Curva:* forma normal si $S>0{,}3$ pp, invertida si $S<0$, plana en otro caso; movimiento de 12 meses según la
+  sección 5.8.
+* *Traspaso:* "mayor en el interbancario y el crédito que en el ahorro" si el cambio del CDT es menor que 60% del
+  menor de los cambios (en valor absoluto) del IBR a 3 meses y de la colocación; "parecido" en otro caso.
+* *Posición ocupacional:* "el empleo se formaliza por la vía de los contratos" si los asalariados privados crecen
+  más (en miles) que los trabajadores por cuenta propia.
+* *Inflación por ingresos:* el texto indica qué grupo enfrenta la mayor inflación según el signo de la diferencia
+  entre ingresos altos y pobres.
+* *Deflactor:* el texto indica si el deflactor del PIB va por encima o por debajo del IPC del trimestre.
+
+## 7. Control de calidad y automatización
+
+### 7.1 Controles al descargar
+
+Cada proceso de descarga valida sus datos antes de escribir y, si algo no cuadra, conserva la versión anterior del
+archivo; una fuente caída nunca borra a las demás.
+
+* **Identidad.** Identificador y nombre de cada serie SUAMECA (sección 3.3); patrón y unicidad del anexo vigente
+  del DANE; coincidencia de la fecha de publicación de los anexos real y nominal del PIB y del último trimestre con
+  el nombre del archivo.
+* **Rangos y longitud mínima.** Rangos plausibles por serie (sección 3.2), historia mínima (por ejemplo, 1.000
+  datos diarios, 60 mensuales, 40 trimestrales en `series_banrep.csv`; al menos 60 trimestres de PIB; 4.000 días
+  de COLCAP; 200 meses de ISE y GEIH; 26 semanas por acción), crecimientos fuera de control (PIB anual mayor a 40%
+  o trimestral mayor a 30%; sectores mayor a 80%) y saltos diarios del COLCAP mayores a 25%.
+* **Coherencia interna.** Departamentos que suman el total nacional (1%); PIB del gasto igual al de producción
+  (0,2%); exportaciones tradicionales más no tradicionales iguales al total (1%); grupos CUODE que suman el total
+  (2%); ponderaciones de divisiones del IPC que suman 100 (0,5) y de subclases (1,5); variaciones del IPC
+  calculadas frente a las publicadas por el DANE (0,05 pp para el último mes y 0,10 pp para la historia mensual).
+* **Fechas.** Sin duplicados, sin fechas futuras (la meta de inflación del año siguiente se descarta), sin meses o
+  trimestres faltantes en las series principales.
+* **Reintentos.** Reintentos con espera ante respuestas de límite de tasa del DANE (código 429) o fallas
+  transitorias del servidor; pausas de cortesía entre series del Banco.
+
+### 7.2 Validación de las tablas publicadas
+
+Después de descargar, un validador revisa las tablas y genera `estado_fuentes.csv`:
+
+* Fuentes principales (PIB, IPC, TES, COLCAP): archivo presente, fechas válidas, ordenadas y sin futuros; PIB
+  trimestral completo y variaciones recalculadas desde los niveles (tolerancia $10^{-4}$); una sola vintage en la
+  tabla del PIB; IPC mensual completo, sin variaciones faltantes, dentro de rangos de control y con el último mes
+  contrastado con el DANE; TES en pesos completos y entre $-5\%$ y 40%; COLCAP positivo, sin saltos diarios mayores
+  a 25% y con la base 100 del 9 de febrero de 2009 recalculada.
+* Fuentes complementarias (ISE, GEIH, informalidad, series del Banco, canasta y acciones, sectores): meses
+  consecutivos, identidad $TD=100\,(1-TO/TGP)$ con tolerancia de 0,05 pp, variación anual del ISE recalculada, 12
+  agrupaciones por trimestre en sectores, tasas de informalidad entre 0 y 100, pesos de la canasta entre 80% y 101%.
+* **Estado de cada fuente.** "Vigente" si la antigüedad de la última observación (o de la última publicación, en PIB
+  e IPC) no supera una tolerancia por fuente; "rezagado" si la supera; "pendiente" si aún no hay archivo.
+
+| Fuente | Tolerancia (días) |
+| --- | --- |
+| PIB real | 130 desde la última publicación |
+| IPC | 45 desde la última publicación |
+| TES | 10 |
+| COLCAP | 7 |
+| ISE, informalidad | 110 |
+| GEIH (desempleo) | 100 |
+| Tasa de política, TRM | 10 |
+| Inflación básica | 75 |
+| ITCR | 100 |
+| Cuenta corriente | 200 |
+| Deuda del Gobierno | 800 |
+| PIB por sectores | 230 |
+| Canasta COLCAP, acciones | 10 |
+
+Si el validador encuentra un error (no una advertencia), el proceso termina con falla y el sitio no se publica.
+
+### 7.3 Saltos aislados
+
+En las tasas TES diarias, una observación se marca como salto aislado cuando se aleja más de 2 pp de sus dos
+vecinos mientras los vecinos difieren entre sí menos de 1 pp:
+$$\lvert x_t-x_{t-1}\rvert>2,\quad \lvert x_t-x_{t+1}\rvert>2,\quad \lvert x_{t-1}-x_{t+1}\rvert<1.$$
+Los saltos de las tasas en pesos se registran en `alertas_datos.csv`; en las seis series TES se conservan en el CSV
+pero se excluyen de los cálculos derivados. Para las series derivadas (breakevens a 1, 5 y 10 años, forward 5y5y y
+tasa real ex ante), donde un salto de un día en una sola tasa UVR se amplifica, se aplica el mismo criterio con
+umbrales de 1 pp y 0,5 pp.
+
+### 7.4 Automatización
+
+Un flujo de GitHub Actions actualiza los datos y publica el sitio estático en GitHub Pages:
+
+* **Actualización completa** cada noche a las 19:30, hora de Colombia: todas las fuentes, en secuencia y cada una en
+  su propio proceso con un tiempo límite, de modo que la falla de una no detiene a las demás.
+* **Actualización rápida** cada hora, de 7:07 a 18:07 en días hábiles: curvas TES, COLCAP y series del Banco de la
+  República (política, TRM, inflación básica, externas).
+* **Orden de cada corrida:** pruebas automáticas del código; descarga; aviso de fuentes con falla (no detiene la
+  publicación: se usa el último dato válido); validación de tablas (un error detiene la publicación); pruebas con
+  los datos del día; registro de los datos nuevos en el repositorio; construcción y publicación del sitio.
+* **Publicación.** La corrida nocturna publica siempre; la horaria solo si llegó un dato nuevo. Un cambio en el código
+  reconstruye el sitio con los datos ya guardados, sin descargar.
+* **Trazabilidad.** El registro de cada corrida (`registro_actualizacion.log`) y el estado de las fuentes se publican
+  en el repositorio; cada actualización de datos queda como un cambio con fecha y modo (rápida o completa).
+
+## 8. Ejercicio de robustez fechado
+
+*Cálculo realizado el 3 de octubre de 2026 con los datos vigentes en esa fecha (PIB hasta el T2 de 2026, publicado el
+18 de agosto de 2026). Las cifras de esta sección cambian con cada publicación y revisión; no son propiedades del
+método.*
+
+**Brecha del producto.** Con 51 trimestres en los que los tres métodos originales están disponibles (2013-T4 a
+2026-T2):
 
 | Métrica | Valor |
 | --- | --- |
-| Coincidencia de signo, HP tiempo real vs. HP dos colas | 78% |
-| Coincidencia de signo, HP tiempo real vs. Hamilton | 65% |
-| Coincidencia de fase, HP tiempo real vs. Hamilton | 43% |
-| Revisión media tiempo real − dos colas | −0,52 pp (MAE 0,96 pp; correlación 0,95) |
-| Correlación entre métodos sin 2020-21 | 0,66–0,77 |
+| Coincidencia de signo, HP en tiempo real frente a HP de dos colas | 78% |
+| Coincidencia de signo, HP en tiempo real frente a Hamilton | 65% |
+| Coincidencia de fase, HP en tiempo real frente a Hamilton (49 trimestres) | 43% |
+| Revisión media, tiempo real menos dos colas | $-0{,}52$ pp (error absoluto medio 0,96 pp; correlación 0,95) |
+| Correlación entre los tres métodos sin 2020–2021 | 0,70 a 0,78 |
 
-**Lectura:** el nivel de la brecha es robusto en signo en la mayoría de trimestres, pero la **fase** es
-sensible al método. Por eso el tablero muestra la banda mínimo–máximo y la cantidad de métodos con brecha
-positiva. Al T2 2026 los tres métodos dan brecha positiva (+0,3% a +2,3%).
+Lectura: el signo de la brecha es razonablemente robusto, pero la **fase** depende del método. Por eso el sitio
+muestra el rango entre métodos y el número de métodos con brecha positiva. En el último trimestre la brecha en tiempo
+real coincide por construcción con la de dos colas (ambas usan la misma muestra), de modo que la revisión futura de
+ese dato solo se conocerá con trimestres adicionales.
 
-**ISE.** Índice mensual del DANE (base 2015). La variación anual usa la serie original, comparable con el
-PIB; el ritmo de corto plazo es $100\,[(\bar{x}_{t,3}/\bar{x}_{t-3,3})^4-1]$ sobre la serie desestacionalizada
-(promedios móviles de tres meses), anualizado.
+**Ley de Okun.** Con 62 trimestres fuera de 2020–2021, la pendiente estimada es $\hat\beta=-0{,}12$ pp de desempleo
+bajo tendencia por cada punto de brecha y la correlación es $-0{,}26$: el desempleo responde poco al ciclo.
 
-### 3.5b Producción frente a su capacidad
+**Inflación implícita a un año como predictor.** Promedio mensual del breakeven a un año frente a la inflación
+observada doce meses después, con la caminata aleatoria (inflación de hoy) como referencia:
 
-La capacidad (PIB potencial) se obtiene del mismo filtro HP en tiempo real: $Y^*_t = Y_t\,e^{-g_t/100}$,
-con $g_t$ la brecha en log×100 y $Y_t$ el PIB real desestacionalizado. El gráfico muestra ambos niveles
-(billones de pesos de 2015 por trimestre) y colorea la distancia: verde por encima (sobrecalentamiento),
-naranja por debajo (holgura). Es la lectura de "frontera de posibilidades de producción" en el tiempo.
-El **crecimiento real por año** suma los cuatro trimestres del PIB real (datos originales) de cada año
-calendario y lo compara con el año anterior: $100\,(\sum_{q} Y_{a,q}/\sum_{q} Y_{a-1,q}-1)$. La barra del año en
-curso usa los últimos 12 meses frente a los 12 previos. Se acompaña del ritmo habitual (promedio anual del
-crecimiento de la tendencia HP) y del promedio simple 2010–2019. El tablero no muestra el PIB en niveles de
-dinero (pesos o dólares); el gráfico de capacidad usa niveles reales solo para dibujar la frontera.
+| Periodo | Meses | Sesgo (observada − implícita) | RMSE implícita | RMSE caminata aleatoria |
+| --- | --- | --- | --- | --- |
+| 2006–2019 | 168 | +0,48 pp | 1,70 pp | 2,08 pp |
+| 2020–2025 | 68 | +2,32 pp | 4,13 pp | 4,07 pp |
+| Total | 236 | +1,01 pp | 2,64 pp | 2,80 pp |
 
-### 3.6 Sectores y mercado laboral
+Antes de 2020 la inflación implícita anticipó mejor que la caminata aleatoria; el choque inflacionario de 2021–2023
+no fue anticipado por ninguno de los dos. El sitio presenta la implícita como **lo que el mercado descuenta**, no como
+pronóstico.
 
-* **Sectores**: 12 agrupaciones CIIU Rev. 4 del PIB por el lado de la oferta (DANE, volúmenes
-  encadenados, datos originales). Crecimiento anual frente al mismo trimestre del año anterior;
-  aporte aproximado $c_{i,t} = (Y_{i,t} - Y_{i,t-4})/VA_{t-4}$. El mapa de calor recorta la escala en
-  ±12 % para que 2020 no oculte el resto de la historia (el recuadro flotante muestra el valor real).
-* **Informalidad**: proporción de ocupados informales de la GEIH (definición DANE 2023, alineada con
-  la OIT), trimestres móviles desde 2021; nacional y 13 ciudades. Por sector, informales / ocupados.
-  La suma por ramas reproduce la tasa nacional publicada (control automático).
-
-## 4. Precios y expectativas
-
-* Inflación anual: $100\,(IPC_t/IPC_{t-12}-1)$; el último mes se reemplaza por la cifra publicada por el DANE
-  (el índice BanRep tiene dos decimales y puede diferir 0,01 pp).
-* Rango meta: 3% ± 1 pp (BanRep desde 2010; serie 853 para la historia).
-* Inflación básica principal: sin alimentos ni regulados (serie 15390).
-* **Inflación implícita (breakeven)** por plazo $h$:
-  $\pi^{BE}_h = 100\left[\dfrac{1+i^{COP}_h}{1+r^{UVR}_h}-1\right]$ con las curvas cero cupón TES (Fisher exacto).
-* **Forward 5y5y**: $\pi^{5y5y} = 100\left[\left(\dfrac{(1+i_{10})^{10}/(1+i_5)^5}{(1+r_{10})^{10}/(1+r_5)^5}\right)^{1/5}-1\right]$.
-  Se considera que las expectativas están **desancladas** si el 5y5y supera el techo del rango (4%).
-
-La inflación implícita incluye primas por riesgo inflacionario y por liquidez (los TES UVR son menos
-líquidos) y el rezago de indexación de la UVR; no es una expectativa pura (Gürkaynak, Sack y Wright, 2010).
-
-**Validación empírica** (implícita a 1 año, promedio mensual, frente a la inflación realizada 12 meses después,
-236 meses entre 2006 y 2025):
-
-| Período | Sesgo (realizada − implícita) | RMSE implícita | RMSE caminata aleatoria |
-| --- | --- | --- | --- |
-| 2006-2019 | +0,48 pp | 1,70 pp | 2,08 pp |
-| 2020-2025 | +2,32 pp | 4,13 pp | 4,07 pp |
-| Total | +1,01 pp | 2,64 pp | 2,80 pp |
-
-Antes de 2020 la implícita pronostica mejor que la caminata aleatoria; el choque 2021-23 no fue anticipado
-por ningún método. La implícita se presenta como **lo que el mercado descuenta**, no como pronóstico.
-
-### 4.1 Trayectoria de inflación que descuenta el mercado
-
-Con los breakevens $b_1, b_5, b_{10}$ (inflación implícita promedio a 1, 5 y 10 años) se obtienen tres
-tramos que encadenan exactamente el breakeven a 10 años:
-
-* año 1: $b_1$;
-* años 1–5: $f_{1,5} = \left[(1+b_5)^5/(1+b_1)\right]^{1/4} - 1$;
-* años 5–10: $f_{5,10} = \left[(1+b_{10})^{10}/(1+b_5)^5\right]^{1/5} - 1$ (la 5y5y).
-
-El gráfico los dibuja hacia el futuro a partir de la última fecha, junto a la inflación observada y a la
-misma lectura de hace un año. **La 5y5y no es un pronóstico de su propia serie**: cada punto histórico
-es lo que el mercado esperaba, ese día, para la inflación promedio entre 5 y 10 años adelante. Incluye
-primas por riesgo inflacionario y liquidez, por lo que es una cota de la expectativa pura.
-
-### 4.2 Publicaciones oficiales
-
-La sección de noticias no copia titulares de prensa: resume el último dato publicado por cada
-entidad (DANE, Banco de la República, BVC) a partir de los datos descargados y enlaza a su página
-oficial. Cuando la fecha exacta de publicación no está en el archivo fuente se muestra "dato más
-reciente". Se descartó leer las páginas de prensa directamente: el sitio del Banco de la República
-bloquea lectores automáticos con un captcha y los agregadores comerciales no permiten republicar.
-
-## 5. Postura monetaria y curva
-
-* Tasa real ex ante: $r^{ea}_t = 100\left[\dfrac{1+TPM_t}{1+\pi^{BE}_{1,t}}-1\right]$.
-* Tasa real ex post: se deflacta con la última inflación **publicada** a cada fecha (el IPC del mes $m$ se
-  considera disponible el día 10 del mes $m+1$), sin usar información futura.
-* **Tasa neutral de referencia: 2,7%–3,0% real**, estimación del equipo técnico de BanRep (2025, con ajuste al
-  alza hacia 2026). Es un parámetro externo, configurable en `colombiamacro.modelo.NEUTRAL_REAL`.
-* Postura: *restrictiva* si $r^{ea} > 3{,}0 + 0{,}5$; *expansiva* si $r^{ea} < 2{,}7 - 0{,}5$; *neutral* en otro caso.
-* Pendientes: TES 10A − TES 1A y TES 10A − TPM, en puntos porcentuales.
-
-## 6. Mercados y sector externo
-
-* COLCAP oficial (índice de precios, sin dividendos). Transición BVC → MSCI COLCAP el 28-may-2021 con
-  continuidad de niveles; el gráfico la marca.
-* COLCAP en dólares: puntos / TRM del mismo día (tolerancia máxima de 7 días).
-* Retorno a 12 meses: último dato frente al último dato disponible 365 días antes.
-* ITCR-IPC (2010 = 100): aumentos = depreciación real del peso.
-
-### 6.1 La bolsa por dentro: equiponderado y 7 Magníficas
-
-* **Canasta y pesos**: composición diaria del fondo iShares MSCI COLCAP (BlackRock), que replica el
-  índice. Los pesos son los del fondo (efectivo excluido), una aproximación cercana a los oficiales
-  de la BVC. Las acciones ordinaria y preferencial de una misma empresa se agrupan por emisor.
-* **7 Magníficas**: las siete empresas de mayor peso agregado en la canasta vigente; se recalculan
-  solas con cada cambio de canasta. En cada índice se usa la clase de acción de mayor peso.
-* **Precios**: cierres semanales de Yahoo Finance (`<TICKER>.CL`), sin dividendos, igual que el COLCAP.
-  Un ticker que cambió (p. ej. Davivienda: PFDAVVNDA → PFDAVIGRP) se empalma en la primera semana
-  común para no crear saltos.
-* **Índices**: equiponderado $I_t = I_{t-1}\,(1 + \bar r_t)$ con $\bar r_t$ el promedio simple de los
-  retornos semanales disponibles (rebalanceo semanal); las 7 Magníficas usan la misma regla con sus
-  siete acciones. Retornos semanales mayores a ±60 % se tratan como errores de la fuente.
-  En el tablero las tres series se re-basan a 100 al inicio del horizonte elegido.
-* **Lectura**: si el COLCAP (ponderado por capitalización) supera al equiponderado, el avance se
-  concentra en las empresas grandes; si ocurre lo contrario, el avance es amplio.
-* **Limitación**: aplicar la canasta actual hacia atrás introduce sesgo de supervivencia.
-
-### 6.2 Paneles de cambio
-
-Cada gráfico principal incluye debajo un panel con el cambio de su serie principal: frente a hace
-un año (tasas en puntos porcentuales, niveles en %), frente al trimestre anterior para el PIB y la
-brecha. Las escalas se ajustan a los datos visibles del horizonte elegido, de modo que 2020 se ve
-completo cuando está dentro del periodo.
-
-## 7. Reglas del veredicto automático
-
-| Concepto | Regla | Parámetro |
-| --- | --- | --- |
-| Posición frente al potencial | cerca si $\lvert g\rvert < 0{,}5$; encima si $g \ge 0{,}5$; debajo si $g \le -0{,}5$ | `UMBRAL_BRECHA` |
-| Dirección de la inflación | acelera si el cambio en 3 meses de la anual > 0,1 pp; cede si < −0,1 pp | — |
-| Fuera del rango meta | inflación anual > 4% o < 2% | — |
-| Postura | ver sección 5 | `NEUTRAL_REAL`, `UMBRAL_POSTURA` |
-| Expectativas | desancladas si 5y5y > 4% | `ANCLA_EXPECTATIVAS` |
-
-## 8. Control de calidad de datos
-
-* Identidad de cada serie por id y nombre; rangos plausibles por serie; historia mínima.
-* Fechas: sin duplicados, sin futuros, sin meses o trimestres faltantes.
-* Fórmulas recalculadas en cada corrida (PIB, IPC, ISE, identidad $TD = 1 - TO/TGP$ de la GEIH).
-* **Saltos aislados** (valor que se aleja > 2 pp de ambos vecinos que difieren < 1 pp): se conservan en el CSV,
-  se listan en `alertas_datos.csv` y se excluyen de los cálculos. Para las series derivadas (implícitas, tasa
-  real) se aplica el mismo criterio con 1 pp / 0,5 pp: 91 observaciones en total entre las cinco series derivadas (de unos 5.800 días cada una).
-* Verificación de la inflación: la inflación mensual compuesta a 12 meses reproduce la anual con error
-  máximo de 0,04 pp (redondeo de la fuente).
+**Saltos en series derivadas.** El filtro de la sección 7.3 excluye 110 observaciones diarias en total entre las
+cinco series derivadas.
 
 ## 9. Limitaciones conocidas
 
-1. **Vintage única**: las cifras históricas corresponden a la última publicación, no a lo que se sabía en cada
-   fecha. La brecha "en tiempo real" elimina la información futura del filtro, pero no las revisiones del DANE.
-2. La fase del ciclo depende del método (sección 3.5); debe leerse junto con la banda.
-3. La tasa neutral es una estimación externa con incertidumbre considerable.
-4. Las implícitas contienen primas variables en el tiempo.
-5. COLCAP es un índice de precios; no mide retorno total.
-6. Las canastas "equiponderada" y "7 Magníficas" del tablero anterior son reconstrucciones sin ajuste por
-   dividendos ni eventos corporativos y con composición posterior a 2021 aproximada. Se conservan en el
-   laboratorio para revisión y **no alimentan ninguna cifra**.
+1. **Una sola vintage.** Cada corrida reemplaza la historia con la última publicación del DANE y del Banco. Las
+   cifras históricas son las revisadas, no las que se conocían en cada fecha. La brecha "en tiempo real" elimina la
+   información futura del filtro, pero no las revisiones de los datos; la fecha de publicación registrada es la del
+   anexo vigente, no la de primera publicación de cada periodo.
+2. **Datos provisionales.** Los últimos trimestres del PIB, del PIB por el gasto y de las cuentas departamentales
+   son provisionales y se revisan; las cuentas departamentales llegan con más de un año de rezago.
+3. **Sensibilidad al método.** La brecha y la fase del ciclo cambian con el método (sección 8). Cuatro de los cinco
+   métodos usan toda la muestra y su último dato se revisará. El tratamiento de la pandemia (interpolación de
+   2020-T2 a 2021-T2) es una decisión de modelado.
+4. **Sesgo de fin de muestra del fechado de giros.** El promedio centrado y la ventana de $\pm 6$ meses usan meses
+   posteriores; el último giro puede moverse o desaparecer con datos nuevos.
+5. **Tasa neutral externa.** El rango de 2,7% a 3,0% es una estimación con incertidumbre considerable y se actualiza
+   a mano; la clasificación de la postura depende de él.
+6. **Primas en los breakevens.** La inflación implícita incluye primas por riesgo inflacionario y por liquidez (los TES
+   UVR son menos líquidos) y el rezago de indexación de la UVR; no es una expectativa pura (Gürkaynak, Sack y Wright,
+   2010). Las primas pueden tener cualquier signo, de modo que la implícita no es necesariamente una cota superior.
+7. **Curva estimada.** Las tasas cero cupón son salidas de un modelo (Nelson-Siegel) estimado por el Banco, no
+   precios negociados; los plazos de 1, 5 y 10 años no describen toda la curva.
+8. **Índice de precios frente a retorno total.** El COLCAP y los índices equiponderado y de 7 Magníficas son índices
+   de precios, sin dividendos; no miden el retorno total del inversionista.
+9. **Fuentes auxiliares y sesgo de supervivencia.** La bolsa por dentro usa pesos de un fondo (no los oficiales) y
+   precios de un proveedor comercial sin ajuste por eventos corporativos; aplicar la canasta vigente hacia atrás omite
+   las empresas que salieron del índice (sesgo de supervivencia) y el empalme de tickers es una aproximación.
+10. **10.000 empresas.** La lista cambia cada año, excluye bancos y aseguradoras y viene en billones con dos decimales;
+    las sumas pueden diferir levemente del informe oficial y las variaciones no comparan las mismas empresas. Las
+    regiones corresponden al domicilio, no al lugar de producción.
+11. **Registro mercantil.** Las cancelaciones incluyen depuraciones administrativas del registro y presentan saltos;
+    el último mes puede estar incompleto aun después del filtro.
+12. **FOB frente a CIF.** Las balanzas comercial y bilateral restan importaciones CIF (con fletes y seguros) de
+    exportaciones FOB, lo que exagera el déficit frente a la balanza de pagos (FOB/FOB). La participación por país de
+    origen usa como denominador las importaciones publicadas sin zonas francas.
+13. **Volumen implícito.** El volumen de comercio es residual: hereda cualquier diferencia de cobertura entre los
+    valores del DANE y los índices de precios del Banco.
+14. **Cuentas fiscales en caja.** Las series del GNC son de caja, sin causaciones; la serie de intereses puede tener
+    meses negativos, por lo que los intereses de 12 meses y la razón intereses/ingresos pueden subestimar el costo de
+    la deuda que el Ministerio de Hacienda reporta en causación.
+15. **Razones al PIB en dólares.** Dependen de la TRM promedio usada para convertir el PIB; un movimiento cambiario
+    fuerte altera la razón sin cambio en el numerador. Algunas razones (cuenta corriente histórica, deuda externa) son
+    las publicadas por el Banco con su propio PIB de referencia y pueden diferir de las calculadas en el sitio.
+16. **Aportes con volúmenes encadenados.** Los aportes sectoriales y de la demanda no suman exactamente el total; el
+    crecimiento "sin Gobierno" o "sin minería" es una aproximación con pesos corrientes.
+17. **Mezcla de vintages entre fuentes.** El PIB, el IPC, la GEIH y las series del Banco se actualizan en días
+    distintos; una misma página puede combinar datos de meses diferentes, lo que se indica con la fecha de cada cifra.
+18. **Identidad parcial de algunas series.** Las series de cuentas externas, fiscales y de empresas del Banco se
+    validan por identificador y longitud, sin texto esperado en el nombre; una reasignación de identificador que
+    conserve la longitud no se detectaría automáticamente.
+19. **Informalidad y GEIH.** La serie de informalidad empieza en 2021 (marco muestral 2018) y no es comparable con la
+    anterior; las series de detalle no están desestacionalizadas.
+20. **Registro manual.** La decisión anunciada de la Junta se registra a mano (sección 3.5); un error de digitación
+    afectaría la tarjeta de la tasa hasta que la decisión entre en vigencia.
 
-## 10. Reproducibilidad
+## 10. Referencias
 
-```bash
-python -m pip install -r requirements-update.txt
-python -m colombiamacro.actualizar       # descarga todas las fuentes
-python -m colombiamacro.validar          # controles y estado de fuentes
-python -m unittest discover -s tests
-python scripts/lanzar_local.py           # construye el sitio y lo abre en un puerto libre
-```
+Arango, L. E., Melo, L. F. y Vásquez, D. M. (2002). *Estimación de la estructura a plazo de las tasas de interés en
+Colombia* (Borradores de Economía n.º 196). Banco de la República.
 
-Módulos: `colombiamacro/fuentes/` (descarga), `colombiamacro/analitica.py` (fórmulas),
-`colombiamacro/modelo.py` (indicadores y veredicto), `colombiamacro/sitio/` (sitio estático).
+Banco de la República. (2025). *Informe de Política Monetaria* (enero, abril y octubre de 2025) y estimaciones de la
+tasa de interés neutral del equipo técnico. Banco de la República.
 
-## Referencias
+Banco de la República. (s. f.). *Definiciones de la tasa de política monetaria, IBR, TIB, DTF, CDT y tasas de
+colocación* (catálogo de series estadísticas). Banco de la República.
 
-* Banco de la República (2025). *Informe de Política Monetaria* (enero, abril y octubre de 2025) y estimaciones de la tasa de interés neutral del equipo técnico.
-* Gürkaynak, R., Sack, B. y Wright, J. (2010). The TIPS Yield Curve and Inflation Compensation. *American Economic Journal: Macroeconomics*, 2(1), 70-92.
-* Hamilton, J. D. (2018). Why You Should Never Use the Hodrick-Prescott Filter. *Review of Economics and Statistics*, 100(5), 831-843.
-* Hodrick, R. y Prescott, E. (1997). Postwar U.S. Business Cycles: An Empirical Investigation. *Journal of Money, Credit and Banking*, 29(1), 1-16.
-* MSCI (2021). *MSCI COLCAP Index Methodology*.
-* OECD. *Business Cycle Clock* — metodología del sistema de indicadores adelantados compuestos.
-* Orphanides, A. y van Norden, S. (2002). The Unreliability of Output-Gap Estimates in Real Time. *Review of Economics and Statistics*, 84(4), 569-583.
+Banco de la República. (s. f.). *Mecanismos de transmisión de la política monetaria en Colombia*. Banco de la
+República.
+
+Banco de la República. (s. f.). *Metodología de cálculo del Índice de Tasa de Cambio Real (ITCR) de Colombia*. Banco de
+la República.
+
+Banco de la República. (s. f.). *Reporte de Estabilidad Financiera* (semestral). Banco de la República.
+
+Banco de la República, Junta Directiva. (2018). *Resolución Externa 1 de 2018* y Circular Reglamentaria DOAM-146.
+Banco de la República.
+
+Baumol, W. J. (1967). Macroeconomics of unbalanced growth: The anatomy of urban crisis. *American Economic Review,
+57*(3), 415–426.
+
+Baxter, M. y King, R. G. (1999). Measuring business cycles: Approximate band-pass filters for economic time series.
+*Review of Economics and Statistics, 81*(4), 575–593.
+
+Bell, D. N. F. y Blanchflower, D. G. (2011). Young people and the Great Recession. *Oxford Review of Economic Policy,
+27*(2), 241–267.
+
+Bernanke, B. S. y Gertler, M. (1995). Inside the black box: The credit channel of monetary policy transmission.
+*Journal of Economic Perspectives, 9*(4), 27–48.
+
+Bernanke, B. S., Gertler, M. y Gilchrist, S. (1999). The financial accelerator in a quantitative business cycle
+framework. En J. B. Taylor y M. Woodford (Eds.), *Handbook of Macroeconomics* (Vol. 1C, pp. 1341–1393). Elsevier.
+
+Betancourt, R., Vargas, H. y Rodríguez, N. (2008). Interest rate pass-through in Colombia: A micro-banking
+perspective. *Cuadernos de Economía, 45*(131), 29–58.
+
+Beveridge, S. y Nelson, C. R. (1981). A new approach to decomposition of economic time series into permanent and
+transitory components with particular attention to measurement of the "business cycle". *Journal of Monetary
+Economics, 7*(2), 151–174.
+
+Blanchard, O. (2019). Public debt and low interest rates. *American Economic Review, 109*(4), 1197–1229.
+
+Blanchard, O., Cerutti, E. y Summers, L. (2015). *Inflation and activity: Two explorations and their monetary policy
+implications* (IMF Working Paper WP/15/230). Fondo Monetario Internacional.
+
+Bry, G. y Boschan, C. (1971). *Cyclical analysis of time series: Selected procedures and computer programs*. National
+Bureau of Economic Research.
+
+Bryan, M. F. y Cecchetti, S. G. (1994). Measuring core inflation. En N. G. Mankiw (Ed.), *Monetary Policy*
+(pp. 195–215). University of Chicago Press.
+
+Burns, A. F. y Mitchell, W. C. (1946). *Measuring business cycles*. National Bureau of Economic Research.
+
+Calvo, G. A., Leiderman, L. y Reinhart, C. M. (1993). Capital inflows and real exchange rate appreciation in Latin
+America: The role of external factors. *IMF Staff Papers, 40*(1), 108–151.
+
+Cecchetti, S. G. (1997). Measuring short-run inflation for central bankers. *Federal Reserve Bank of St. Louis Review,
+79*(3), 143–155.
+
+Cerra, V. y Saxena, S. C. (2008). Growth dynamics: The myth of economic recovery. *American Economic Review, 98*(1),
+439–457.
+
+Chavarro, X., Cristiano, D., Gómez, J. E., González, E. y Huertas, C. (2015). *Evaluación de la transmisión de la tasa
+de interés de referencia a las tasas de interés del sistema financiero* (Borradores de Economía n.º 874). Banco de la
+República.
+
+Chen, Y.-C. y Rogoff, K. (2003). Commodity currencies. *Journal of International Economics, 60*(1), 133–160.
+
+Christiano, L. J. y Fitzgerald, T. J. (2003). The band pass filter. *International Economic Review, 44*(2), 435–465.
+
+Clarida, R., Galí, J. y Gertler, M. (1999). The science of monetary policy: A New Keynesian perspective. *Journal of
+Economic Literature, 37*(4), 1661–1707.
+
+Congreso de la República de Colombia. (2011). *Ley 1473 de 2011, por medio de la cual se establece una regla fiscal y
+se dictan otras disposiciones*.
+
+Congreso de la República de Colombia. (2013). *Ley Estatutaria 1622 de 2013, por medio de la cual se expide el
+estatuto de ciudadanía juvenil*.
+
+Congreso de la República de Colombia. (2021). *Ley 2155 de 2021, por medio de la cual se expide la Ley de Inversión
+Social* (modifica la regla fiscal y crea el Comité Autónomo de la Regla Fiscal).
+
+DANE. (2019). *Índice de Precios al Consumidor, base diciembre de 2018: metodología y canasta*. Departamento
+Administrativo Nacional de Estadística.
+
+DANE. (2021). *Gran Encuesta Integrada de Hogares: metodología y marco conceptual*. Departamento Administrativo
+Nacional de Estadística.
+
+DANE. (s. f.). *Cuentas nacionales departamentales, base 2015: metodología (CD-01)*. Departamento Administrativo
+Nacional de Estadística.
+
+DANE. (s. f.). *Cuentas nacionales trimestrales: metodología (enfoque de la producción, índices encadenados)*.
+Departamento Administrativo Nacional de Estadística.
+
+DANE. (s. f.). *Estadísticas de comercio internacional: exportaciones (FOB) e importaciones (CIF) con base en
+registros administrativos de la DIAN*. Departamento Administrativo Nacional de Estadística.
+
+DANE. (s. f.). *Proyecciones y retroproyecciones de población, Censo Nacional de Población y Vivienda 2018
+(actualización 2025)*. Departamento Administrativo Nacional de Estadística.
+
+Dornbusch, R. (1976). Expectations and exchange rate dynamics. *Journal of Political Economy, 84*(6), 1161–1176.
+
+Espinosa, J. A., Melo, L. F. y Moreno, J. F. (2014). *Estimación de la prima por vencimiento de los TES en pesos del
+gobierno colombiano* (Borradores de Economía n.º 854). Banco de la República.
+
+Estrella, A. y Hardouvelis, G. A. (1991). The term structure as a predictor of real economic activity. *Journal of
+Finance, 46*(2), 555–576.
+
+Fisher, I. (1930). *The theory of interest*. Macmillan.
+
+Fondo Monetario Internacional. (2009). *Manual de balanza de pagos y posición de inversión internacional* (6.ª ed.,
+MBP6). FMI.
+
+Fondo Monetario Internacional, Organización Internacional del Trabajo, OCDE, Eurostat, Comisión Económica de las
+Naciones Unidas para Europa y Banco Mundial. (2004). *Consumer price index manual: Theory and practice*. FMI.
+
+Gabaix, X. (2011). The granular origins of aggregate fluctuations. *Econometrica, 79*(3), 733–772.
+
+Goldin, C. (2014). A grand gender convergence: Its last chapter. *American Economic Review, 104*(4), 1091–1119.
+
+Gürkaynak, R. S., Sack, B. y Wright, J. H. (2010). The TIPS yield curve and inflation compensation. *American Economic
+Journal: Macroeconomics, 2*(1), 70–92.
+
+Hamilton, J. D. (2018). Why you should never use the Hodrick-Prescott filter. *Review of Economics and Statistics,
+100*(5), 831–843.
+
+Hausmann, R., Hwang, J. y Rodrik, D. (2007). What you export matters. *Journal of Economic Growth, 12*(1), 1–25.
+
+Herfindahl, O. C. (1950). *Concentration in the steel industry* (tesis doctoral). Columbia University.
+
+Hidalgo, C. A., Klinger, B., Barabási, A.-L. y Hausmann, R. (2007). The product space conditions the development of
+nations. *Science, 317*(5837), 482–487.
+
+Hirschman, A. O. (1964). The paternity of an index. *American Economic Review, 54*(5), 761.
+
+Hodrick, R. J. y Prescott, E. C. (1997). Postwar U.S. business cycles: An empirical investigation. *Journal of Money,
+Credit and Banking, 29*(1), 1–16.
+
+Hsieh, C.-T. y Klenow, P. J. (2009). Misallocation and manufacturing TFP in China and India. *Quarterly Journal of
+Economics, 124*(4), 1403–1448.
+
+Jaravel, X. (2021). Inflation inequality: Measurement, causes, and policy implications. *Annual Review of Economics,
+13*, 599–629.
+
+Kohli, U. (2004). Real GDP, real domestic income, and terms-of-trade changes. *Journal of International Economics,
+62*(1), 83–106.
+
+Lane, P. R. y Milesi-Ferretti, G. M. (2007). The external wealth of nations mark II: Revised and extended estimates of
+foreign assets and liabilities, 1970–2004. *Journal of International Economics, 73*(2), 223–250.
+
+Laubach, T. y Williams, J. C. (2003). Measuring the natural rate of interest. *Review of Economics and Statistics,
+85*(4), 1063–1070.
+
+Litterman, R. y Scheinkman, J. (1991). Common factors affecting bond returns. *Journal of Fixed Income, 1*(1), 54–61.
+
+Maloney, W. F. (2004). Informality revisited. *World Development, 32*(7), 1159–1178.
+
+Meese, R. A. y Rogoff, K. (1983). Empirical exchange rate models of the seventies: Do they fit out of sample?
+*Journal of International Economics, 14*(1–2), 3–24.
+
+Melitz, M. J. (2003). The impact of trade on intra-industry reallocations and aggregate industry productivity.
+*Econometrica, 71*(6), 1695–1725.
+
+Modigliani, F. y Miller, M. H. (1958). The cost of capital, corporation finance and the theory of investment.
+*American Economic Review, 48*(3), 261–297.
+
+MSCI. (2021). *MSCI COLCAP Index methodology*. MSCI Inc.
+
+Naciones Unidas. (1999). *Classification of individual consumption according to purpose (COICOP)*. Naciones Unidas.
+
+Naciones Unidas, Comisión Europea, FMI, OCDE y Banco Mundial. (2009). *System of National Accounts 2008*. Naciones
+Unidas.
+
+Nelson, C. R. y Siegel, A. F. (1987). Parsimonious modeling of yield curves. *Journal of Business, 60*(4), 473–489.
+
+Obstfeld, M. y Rogoff, K. (1995). The intertemporal approach to the current account. En G. M. Grossman y K. Rogoff
+(Eds.), *Handbook of International Economics* (Vol. 3, pp. 1731–1799). Elsevier.
+
+OECD. (2001). *Measuring productivity: OECD manual*. OECD Publishing.
+
+OECD. (s. f.). *Business Cycle Clock* (metodología del sistema de indicadores adelantados compuestos). OECD.
+
+Okun, A. M. (1962). Potential GNP: Its measurement and significance. En *Proceedings of the Business and Economic
+Statistics Section* (pp. 98–104). American Statistical Association.
+
+Organización Internacional del Trabajo. (1993). *Resolución sobre la Clasificación Internacional de la Situación en
+el Empleo (CISE-93)*. 15.ª Conferencia Internacional de Estadísticos del Trabajo.
+
+Organización Internacional del Trabajo. (2013). *Resolución sobre las estadísticas del trabajo, la ocupación y la
+subutilización de la fuerza de trabajo*. 19.ª Conferencia Internacional de Estadísticos del Trabajo.
+
+Orphanides, A. y van Norden, S. (2002). The unreliability of output-gap estimates in real time. *Review of Economics
+and Statistics, 84*(4), 569–583.
+
+Prebisch, R. (1950). *The economic development of Latin America and its principal problems*. Naciones Unidas, CEPAL.
+
+Rajan, R. G. y Zingales, L. (1998). Financial dependence and growth. *American Economic Review, 88*(3), 559–586.
+
+Ravn, M. O. y Uhlig, H. (2002). On adjusting the Hodrick-Prescott filter for the frequency of observations. *Review of
+Economics and Statistics, 84*(2), 371–376.
+
+Reinhart, C. M. y Rogoff, K. S. (2009). *This time is different: Eight centuries of financial folly*. Princeton
+University Press.
+
+Rey, H. (2013). Dilemma not trilemma: The global financial cycle and monetary policy independence. En *Proceedings of
+the Jackson Hole Economic Policy Symposium* (pp. 285–333). Federal Reserve Bank of Kansas City.
+
+Rogoff, K. (1996). The purchasing power parity puzzle. *Journal of Economic Literature, 34*(2), 647–668.
+
+Superintendencia de Sociedades. (2026). *Informe de las 10.000 empresas más grandes del país* (cifras a diciembre de
+2025). Supersociedades.
+
+Superintendencia Financiera de Colombia. (s. f.). *Tasa de cambio representativa del mercado: antecedentes normativos
+y metodología*. Superfinanciera.
+
+Taylor, J. B. (1993). Discretion versus policy rules in practice. *Carnegie-Rochester Conference Series on Public
+Policy, 39*, 195–214.

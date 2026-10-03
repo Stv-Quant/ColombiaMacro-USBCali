@@ -1,0 +1,1147 @@
+% =====================================================================
+% CODEX ColombiaMacro · Parte II · Fundamentos para leer datos macro (español)
+% Fragmento para \input: sin preámbulo.
+% =====================================================================
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\part{Fundamentos para leer datos macro}
+
+Esta parte reúne las herramientas con las que se construye cada cifra del sitio. Cada concepto tiene una
+definición, su fórmula, un ejemplo numérico y un recuadro de lectura o de cautela.
+
+\begin{alerta}[Sobre los ejemplos]
+Todos los números de los ejemplos de esta parte son \textbf{ilustrativos}: se eligieron para que las cuentas
+sean fáciles de seguir y \emph{no} corresponden a datos actuales ni a ninguna fecha concreta. Las cifras
+vigentes están siempre en el sitio.
+\end{alerta}
+
+Notación general: $X_t$ es el valor de una serie en el período $t$; $t-1$ es el período anterior (mes,
+trimestre o día según la frecuencia), $t-4$ es el mismo trimestre del año anterior y $t-12$ el mismo mes del año
+anterior. Las tasas de crecimiento se expresan en porcentaje: $g=100\,(X_t/X_{t-k}-1)$.
+
+% ---------------------------------------------------------------------
+\chapter{Niveles, cambios y unidades}
+\label{es:f:cambios}
+
+\section{Niveles y cambios}
+Un \textbf{nivel} es el valor de una variable en un momento (la TRM de hoy, el PIB de un trimestre, la tasa de
+desempleo de un mes). Un \textbf{cambio} compara dos niveles. Casi todo lo que interesa en macroeconomía es un
+cambio: cuánto creció el PIB, cuánto subieron los precios, cuánto se movió la tasa de un bono.
+
+Hay dos familias de variables, y cada una cambia en una unidad distinta:
+\begin{itemize}
+\item \textbf{Niveles}, medidos en unidades (pesos, dólares, puntos de un índice, personas). Su cambio se mide
+  en \textbf{porcentaje}: $\Delta\%X = 100\,(X_t/X_{t-k}-1)$.
+\item \textbf{Tasas}, medidas ya en porcentaje (inflación, desempleo, tasas de interés, crecimiento, razones al
+  PIB). Su cambio se mide en \textbf{puntos porcentuales}: $\Delta X = X_t-X_{t-k}$.
+\end{itemize}
+
+\section{Porcentaje, puntos porcentuales y puntos básicos}
+\label{es:f:pp}
+\begin{itemize}
+\item Un \textbf{punto porcentual} (pp) es la diferencia aritmética entre dos porcentajes.
+\item Un \textbf{punto básico} (pb) es una centésima de punto porcentual: $1\pp = 100$ pb. Se usa para tasas de
+  interés y de cambio que se mueven en fracciones pequeñas.
+\item El \textbf{cambio relativo} de una tasa es otra cosa: $100\,(X_t/X_{t-k}-1)$.
+\end{itemize}
+
+\begin{dato}[Ejemplo ilustrativo]
+La tasa de desempleo pasa de 10,0\% a 11,0\%. El cambio es $+1{,}0$ pp ($+100$ pb). En términos relativos,
+el desempleo subió $100\,(11/10-1)=10\%$. Una tasa de interés que pasa de 4\% a 5\% sube 1 pp, pero un 25\% en
+términos relativos.
+\end{dato}
+
+\begin{alerta}
+Confundir pp con \% es el error más común al leer datos macro. El sitio siempre expresa en pp los cambios de las
+tasas y en \% los de los niveles (TRM, COLCAP, tasa de cambio real, valores en dólares). Cuando lea ``la inflación
+subió 1,1'', verifique si son puntos (de 5,1\% a 6,2\%) o por ciento (de 5,1\% a 5,16\%).
+\end{alerta}
+
+\section{Variación mensual}
+\[
+m_t = 100\left(\frac{X_t}{X_{t-1}}-1\right).
+\]
+Es la medida más reciente posible, pero también la más ruidosa: en datos sin desestacionalizar refleja sobre todo
+la temporada (matrículas en febrero, alimentos con el clima, primas en diciembre).
+
+\begin{dato}[Ejemplo ilustrativo]
+Un índice de precios pasa de 120,0 a 120,6: $m_t=100\,(120{,}6/120{,}0-1)=0{,}50\%$.
+\end{dato}
+
+\section{Variación anual}
+\[
+a_t = 100\left(\frac{X_t}{X_{t-12}}-1\right)\ \text{(mensual)},\qquad
+a_t = 100\left(\frac{X_t}{X_{t-4}}-1\right)\ \text{(trimestral)}.
+\]
+Compara con el mismo período del año anterior, por lo que elimina la mayor parte de la estacionalidad sin necesidad
+de modelos. Es la medida principal del sitio para la inflación, el PIB y el empleo. Con variaciones mensuales,
+\[
+1+\frac{a_t}{100}=\prod_{k=0}^{11}\left(1+\frac{m_{t-k}}{100}\right).
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el índice vale 126,0 hoy y 120,0 hace doce meses, la variación anual es $100\,(126/120-1)=5{,}0\%$. Si los
+precios subieran 0,4\% todos los meses, la inflación anual sería $100\,(1{,}004^{12}-1)=4{,}91\%$, no $12\times0{,}4=4{,}8\%$.
+\end{dato}
+
+\begin{leer}
+La variación anual es lenta: resume doce meses. Un cambio de tendencia aparece primero en las variaciones
+mensuales o trimestrales anualizadas y solo después en la anual.
+\end{leer}
+
+\section{Variación acumulada en el año (año corrido)}
+Compara con el cierre del año anterior (diciembre o el cuarto trimestre):
+\[
+c_t = 100\left(\frac{X_t}{X_{\text{dic},\,a-1}}-1\right).
+\]
+Para flujos (PIB, exportaciones) el \emph{año corrido} compara la suma de los períodos transcurridos con la
+misma suma del año anterior:
+\[
+c_t = 100\left(\frac{\sum_{q=1}^{Q}Y_{a,q}}{\sum_{q=1}^{Q}Y_{a-1,q}}-1\right).
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el IPC de diciembre fue 122,0 y el de junio es 125,05, la inflación en lo corrido del año es $2{,}5\%$. Si el PIB
+del primer semestre suma 520 (miles de millones de pesos constantes) frente a 505 un año antes, el crecimiento
+año corrido es $100\,(520/505-1)=2{,}97\%$.
+\end{dato}
+
+\begin{alerta}
+La variación año corrido de enero a junio no es comparable con una variación anual: cubre menos meses y hereda la
+estacionalidad del primer semestre.
+\end{alerta}
+
+\section{Variación trimestral anualizada}
+\label{es:f:anualizada}
+Para ver el ritmo reciente se usa el cambio frente al trimestre anterior de la serie
+\emph{desestacionalizada} ($Y^{sa}$), llevado a un año por capitalización compuesta:
+\[
+g^{\text{anualizada}}_t = 100\left[\left(\frac{Y^{sa}_t}{Y^{sa}_{t-1}}\right)^{4}-1\right]
+=100\left[(1+g^{q}_t)^4-1\right],
+\]
+donde $g^q_t$ es la variación trimestral en tanto por uno. Es la convención de la Oficina de Análisis Económico
+de Estados Unidos (BEA). En datos mensuales, el sitio usa la versión de tres meses contra tres meses:
+\[
+g^{3m/3m}_t = 100\left[\left(\frac{\bar x_{t,3}}{\bar x_{t-3,3}}\right)^{4}-1\right],\qquad
+\bar x_{t,3}=\tfrac13(x_t+x_{t-1}+x_{t-2}).
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el PIB desestacionalizado crece 1,3\% en un trimestre, el ritmo anualizado es $100\,(1{,}013^4-1)=5{,}3\%$:
+``si la economía creciera así durante un año entero, crecería 5,3\%''. Si el promedio de los últimos tres meses del
+ISE es 101,2 y el de los tres anteriores 100,0, el ritmo 3m/3m anualizado es $100\,(1{,}012^4-1)=4{,}9\%$.
+\end{dato}
+
+\begin{leer}
+Cuando el ritmo anualizado está por encima de la variación anual, la actividad \emph{acelera}; cuando está por
+debajo, \emph{se modera}. La página \emph{Ciclo} usa esta comparación.
+\end{leer}
+
+\begin{alerta}
+La anualización multiplica el ruido por cuatro: un trimestre atípico (un paro, un festivo, una revisión) produce
+saltos grandes. Léala junto a la variación anual, nunca sola.
+\end{alerta}
+
+\section{Sumas y promedios móviles de 12 meses}
+\label{es:f:moviles}
+Para flujos mensuales con mucha estacionalidad (exportaciones, importaciones, remesas, balanza cambiaria, matrículas
+de empresas) el sitio usa la \textbf{suma móvil de 12 meses}:
+\[
+S^{12}_t=\sum_{k=0}^{11}x_{t-k},\qquad \Delta\% S^{12}_t = 100\left(\frac{S^{12}_t}{S^{12}_{t-12}}-1\right).
+\]
+Para tasas (desempleo por sexo, subutilización) usa el \textbf{promedio móvil}, $\bar x^{12}_t=S^{12}_t/12$; y para
+series trimestrales, la suma de los últimos \textbf{cuatro trimestres}. La GEIH publica además \textbf{trimestres
+móviles}: el dato de un mes es el promedio de ese mes y los dos anteriores (por ejemplo, may--jul).
+
+\begin{dato}[Ejemplo ilustrativo]
+Si las exportaciones de los últimos 12 meses suman US\$52.000 millones y las de los 12 meses previos US\$48.000
+millones, el crecimiento en 12 meses es $100\,(52/48-1)=8{,}3\%$.
+\end{dato}
+
+\begin{alerta}
+Dos trimestres móviles consecutivos comparten dos de sus tres meses: no son observaciones independientes. Una
+suma de 12 meses reacciona con lentitud: un cambio brusco tarda un año en reflejarse por completo.
+\end{alerta}
+
+\section{Efecto base}
+\label{es:f:base}
+La variación anual de hoy depende tanto del mes que entra como del mes que \emph{sale} de la ventana de doce
+meses:
+\[
+1+\pi^{12}_t=\left(1+\pi^{12}_{t-1}\right)\frac{1+m_t}{1+m_{t-12}}.
+\]
+Si hace un año hubo un salto atípico ($m_{t-12}$ alto), la inflación anual cae cuando ese mes sale de la ventana,
+aunque los precios de hoy se comporten igual. Lo mismo ocurre al revés.
+
+\begin{dato}[Ejemplo ilustrativo]
+La inflación anual del mes pasado era 6,0\%. Este mes los precios suben 0,3\%, pero en el mismo mes del año
+anterior habían subido 2,0\% por un choque puntual. La nueva inflación anual es
+$100\,[1{,}06\times1{,}003/1{,}02-1]=4{,}23\%$: cae 1,77 pp por efecto base, no porque los precios hayan
+bajado.
+\end{dato}
+
+\begin{leer}
+Antes de interpretar un cambio grande en una variación anual, mire la variación mensual de hoy \emph{y} la del
+mismo mes del año anterior. Si la segunda explica el movimiento, es efecto base. El crecimiento del PIB en 2021,
+medido contra el trimestre más bajo de 2020, es el ejemplo extremo.
+\end{leer}
+
+\section{Estacionalidad y series desestacionalizadas}
+\label{es:f:estacional}
+Muchas series tienen un patrón que se repite cada año (\textbf{estacionalidad}) y efectos de calendario (número
+de días hábiles, Semana Santa, festivos). Hay tres formas de neutralizarlos:
+\begin{enumerate}
+\item \textbf{Comparar con el mismo período del año anterior} (variación anual): la más simple y la usada en las
+  series \emph{originales}.
+\item \textbf{Usar la serie desestacionalizada} ($sa$) que publica la fuente (por ejemplo el PIB, el ISE y el
+  desempleo del DANE), estimada con modelos estadísticos que remueven la estacionalidad y el calendario. Solo
+  con ella tiene sentido comparar un período con el inmediatamente anterior.
+\item \textbf{Sumas o promedios de 12 meses}, que contienen exactamente una temporada de cada tipo.
+\end{enumerate}
+
+\begin{alerta}
+No compare un mes o trimestre con el anterior en una serie original: el cambio estará dominado por la temporada.
+Y recuerde que las series desestacionalizadas se \emph{revisan}: cada dato nuevo cambia ligeramente la
+estimación de los factores estacionales de la historia reciente.
+\end{alerta}
+
+% ---------------------------------------------------------------------
+\chapter{Precios, valores reales e índices}
+\label{es:f:precios}
+
+\section{Nominal y real}
+Una magnitud \textbf{nominal} se mide a precios corrientes (pesos de cada año); una \textbf{real} se mide a precios
+constantes (pesos de un año base) o como volumen. La relación es
+\[
+\text{Real}_t=\frac{\text{Nominal}_t}{P_t/100},
+\qquad 1+g^{\text{real}}=\frac{1+g^{\text{nominal}}}{1+\pi},
+\]
+con $P_t$ un índice de precios (base 100) y $\pi$ su variación. El PIB del DANE se publica en las dos versiones;
+el crecimiento de la economía es siempre el \emph{real}.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el PIB nominal crece 9,0\% y los precios de lo producido suben 5,5\%, el crecimiento real es
+$100\,(1{,}09/1{,}055-1)=3{,}3\%$.
+\end{dato}
+
+\begin{alerta}[Ilusión nominal]
+Un salario, una utilidad o un saldo de crédito que crece 8\% con una inflación de 9\% \emph{cae} en términos
+reales. El sitio deflacta por la inflación las variables donde esa diferencia importa (crédito, tasas de
+interés, PIB).
+\end{alerta}
+
+\section{Deflactores}
+\label{es:f:deflactor}
+Un \textbf{deflactor} es el índice de precios con el que se pasa de nominal a real.
+\begin{itemize}
+\item \textbf{IPC}: precios de la canasta de consumo de los hogares (DANE). Es el que define la inflación y la
+  meta del Banco de la República.
+\item \textbf{Deflactor implícito del PIB}: precios de todo lo que se \emph{produce} en el país,
+  \[
+  D_t = 100\,\frac{\text{PIB nominal}_t}{\text{PIB real}_t}.
+  \]
+  Incluye exportaciones (petróleo, carbón, café) y excluye importaciones; por eso se separa del IPC cuando
+  cambian los términos de intercambio (Kohli, 2004).
+\end{itemize}
+
+\begin{leer}
+Si el deflactor del PIB sube más que el IPC, los precios de lo que el país vende (incluidas sus exportaciones)
+suben más que los de lo que consume: suele coincidir con mejores términos de intercambio. Si sube menos, ocurre
+lo contrario.
+\end{leer}
+
+\section{Inflación: total, de fondo y aportes}
+\label{es:f:inflacion}
+La \textbf{inflación} es la variación anual del IPC: $\pi_t=100\,(IPC_t/IPC_{t-12}-1)$. La meta del Banco de la
+República es 3\% con un rango de $\pm1$ pp.
+
+La \textbf{inflación de fondo} (o básica) excluye los componentes más volátiles para medir la presión persistente.
+La principal del sitio es la \emph{inflación sin alimentos ni regulados} (cálculo de BanRep). Si la total sube y
+la de fondo no, el choque probablemente es transitorio (clima, energía, tarifas).
+
+El \textbf{aporte} de un componente $j$ a la inflación total (en pp) combina su peso en la canasta y su
+variación; de forma aproximada,
+\[
+\text{aporte}_{j,t}\approx w_{j,t-12}\,\pi_{j,t},
+\]
+donde $w_{j,t-12}$ es el peso efectivo del componente al inicio de la ventana (ponderación de la canasta ajustada
+por los precios relativos). El DANE publica los aportes exactos, que suman la inflación total.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si alimentos pesa 0,15 de la canasta y su inflación anual es 10\%, aporta cerca de $0{,}15\times10=1{,}5$ pp a la
+inflación total. Un arriendo que pesa 0,25 con inflación de 5\% aporta $1{,}25$ pp: un componente grande con
+inflación moderada puede aportar tanto como uno pequeño con inflación alta.
+\end{dato}
+
+\section{Tasa de interés real: Fisher exacta y aproximada}
+\label{es:f:fisher}
+La \textbf{ecuación de Fisher} relaciona la tasa nominal $i$, la tasa real $r$ y la inflación $\pi$ (en tanto
+por uno):
+\[
+1+i=(1+r)(1+\pi)\quad\Longrightarrow\quad r=\frac{1+i}{1+\pi}-1\qquad\text{(exacta)},
+\]
+\[
+r\approx i-\pi\qquad\text{(aproximada)}.
+\]
+La diferencia entre ambas es $r_{\text{aprox}}-r=\dfrac{\pi\,(i-\pi)}{1+\pi}$: pequeña con tasas bajas y
+relevante con tasas de dos dígitos. El sitio usa siempre la forma exacta.
+
+\begin{itemize}
+\item \textbf{Tasa real ex ante}: deflacta con la inflación \emph{esperada} (en el sitio, la implícita a 1 año
+  de los TES). Es la que importa para decidir hoy un crédito o una inversión.
+\item \textbf{Tasa real ex post}: deflacta con la inflación \emph{observada}. En el sitio se usa la última
+  inflación publicada en cada fecha (el IPC de un mes se considera disponible el día 10 del mes siguiente), para
+  no usar información que aún no existía.
+\end{itemize}
+
+\begin{dato}[Ejemplo ilustrativo]
+Con una tasa nominal de 12\% y una inflación esperada de 7\%: $r=1{,}12/1{,}07-1=4{,}67\%$. La aproximación daría
+5,0\%, un error de 0,33 pp.
+\end{dato}
+
+\begin{leer}
+Una tasa nominal alta no implica una política restrictiva si la inflación esperada también es alta. Lo que frena o
+estimula la economía es la tasa \emph{real} frente a la neutral (sección~\ref{es:f:neutral}).
+\end{leer}
+
+\section{Índices base 100 y rebase}
+\label{es:f:indices}
+Un \textbf{índice} expresa una serie en relación con un período base:
+\[
+I_t=100\,\frac{X_t}{X_{b}}.
+\]
+Un valor de 115 significa 15\% por encima del período base. Para cambiar la base a otro período $t_0$
+(\textbf{rebase}) se divide toda la serie por su valor en $t_0$:
+\[
+\tilde I_t = 100\,\frac{I_t}{I_{t_0}}.
+\]
+El rebase no altera las variaciones porcentuales entre dos fechas; solo cambia el punto de referencia. Por eso
+permite comparar series de unidades distintas (acciones, monedas, componentes de la inversión) desde un mismo
+punto de partida.
+
+\begin{dato}[Ejemplo ilustrativo]
+Una serie vale 80, 92 y 110 en tres fechas. Con base en la primera: 100, 115 y 137,5. El valor final (137,5) dice
+directamente que la serie subió 37,5\% en el período.
+\end{dato}
+
+\begin{alerta}
+En un gráfico re-basado, el orden y la distancia entre líneas dependen del punto de partida. Dos series que parten de
+100 en una fecha favorable para una de ellas mostrarán una ventaja que desaparece con otro punto de partida. Pruebe
+varios horizontes.
+\end{alerta}
+
+\section{Logaritmos multiplicados por 100}
+\label{es:f:log}
+Para variaciones pequeñas, la diferencia de logaritmos por 100 es casi igual a la variación porcentual:
+\[
+100\,[\ln X_t-\ln X_{t-1}]\approx100\left(\frac{X_t}{X_{t-1}}-1\right).
+\]
+Tiene dos ventajas: las variaciones en logaritmos se \textbf{suman} en el tiempo y son simétricas (subir y bajar
+la misma cantidad logarítmica devuelve al punto inicial). Por eso la brecha del producto y los filtros de tendencia
+trabajan con $y_t=100\ln Y_t$; una brecha de $g$ significa que el PIB está aproximadamente $g\%$ por encima de su
+tendencia. La conversión exacta es $100\,(e^{g/100}-1)$.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si $X$ pasa de 100 a 105, la variación es 5,00\% y la diferencia logarítmica $100\ln1{,}05=4{,}88$. Para una
+brecha de $+0{,}3$ la diferencia entre ambas medidas es despreciable.
+\end{dato}
+
+% ---------------------------------------------------------------------
+\chapter{Composición: participaciones, aportes y concentración}
+\label{es:f:composicion}
+
+\section{Participaciones}
+La \textbf{participación} de un componente $i$ en un total es $w_{i,t}=100\,X_{i,t}/X_t$. Las participaciones
+suman 100 cuando los componentes son aditivos (precios corrientes, conteos de personas, valores en dólares).
+
+\section{Aportes al crecimiento}
+\label{es:f:aportes}
+El \textbf{aporte} (o contribución) de un componente al crecimiento anual del total, en pp, es
+\[
+c_{i,t}=100\,\frac{X_{i,t}-X_{i,t-4}}{X_{t-4}}=\frac{w_{i,t-4}\;g_{i,t}}{100},
+\]
+es decir, el crecimiento del componente ponderado por su participación \emph{un año antes}. Si los componentes son
+aditivos, $\sum_i c_{i,t}=g_t$: los aportes suman el crecimiento total.
+
+\begin{dato}[Ejemplo ilustrativo]
+Un sector que pesaba 30\% del valor agregado y crece 2\% aporta $0{,}30\times2=0{,}6$ pp. Otro que pesaba 2\% y
+crece 15\% aporta $0{,}02\times15=0{,}3$ pp. El sector grande que crece poco aporta el doble que el pequeño que crece
+mucho.
+\end{dato}
+
+\begin{leer}
+Para saber \emph{quién explica} el crecimiento, mire los aportes, no las tasas de crecimiento. Para saber
+\emph{quién está acelerando}, compare la tasa de crecimiento de cada componente con su propia historia.
+\end{leer}
+
+\section{Por qué los volúmenes encadenados no suman exacto}
+\label{es:f:encadenados}
+El DANE mide el PIB real con \textbf{índices de volumen encadenados} (referencia 2015): cada año se valora con los
+precios del año anterior y los eslabones se encadenan. Este método refleja mejor los cambios de precios relativos,
+pero tiene una consecuencia: los componentes en volúmenes encadenados \textbf{no son aditivos}. La suma de los 12
+sectores no es exactamente el valor agregado total, las participaciones calculadas con volúmenes pueden sumar algo
+distinto de 100 y los aportes suman \emph{aproximadamente} el crecimiento.
+
+Además, el PIB por el lado de la oferta es el valor agregado de los sectores \emph{más los impuestos netos de
+subvenciones}; por eso los aportes sectoriales suman el crecimiento del valor agregado, no el del PIB. Por el lado
+de la demanda, el sitio muestra la diferencia como \emph{Existencias y discrepancia}, que incluye la variación de
+inventarios y la no aditividad.
+
+\begin{alerta}
+Una diferencia pequeña entre la suma de aportes y el crecimiento total no es un error de cálculo: es una propiedad
+del encadenamiento y del tratamiento de los impuestos.
+\end{alerta}
+
+\section{Crecimiento sin un sector}
+Para saber cuánto crece la economía sin un sector $X$ (por ejemplo, sin \emph{Gobierno, educación y salud}):
+\[
+g^{\,\text{sin }X}_t=100\,\frac{\sum_i c_{i,t}-c_{X,t}}{\sum_i w_{i,t-4}-w_{X,t-4}}.
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Los aportes suman 3,0 pp con pesos que suman 100. El sector $X$ pesa 18 y aporta 1,8 pp. Sin él, el resto crece
+$100\times(3{,}0-1{,}8)/(100-18)=1{,}46\%$: más de la mitad del crecimiento venía de un sector que pesa menos de una
+quinta parte.
+\end{dato}
+
+\section{Índices de difusión y amplitud}
+\label{es:f:difusion}
+Un \textbf{índice de difusión} cuenta cuántos componentes se mueven en una dirección (Burns y Mitchell, 1946). El
+sitio usa dos:
+\begin{itemize}
+\item \emph{Sectores que crecen, de 12}: número de sectores con variación anual positiva.
+\item \emph{Amplitud del ciclo}: número de sectores que producen por encima de su propia tendencia. Más de 6 de 12
+  se lee como expansión \emph{generalizada}; 6 o menos, como expansión \emph{concentrada}.
+\end{itemize}
+
+\begin{leer}
+Un crecimiento total alto con pocos sectores que crecen es frágil: depende de pocos motores. Una inflación alta con
+la mayoría de subclases subiendo por encima de la meta (distribución desplazada a la derecha) es más persistente que
+una explicada por pocos rubros.
+\end{leer}
+
+\section{Herfindahl y número equivalente}
+\label{es:f:herfindahl}
+El \textbf{índice de Herfindahl--Hirschman} mide la concentración con la suma de las participaciones al cuadrado
+(en tanto por uno):
+\[
+H=\sum_{i=1}^{n}s_i^2,\qquad \frac1n\le H\le 1,\qquad N^{\text{eq}}=\frac1H .
+\]
+El \textbf{número equivalente} $N^{\text{eq}}$ es el número de componentes de igual tamaño que darían la misma
+concentración. El sitio lo usa para la diversificación de la estructura productiva de cada departamento, de los
+destinos de exportación y de los grupos de productos exportados.
+
+\begin{dato}[Ejemplo ilustrativo]
+Con participaciones de 40\%, 30\%, 20\% y 10\%: $H=0{,}16+0{,}09+0{,}04+0{,}01=0{,}30$ y $N^{\text{eq}}=3{,}3$. Si
+los cuatro pesaran 25\%, $H=0{,}25$ y $N^{\text{eq}}=4$.
+\end{dato}
+
+\begin{alerta}
+El número equivalente depende del nivel de detalle de la clasificación: con cinco grupos de productos, su máximo
+posible es 5. Solo compare números equivalentes calculados con la misma clasificación.
+\end{alerta}
+
+% ---------------------------------------------------------------------
+\chapter{Tendencia, ciclo y capacidad}
+\label{es:f:ciclo}
+
+\section{Tendencia y ciclo}
+Una serie de actividad se puede descomponer en una \textbf{tendencia} (la trayectoria de largo plazo, asociada a
+la capacidad productiva) y un \textbf{ciclo} (las desviaciones transitorias alrededor de ella):
+\[
+y_t=\tau_t+c_t,\qquad y_t=100\ln Y_t .
+\]
+Ni la tendencia ni el ciclo se observan: se \emph{estiman}. Distintos métodos dan resultados distintos, sobre todo
+en los extremos de la muestra. Por eso el sitio muestra varios y su rango.
+
+\section{El filtro de Hodrick y Prescott (HP)}
+\label{es:f:hp}
+La tendencia HP (Hodrick y Prescott, 1997) es la serie $\tau$ que resuelve
+\[
+\min_{\{\tau_t\}}\ \sum_{t=1}^{T}(y_t-\tau_t)^2+\lambda\sum_{t=2}^{T-1}\big[(\tau_{t+1}-\tau_t)-(\tau_t-\tau_{t-1})\big]^2 .
+\]
+El primer término pide que la tendencia se parezca a los datos; el segundo penaliza los cambios en su pendiente. El
+parámetro $\lambda$ regula la suavidad: $\lambda=1.600$ para datos trimestrales y $\lambda=129.600$ para mensuales
+(equivalencia de Ravn y Uhlig, 2002). En forma matricial, $\tau=(I+\lambda D^\top D)^{-1}y$, con $D$ la matriz de
+segundas diferencias.
+
+\subsection{Tiempo real frente a dos colas}
+\begin{itemize}
+\item \textbf{HP de dos colas} ($\tau_{t|T}$): usa toda la muestra, incluidas observaciones posteriores a $t$. Es
+  la mejor estimación \emph{ex post}, pero la tendencia de un año cambia cuando llegan datos nuevos.
+\item \textbf{HP en tiempo real} o de una cola ($\tau_{t|t}$): para cada $t$ se resuelve el problema solo con
+  $y_1,\dots,y_t$ y se conserva el último punto. Reproduce lo que se habría estimado en cada fecha. Es la
+  estimación principal del sitio (con un mínimo de 20 trimestres).
+\end{itemize}
+Orphanides y van Norden (2002) muestran que las revisiones entre ambas versiones son del mismo orden que la brecha
+misma: la estimación del último trimestre es la más incierta.
+
+\subsection{El tratamiento de la pandemia}
+Los trimestres 2020-T2 a 2021-T2 se reemplazan por una interpolación lineal \emph{solo para estimar la tendencia}
+(en datos mensuales, marzo de 2020 a junio de 2021). La brecha se mide siempre contra el dato observado. Sin este
+tratamiento, una caída de casi una quinta parte del PIB en un trimestre arrastraría la tendencia y deformaría la
+lectura de los años vecinos.
+
+\section{Otros métodos: Hamilton, Christiano--Fitzgerald y Beveridge--Nelson}
+\label{es:f:metodos}
+\begin{itemize}
+\item \textbf{Hamilton (2018)}: el ciclo es el error de proyectar el PIB ocho trimestres adelante con sus cuatro
+  últimos valores, estimado por mínimos cuadrados:
+  \[
+  y_{t+8}=\beta_0+\sum_{k=0}^{3}\beta_k\,y_{t-k}+v_{t+8},\qquad c^{H}_{t+8}=\hat v_{t+8}.
+  \]
+  Evita las propiedades espurias del HP en series con raíz unitaria.
+\item \textbf{Christiano y Fitzgerald (2003)}: filtro de paso de banda que conserva las fluctuaciones con períodos de
+  6 a 32 trimestres (1,5 a 8 años), la duración típica de un ciclo.
+\item \textbf{Beveridge y Nelson (1981)}: la tendencia es el nivel al que convergería el PIB si no hubiera nuevos
+  choques, con un AR(4) para el crecimiento.
+\end{itemize}
+La página \emph{Ciclo} muestra las cinco brechas (HP en tiempo real, HP de dos colas, Hamilton, CF y BN), su
+\textbf{mediana} como consenso, su \textbf{rango} como medida de incertidumbre y cuántas son positivas.
+
+\begin{leer}
+Si los cinco métodos coinciden en el signo, la lectura (por encima o por debajo de la capacidad) es robusta. Si se
+reparten, la economía está cerca de su capacidad y la fase es incierta: conviene esperar el siguiente dato.
+\end{leer}
+
+\section{Brecha del producto y capacidad}
+\label{es:f:brecha}
+La \textbf{brecha del producto} es la distancia porcentual entre el PIB observado y su tendencia (la
+\textbf{capacidad} o PIB potencial):
+\[
+g_t=y_t-\tau_t=100\,(\ln Y_t-\ln Y^*_t)\quad\Longleftrightarrow\quad Y^*_t=Y_t\,e^{-g_t/100}.
+\]
+Una brecha positiva indica que la economía produce por encima de lo que puede sostener sin presiones de inflación
+(empresas a tope, mercado laboral estrecho); una negativa indica \textbf{holgura} (capacidad ociosa, desempleo). La
+capacidad es como una \emph{frontera de posibilidades de producción} que se desplaza con el tiempo.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el PIB trimestral desestacionalizado es 260 (billones de pesos de 2015) y la brecha es $+0{,}3\%$, la capacidad
+es $260\,e^{-0{,}003}=259{,}2$: la economía produce unos 0,8 billones por encima de su capacidad en el trimestre.
+\end{dato}
+
+\begin{alerta}
+La brecha es una \emph{estimación}: su nivel exacto cambia con el método y con los datos nuevos. Lo más informativo
+es su signo cuando los métodos coinciden y su \emph{dirección} (si se abre o se cierra).
+\end{alerta}
+
+\section{Crecimiento potencial (``ritmo habitual'')}
+\label{es:f:potencial}
+El \textbf{crecimiento potencial} es el crecimiento anual de la tendencia:
+\[
+g^{\text{pot}}_t=100\left[\exp\!\left(\frac{\tau_t-\tau_{t-4}}{100}\right)-1\right].
+\]
+El sitio lo calcula con la tendencia HP de dos colas (la versión en tiempo real oscila con el rebote posterior a la
+pandemia) y lo presenta como el \emph{ritmo habitual} de la economía. Crecer por encima de él cierra una brecha
+negativa o abre una positiva; crecer por debajo hace lo contrario.
+
+\begin{leer}
+Crecimiento y capacidad son cosas distintas. Una economía que crece 3,5\% puede estar \emph{por debajo} de su
+capacidad si venía de muy abajo, y una que crece 1\% puede estar por encima. Lo relevante para la inflación es la
+distancia a la capacidad, no la tasa de crecimiento.
+\end{leer}
+
+\section{El reloj del ciclo}
+\label{es:f:reloj}
+La fase del ciclo combina el \textbf{nivel} de la brecha y su \textbf{dirección}, medida como su cambio en dos
+trimestres, $\Delta_2 g_t=g_t-g_{t-2}$ (dos trimestres reducen el ruido de un solo dato):
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+ & $\Delta_2 g_t\ge 0$ & $\Delta_2 g_t<0$\\\midrule
+$g_t\ge 0$ & \textcolor{cmgreen}{\textbf{Expansión}} & \textcolor{cmamber}{\textbf{Desaceleración}}\\
+$g_t<0$ & \textcolor{cmblue}{\textbf{Recuperación}} & \textcolor{cmred}{\textbf{Contracción}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Es la lógica del \emph{business cycle clock} de la OCDE. En datos mensuales (ISE) la dirección es el cambio en tres
+meses de la brecha mensual.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si la brecha es $-0{,}4\%$ y hace dos trimestres era $-1{,}0\%$, entonces $\Delta_2 g=+0{,}6$ pp: la economía está
+por debajo de su capacidad pero acercándose, en \emph{Recuperación}. Si en el trimestre siguiente la brecha pasa a
+$+0{,}2\%$ y sigue subiendo, entra en \emph{Expansión}.
+\end{dato}
+
+\begin{leer}
+La economía suele girar en el sentido del reloj: expansión $\rightarrow$ desaceleración $\rightarrow$ contracción
+$\rightarrow$ recuperación. Cerca de cero, un movimiento pequeño cambia el cuadrante: lea el recorrido de varios
+trimestres, no un punto.
+\end{leer}
+
+\section{Ley de Okun}
+\label{es:f:okun}
+La ley de Okun (1962) relaciona la brecha del producto con la brecha del desempleo:
+\[
+u_t-u^*_t=\beta\,g_t+\varepsilon_t,
+\]
+donde $u^*_t$ es la tendencia del desempleo (HP) y $\beta<0$. El sitio estima $\beta$ por mínimos cuadrados sin
+2020--2021. Un $\beta$ cercano a cero indica que el empleo responde poco a la producción (en Colombia, en parte
+porque la informalidad absorbe los choques).
+
+\begin{dato}[Ejemplo ilustrativo]
+Con $\beta=-0{,}2$, una brecha del producto de $+1\%$ se asocia, en promedio, con un desempleo 0,2 pp por debajo de
+su tendencia.
+\end{dato}
+
+\section{Fechado de expansiones y recesiones}
+\label{es:f:bryboschan}
+El sitio identifica \textbf{picos} y \textbf{valles} en el nivel del ISE (promedio móvil de tres meses) con la regla de
+Bry y Boschan (1971): un pico es un máximo local en una ventana de $\pm6$ meses, un valle un mínimo local, y picos y
+valles deben alternarse (Harding y Pagan, 2002). Una \textbf{recesión} va de un pico a un valle; una
+\textbf{expansión}, de un valle al pico siguiente. Para cada fase se reporta su duración en meses y la variación
+del ISE.
+
+\begin{alerta}
+Es un fechado académico y descriptivo, no oficial. El último giro siempre es provisional: un pico solo se confirma
+cuando han pasado suficientes meses de caída.
+\end{alerta}
+
+% ---------------------------------------------------------------------
+\chapter{Herramientas estadísticas}
+\label{es:f:estadistica}
+
+\section{Percentil histórico}
+\label{es:f:percentil}
+El \textbf{percentil histórico} ubica el último dato $x^*$ dentro de su propia historia desde 2010:
+\[
+p=100\times\frac{\#\{\,t\ge 2010:\ x_t\le x^*\,\}}{\#\{\,t\ge2010\,\}}.
+\]
+Un percentil de 96 significa que el dato actual es mayor o igual que el 96\% de las observaciones desde 2010. El
+sitio lo traduce a palabras: muy bajo ($<10$), bajo ($<30$), normal (30--70), alto ($\le90$) y muy alto ($>90$).
+
+\begin{dato}[Ejemplo ilustrativo]
+Si una serie tiene 200 observaciones desde 2010 y el último dato es mayor o igual que 160 de ellas, su percentil es
+80: ``Alto''.
+\end{dato}
+
+\begin{alerta}
+El percentil depende de la ventana: desde 2010 incluye la pandemia y el ciclo de inflación posterior. No dice si un
+nivel es bueno o malo, ni si es sostenible; solo qué tan inusual es frente a esa historia.
+\end{alerta}
+
+\section{Volatilidad anualizada}
+\label{es:f:volatilidad}
+La \textbf{volatilidad} es la desviación estándar de los cambios diarios en una ventana móvil, llevada a un año con
+la raíz del número de días hábiles (252):
+\[
+\sigma^{\text{anual}}_t=\sqrt{252}\times\operatorname{desv.est.}\{\Delta x_{t-59},\dots,\Delta x_t\}.
+\]
+Para la tasa de cambio, $\Delta x$ son cambios logarítmicos diarios (en \%); para los TES, cambios diarios de la
+tasa (en pb). El sitio usa ventanas de 60 días hábiles. La regla $\sqrt{252}$ supone cambios diarios
+independientes.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si la tasa del TES a 10 años cambia, en promedio, con una desviación estándar de 6 pb diarios, su volatilidad
+anualizada es $6\sqrt{252}\approx95$ pb. Si la TRM se mueve con una desviación de 0,7\% diaria, su volatilidad anual
+es cerca de 11\%.
+\end{dato}
+
+\begin{leer}
+La volatilidad mide el tamaño de los movimientos, no su dirección. Compárela con su promedio histórico (línea
+punteada) y con la de las monedas vecinas: una volatilidad alta solo en Colombia apunta a factores locales.
+\end{leer}
+
+\section{Correlación}
+\label{es:f:correlacion}
+El coeficiente de correlación de Pearson entre dos series de cambios $a$ y $b$ en una ventana de $n$ observaciones es
+\[
+\rho_{ab}=\frac{\sum_t(a_t-\bar a)(b_t-\bar b)}{\sqrt{\sum_t(a_t-\bar a)^2}\sqrt{\sum_t(b_t-\bar b)^2}},\qquad -1\le\rho\le1 .
+\]
+El sitio la calcula en ventanas móviles de 52 semanas con variaciones semanales porcentuales (por ejemplo, TRM
+frente al petróleo Brent y frente al índice amplio del dólar).
+
+\begin{alerta}[Correlación no es causalidad]
+Una correlación alta dice que dos variables se movieron juntas en la ventana, no que una cause a la otra, ni que la
+relación vaya a mantenerse. Las correlaciones móviles cambian de signo y de tamaño con el tiempo.
+\end{alerta}
+
+\section{Rectas de ajuste descriptivas}
+Algunos gráficos de dispersión incluyen una recta de mínimos cuadrados, $y=a+bx$. Describe la asociación promedio en
+el período, no un modelo causal ni una proyección. El coeficiente $b$ dice cuánto cambia $y$, en promedio, por cada
+unidad de $x$.
+
+% ---------------------------------------------------------------------
+\chapter{Mercado laboral}
+\label{es:f:laboral}
+
+\section{Tasas básicas}
+Con PET la población en edad de trabajar (15 años y más), FT la fuerza de trabajo (ocupados más desocupados),
+$O$ los ocupados y $D$ los desocupados:
+\[
+TGP=100\,\frac{FT}{PET},\qquad TO=100\,\frac{O}{PET},\qquad TD=100\,\frac{D}{FT},\qquad
+TD=100\left(1-\frac{TO}{TGP}\right).
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Con PET de 40 millones, FT de 26 millones y 23,4 millones de ocupados: $TGP=65\%$, $TO=58{,}5\%$ y
+$TD=100\,(1-58{,}5/65)=10\%$.
+\end{dato}
+
+\begin{leer}
+El desempleo puede bajar por dos razones muy distintas: porque se crean empleos (sube la TO) o porque la gente deja
+de buscar (baja la TGP). Mire siempre las tres tasas juntas.
+\end{leer}
+
+\section{Subutilización}
+Siguiendo la 19.ª CIET de la OIT (2013), además del desempleo el sitio muestra la \textbf{tasa combinada de
+desocupación y subocupación por horas} y la \textbf{medida compuesta de subutilización}, que agrega la fuerza de
+trabajo potencial (personas que quieren trabajar pero no buscan o no están disponibles):
+\[
+TCSD=100\,\frac{D+SH}{FT},\qquad MCSFT=100\,\frac{D+SH+FTP}{FT+FTP}.
+\]
+
+\section{Informalidad}
+La \textbf{tasa de informalidad} es la proporción de ocupados que trabajan sin seguridad social o en unidades
+económicas no registradas (definición del DANE de 2023, alineada con la OIT). Por sector o ciudad,
+$\text{tasa}=100\times\text{informales}/\text{ocupados}$.
+
+\begin{alerta}
+La serie vigente empieza en 2021 y no es comparable con la serie anterior (otra definición y marco muestral). La
+informalidad cambia despacio: medio punto en un año es un movimiento relevante.
+\end{alerta}
+
+% ---------------------------------------------------------------------
+\chapter{Tasas de interés y curva de rendimientos}
+\label{es:f:tasas}
+
+\section{Tasas efectivas anuales}
+Las tasas del sitio son \textbf{efectivas anuales} (e.a.): ya incluyen la capitalización dentro del año. Una tasa
+nominal $j$ capitalizable $m$ veces al año equivale a una efectiva $i=(1+j/m)^m-1$. Comparar tasas con distinta
+convención introduce errores de varias décimas cuando las tasas son altas.
+
+\section{Tasa de política, tasa neutral y postura}
+\label{es:f:neutral}
+La \textbf{tasa de política monetaria} (TPM) es la tasa mínima a la que el Banco de la República presta liquidez a
+un día a las entidades financieras. La \textbf{tasa real neutral} es la tasa real que ni estimula ni frena la
+economía (Laubach y Williams, 2003); no se observa y se estima con incertidumbre. La \textbf{postura} compara la tasa
+real ex ante con la neutral:
+\[
+\text{brecha de postura}=r^{\text{ex ante}}-r^{n}.
+\]
+Por encima de la neutral la política es restrictiva; por debajo, expansiva. El rango y el margen que usa el sitio
+están en la sección~\ref{es:i:estados-tabla}.
+
+\section{Traspaso (transmisión) de la tasa de política}
+\label{es:f:traspaso}
+El \textbf{traspaso} mide qué parte del cambio de la TPM en un ciclo llegó a otra tasa $k$ (IBR, CDT, crédito):
+\[
+\text{traspaso}_k=100\times\frac{i_k(t_1)-i_k(t_0)}{TPM(t_1)-TPM(t_0)},
+\]
+con $t_0$ el día anterior a la primera decisión del ciclo y $t_1$ tres meses después de la última. Un traspaso de
+100\% significa que la tasa se movió lo mismo que la TPM.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si en un ciclo de alzas la TPM sube 4,0 pp y la tasa de consumo 2,6 pp, el traspaso es 65\%.
+\end{dato}
+
+\section{Crecimiento real del crédito}
+\[
+g^{\text{real}}=100\left[\frac{1+g^{\text{nominal}}/100}{1+\pi/100}-1\right].
+\]
+\begin{dato}[Ejemplo ilustrativo]
+Si la cartera crece 8\% nominal con una inflación de 5\%, el crédito real crece $100\,(1{,}08/1{,}05-1)=2{,}9\%$.
+\end{dato}
+
+\section{La curva cero cupón}
+\label{es:f:curva}
+La \textbf{curva de rendimientos} muestra la tasa que exige el mercado por prestarle al Gobierno a cada plazo. Una
+tasa \textbf{cero cupón} $y_h$ es la de un bono que paga todo al vencimiento (sin cupones intermedios); su precio
+por cada peso a recibir en $h$ años es
+\[
+P_h=\frac{1}{(1+y_h)^h}.
+\]
+El Banco de la República estima cada día las curvas cero cupón de los TES con el modelo de Nelson y Siegel (1987),
+en pesos (tasa nominal) y en UVR (tasa real, porque el principal se ajusta con la inflación), y publica los plazos de
+1, 5 y 10 años.
+
+\section{Nivel, pendiente, curvatura y forma}
+\label{es:f:factores}
+Con las tasas en pesos a 1, 5 y 10 años:
+\[
+\text{nivel}=\frac{y_1+y_5+y_{10}}{3},\qquad \text{pendiente}=y_{10}-y_1,\qquad
+\text{curvatura}=2y_5-y_1-y_{10}.
+\]
+Estos tres factores resumen casi todo el movimiento de una curva (Litterman y Scheinkman, 1991). La pendiente define la
+\textbf{forma}: \emph{normal} (creciente), \emph{plana} o \emph{invertida} (los plazos cortos pagan más que los
+largos).
+
+\begin{dato}[Ejemplo ilustrativo]
+Con $y_1=9{,}0\%$, $y_5=9{,}6\%$ e $y_{10}=10{,}2\%$: nivel 9,6\%, pendiente $+1{,}2$ pp y curvatura
+$2(9{,}6)-9{,}0-10{,}2=0$ (curva recta). Si $y_5$ fuera 9,9\%, la curvatura sería $+0{,}6$: la parte media se arquea
+hacia arriba.
+\end{dato}
+
+\begin{leer}
+Una pendiente positiva es lo normal: prestar a más plazo exige compensación por el tiempo y el riesgo. Una curva plana
+o invertida suele aparecer cuando la tasa de política está alta y el mercado espera que baje; la pendiente ha tenido
+contenido informativo sobre la actividad futura en muchos países (Estrella y Hardouvelis, 1991), pero el sitio no la
+usa para pronosticar.
+\end{leer}
+
+\section{Tipos de movimiento de la curva}
+Comparando dos fechas, con $\Delta N$ el cambio del nivel y $\Delta S$ el de la pendiente (umbral de 0,10 pp):
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & $\Delta S\ge0$ (se empina) & $\Delta S<0$ (se aplana)\\\midrule
+$\Delta N\ge0$ (suben las tasas) & Alza con empinamiento (\emph{bear steepening}) & Alza con aplanamiento (\emph{bear flattening})\\
+$\Delta N<0$ (bajan las tasas) & Baja con empinamiento (\emph{bull steepening}) & Baja con aplanamiento (\emph{bull flattening})\\
+\bottomrule
+\end{tabular}
+\end{center}
+Si $|\Delta N|$ y $|\Delta S|$ son menores que 0,10 pp, el sitio dice \emph{sin cambio de fondo}. ``Bear'' y ``bull''
+se refieren al precio de los bonos: cuando las tasas suben, los precios bajan.
+
+\section{Inflación implícita (breakeven)}
+\label{es:f:breakeven}
+Para un plazo $h$, con $i_h$ la tasa TES en pesos y $r_h$ la tasa TES en UVR:
+\[
+\pi^{BE}_h=100\left[\frac{1+i_h}{1+r_h}-1\right].
+\]
+Es la inflación promedio que iguala el rendimiento de ambos bonos: si la inflación resulta mayor, gana el bono en UVR;
+si resulta menor, gana el bono en pesos. Por la identidad de Fisher, el cambio de la tasa nominal se reparte entre el
+cambio de la tasa real y el de la compensación por inflación:
+\[
+\Delta i_h\approx\Delta r_h+\Delta\pi^{BE}_h .
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Con $i_5=10{,}0\%$ y $r_5=4{,}5\%$: $\pi^{BE}_5=100\,(1{,}100/1{,}045-1)=5{,}26\%$.
+\end{dato}
+
+\begin{alerta}[No es una expectativa pura]
+La inflación implícita incluye una \textbf{prima por riesgo inflacionario} (compensación por la incertidumbre sobre
+la inflación) y una \textbf{prima por liquidez} (los TES UVR se negocian menos), y la UVR se indexa con rezago a la
+inflación pasada, lo que afecta sobre todo al plazo de 1 año (Gürkaynak, Sack y Wright, 2010). Por eso el sitio la
+describe como \emph{lo que el mercado descuenta} y como una cota de la expectativa pura.
+\end{alerta}
+
+\section{Tasas forward, la 5y5y y la trayectoria a 10 años}
+\label{es:f:forward}
+La \textbf{tasa forward} entre los años $a$ y $b$ es la tasa anual implícita para ese tramo futuro, que hace
+equivalente invertir a $b$ años o a $a$ años y reinvertir:
+\[
+f_{a,b}=\left[\frac{(1+y_b)^b}{(1+y_a)^a}\right]^{\frac{1}{b-a}}-1 .
+\]
+La \textbf{5y5y} es la inflación implícita promedio entre los años 5 y 10:
+\[
+f^{nom}_{5,10}=\left[\frac{(1+i_{10})^{10}}{(1+i_5)^{5}}\right]^{1/5}\!-1,\quad
+f^{real}_{5,10}=\left[\frac{(1+r_{10})^{10}}{(1+r_5)^{5}}\right]^{1/5}\!-1,\quad
+\pi^{5y5y}=\frac{1+f^{nom}_{5,10}}{1+f^{real}_{5,10}}-1 .
+\]
+Es el indicador estándar de \textbf{anclaje} de las expectativas: a ese plazo, la política monetaria debería haber
+llevado la inflación a la meta. Con las implícitas cero cupón $b_1$, $b_5$ y $b_{10}$, la \textbf{trayectoria} que
+descuenta el mercado tiene tres tramos que encadenan exactamente la implícita a 10 años:
+\[
+\text{año 1: } b_1,\qquad f_{1,5}=\left[\frac{(1+b_5)^5}{1+b_1}\right]^{1/4}\!-1,\qquad
+f_{5,10}=\left[\frac{(1+b_{10})^{10}}{(1+b_5)^5}\right]^{1/5}\!-1,
+\]
+\[
+(1+b_1)(1+f_{1,5})^4(1+f_{5,10})^5=(1+b_{10})^{10}.
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Con $i_5=10{,}0\%$, $i_{10}=10{,}5\%$, $r_5=4{,}5\%$ y $r_{10}=4{,}8\%$: $f^{nom}=11{,}00\%$, $f^{real}=5{,}10\%$ y
+$\pi^{5y5y}=1{,}1100/1{,}0510-1=5{,}61\%$. Con $b_1=5{,}5\%$, $b_5=5{,}0\%$ y $b_{10}=4{,}8\%$, la trayectoria es 5,5\% el
+primer año, $f_{1,5}=4{,}88\%$ por año entre los años 1 y 5 y $f_{5,10}=4{,}60\%$ por año entre los años 5 y 10: el
+mercado descuenta una inflación que baja, pero que no llega al 3\%.
+\end{dato}
+
+\begin{leer}
+Si la 5y5y se mantiene dentro del rango meta, el mercado confía en que la inflación volverá a la meta; por encima del
+techo de 4\% se considera que las expectativas están \emph{desancladas}. Cada punto de la historia de la 5y5y es lo que
+el mercado esperaba \emph{ese día} para los años 5 a 10: no es un pronóstico de su propia línea.
+\end{leer}
+
+\section{Primas sobre la tasa de política}
+La diferencia entre una tasa de mercado y la TPM vigente (por ejemplo $y_{10}-TPM$) combina lo que el mercado espera de la
+TPM en el futuro y una \textbf{prima por plazo} (compensación por mantener un bono largo, que crece y se vuelve más
+volátil con el vencimiento). El sitio la muestra como dato, sin descomponerla.
+
+% ---------------------------------------------------------------------
+\chapter{Tasa de cambio y activos}
+\label{es:f:cambio}
+
+\section{TRM, apreciación y depreciación}
+\label{es:f:trm}
+La \textbf{TRM} (tasa representativa del mercado) es el número de pesos por un dólar, certificado cada día por la
+Superintendencia Financiera con las operaciones del día hábil anterior. Como se expresa en pesos por dólar:
+\begin{itemize}
+\item si la TRM \textbf{sube}, el peso se \textbf{deprecia} (se debilita): se necesitan más pesos por dólar;
+\item si la TRM \textbf{baja}, el peso se \textbf{aprecia} (se fortalece).
+\end{itemize}
+El cambio del dólar en pesos y el del peso en dólares no son simétricos:
+\[
+\Delta\%(\text{COP por USD})=100\left(\frac{E_t}{E_{t-k}}-1\right),\qquad
+\Delta\%(\text{USD por COP})=100\left(\frac{E_{t-k}}{E_t}-1\right).
+\]
+
+\begin{dato}[Ejemplo ilustrativo]
+Si la TRM pasa de 4.000 a 4.400, el dólar sube 10\% en pesos y el peso cae $100\,(4.000/4.400-1)=-9{,}1\%$ en dólares.
+\end{dato}
+
+\section{Tasas cruzadas}
+Para expresar el peso frente a otra moneda $M$ se combinan la TRM y las unidades de $M$ por dólar:
+\[
+\text{COP por }M=\frac{\text{COP por USD}}{M\text{ por USD}} .
+\]
+\begin{dato}[Ejemplo ilustrativo]
+Con TRM de 4.000 y 5,0 reales por dólar, un real cuesta $4.000/5{,}0=800$ pesos.
+\end{dato}
+
+\begin{leer}[¿Es el peso o es el dólar?]
+Si la TRM sube y el dólar global (índice amplio de la Reserva Federal) también sube con fuerza, el movimiento es en
+buena parte del dólar. Si el peso se mueve más que el real brasileño, el peso mexicano o el sol peruano, hay factores
+propios de Colombia.
+\end{leer}
+
+\section{Tasa de cambio real (ITCR)}
+\label{es:f:itcr}
+La \textbf{tasa de cambio real} ajusta la tasa nominal por los precios relativos. Para un socio $j$, con $E_j$ los
+pesos por unidad de su moneda, $P_j$ sus precios y $P$ los de Colombia,
+\[
+Q_j=\frac{E_j\,P_j}{P}.
+\]
+El ITCR multilateral del Banco de la República promedia los socios comerciales con ponderaciones de comercio
+(forma geométrica, base 2010 = 100):
+\[
+ITCR_t=100\prod_j\left(\frac{Q_{j,t}}{Q_{j,2010}}\right)^{w_j}.
+\]
+Un \textbf{aumento} del ITCR es una \textbf{depreciación real} (los bienes colombianos se abaratan frente a los
+extranjeros); una disminución, una apreciación real.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si en un año el peso se deprecia 5\% frente a un socio, la inflación del socio es 3\% y la de Colombia 6\%, la tasa real
+bilateral cambia $100\,[1{,}05\times1{,}03/1{,}06-1]=2{,}0\%$: depreciación real de 2\%, menor que la nominal porque
+la inflación colombiana fue mayor.
+\end{dato}
+
+\begin{alerta}
+El año base (2010) es solo una fecha de comparación, no un nivel de equilibrio. Que el ITCR esté por debajo de su
+promedio histórico no significa que ``deba'' subir.
+\end{alerta}
+
+\section{Rendimiento en dólares}
+\label{es:f:usd}
+Para un inversionista que mide en dólares, el rendimiento de un activo en pesos combina el precio local y la tasa de
+cambio:
+\[
+1+R^{USD}=\frac{1+R^{COP}}{1+\Delta\%E/100},
+\]
+con $\Delta\%E$ la variación de la TRM. El COLCAP en dólares es $\text{COLCAP}_t/E_t$.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el COLCAP sube 20\% y la TRM baja 10\% (el peso se aprecia), el rendimiento en dólares es
+$100\,(1{,}20/0{,}90-1)=33{,}3\%$.
+\end{dato}
+
+\section{Índices bursátiles}
+\label{es:f:bolsa}
+\begin{itemize}
+\item \textbf{Ponderado por capitalización} (como el COLCAP): cada acción pesa según su capitalización ajustada; las
+  empresas grandes mueven el índice.
+\item \textbf{Equiponderado}: todas las acciones pesan igual, con rebalanceo periódico. Con $R_{j,t}$ el retorno
+  semanal de la acción $j$ y $A_t$ las acciones disponibles,
+  \[
+  I_t=I_{t-1}\Big(1+\frac{1}{|A_t|}\sum_{j\in A_t}R_{j,t}\Big),\qquad I_0=100 .
+  \]
+\item \textbf{Índice de precios frente a retorno total}: el COLCAP y los índices construidos en el sitio no incluyen
+  dividendos.
+\item \textbf{Retorno a 12 meses}: último dato frente al último disponible 365 días antes.
+\item \textbf{Caída desde el máximo} (\emph{drawdown}): $100\,(P_t/\max_{s\le t}P_s-1)$.
+\end{itemize}
+
+\begin{leer}
+Si el índice ponderado sube más que el equiponderado, las ganancias se concentran en las empresas grandes; si ocurre
+lo contrario, el alza es amplia. Una bolsa que sube por pocas empresas es más sensible a un choque en una de ellas
+(Gabaix, 2011).
+\end{leer}
+
+\begin{alerta}[Sesgo de supervivencia]
+Aplicar la canasta \emph{actual} hacia atrás omite las empresas que salieron del índice (por adquisiciones,
+deslistamientos o malos resultados) y tiende a sobrestimar el rendimiento pasado.
+\end{alerta}
+
+% ---------------------------------------------------------------------
+\chapter{Cuentas externas, fiscales y comercio}
+\label{es:f:externo}
+
+\section{FOB y CIF}
+\label{es:f:fobcif}
+\begin{itemize}
+\item \textbf{FOB} (\emph{free on board}): valor de la mercancía puesta en el puerto de salida, sin fletes ni seguros
+  internacionales. Las exportaciones se valoran FOB.
+\item \textbf{CIF} (\emph{cost, insurance and freight}): valor de la mercancía más el flete y el seguro hasta el
+  destino. Las importaciones del DANE se valoran CIF:
+  \[
+  \text{CIF}=\text{FOB}+\text{flete}+\text{seguro}.
+  \]
+\end{itemize}
+
+\begin{dato}[Ejemplo ilustrativo]
+Una importación de US\$100 FOB con US\$6 de flete y US\$1 de seguro vale US\$107 CIF. Una balanza comercial
+calculada como exportaciones FOB menos importaciones CIF es por eso algo más negativa que la de la balanza de pagos,
+que valora ambos lados FOB.
+\end{dato}
+
+\section{Valor, precio y volumen}
+El cambio del valor de las exportaciones o importaciones se puede separar en precio y volumen implícito:
+\[
+1+g^{\text{valor}}=(1+g^{\text{precio}})(1+g^{\text{volumen}})\quad\Longrightarrow\quad
+g^{\text{volumen}}=\frac{1+g^{\text{valor}}}{1+g^{\text{precio}}}-1 .
+\]
+Los \textbf{términos de intercambio} son el cociente entre el índice de precios de exportación y el de importación.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el valor exportado sube 8\% y los precios de exportación 5\%, el volumen implícito sube $100\,(1{,}08/1{,}05-1)=2{,}9\%$.
+\end{dato}
+
+\begin{alerta}
+El volumen implícito es un \emph{residuo}, no una medición directa de cantidades: hereda los errores del índice de
+precios.
+\end{alerta}
+
+\section{Razones al PIB y conversión a dólares}
+\label{es:f:razones}
+Para comparar flujos de tamaño muy distinto se dividen por el PIB. En el sitio:
+\begin{itemize}
+\item el numerador y el denominador cubren el mismo período (normalmente la suma de los \textbf{últimos cuatro
+  trimestres});
+\item cuando el numerador está en dólares (cuenta corriente, exportaciones, remesas, posición de inversión), el PIB
+  nominal en pesos se convierte a dólares con la TRM promedio de cada trimestre:
+  \[
+  PIB^{US\$}=\sum_{q=1}^{4}\frac{N_q}{\overline{E}_q},\qquad
+  \text{razón}=100\times\frac{\sum_{q=1}^{4}X^{US\$}_q}{PIB^{US\$}} .
+  \]
+\end{itemize}
+La \textbf{apertura comercial} es $(X+M)/PIB$.
+
+\begin{dato}[Ejemplo ilustrativo]
+Si el PIB de cuatro trimestres equivale a US\$450.000 millones y el déficit de cuenta corriente de esos trimestres es
+US\$13.500 millones, el déficit es $100\times13{,}5/450=3{,}0\%$ del PIB.
+\end{dato}
+
+\begin{alerta}
+Una razón al PIB puede cambiar porque cambia el numerador, el PIB o la tasa de cambio. Una depreciación fuerte reduce
+el PIB en dólares y \emph{sube} las razones de las variables en dólares aunque estas no cambien.
+\end{alerta}
+
+\section{Balanza de pagos}
+\label{es:f:bp}
+La balanza de pagos registra las transacciones de los residentes con el resto del mundo (Manual del FMI, sexta
+edición, MBP6). Sus cuentas son:
+\begin{itemize}
+\item \textbf{Cuenta corriente} (CC): bienes, servicios, \emph{ingreso primario} (utilidades, dividendos e
+  intereses) e \emph{ingreso secundario} (transferencias, sobre todo remesas);
+\item \textbf{Cuenta de capital} (CK): transferencias de capital (pequeña en Colombia);
+\item \textbf{Cuenta financiera} (CF): adquisición neta de activos financieros menos emisión neta de pasivos:
+  inversión directa, de cartera, otra inversión (préstamos) y activos de reserva.
+\end{itemize}
+La identidad contable es
+\[
+CC+CK=CF+\varepsilon,
+\]
+donde $\varepsilon$ son los \textbf{errores y omisiones} netos, con el signo que cierra la identidad. Con los signos del
+MBP6, una CF \emph{negativa} significa que el país se endeuda o recibe inversión neta del exterior (los pasivos crecen
+más que los activos); una CF positiva, que presta o invierte afuera. Un déficit de cuenta corriente se financia con una
+CF negativa.
+
+\begin{leer}[Convención de los gráficos del sitio]
+Para facilitar la lectura, el gráfico de financiamiento muestra la cuenta financiera \textbf{con el signo
+invertido}: positivo = entrada neta de capital. En esa presentación, las reservas positivas indican una
+\emph{disminución} de reservas (una fuente de financiamiento) y las negativas, una acumulación.
+\end{leer}
+
+\begin{dato}[Ejemplo ilustrativo]
+Con una cuenta corriente de $-3{,}5\%$ del PIB y una cuenta de capital nula, la cuenta financiera es aproximadamente
+$-3{,}5\%$. Presentada con signo invertido, podría verse como $+3{,}0$ de inversión directa, $+0{,}8$ de cartera,
+$+0{,}2$ de otra inversión y $-0{,}5$ de reservas (acumulación): suman $+3{,}5$.
+\end{dato}
+
+\begin{leer}
+Importa tanto el tamaño del déficit como su financiamiento: un déficit financiado con inversión extranjera directa es más
+estable que uno financiado con flujos de cartera de corto plazo (Calvo, Leiderman y Reinhart, 1993).
+\end{leer}
+
+\section{Deuda externa y posición de inversión internacional}
+La \textbf{deuda externa} son los pasivos con no residentes que exigen pagos de principal o intereses (préstamos,
+bonos, créditos comerciales), pública y privada. La \textbf{posición de inversión internacional} (PII) es el saldo de
+todos los activos y pasivos financieros externos; su posición neta es $\text{PII}^{neta}=\text{Activos}-\text{Pasivos}$
+(Lane y Milesi-Ferretti, 2007). Los déficits de cuenta corriente acumulados hacen más negativa la PII; también la
+mueven los cambios de precios y de tasa de cambio.
+
+\section{Balance fiscal total y primario}
+\label{es:f:fiscal}
+Para el Gobierno nacional central (cifras de caja, suma de cuatro trimestres sobre el PIB de esos trimestres):
+\[
+\text{balance total}=\text{ingresos}-\text{gastos},\qquad
+\text{balance primario}=\text{balance total}+\text{intereses}.
+\]
+El balance primario dice si el Gobierno cubre sus gastos sin contar el costo de la deuda. La razón
+$\text{intereses}/\text{ingresos}$ mide la carga financiera.
+
+\begin{dato}[Ejemplo ilustrativo]
+Con ingresos de 16\% del PIB y gastos de 22\% (de los cuales 4,5\% son intereses): balance total $-6{,}0\%$ y balance
+primario $-1{,}5\%$. Los intereses absorben $4{,}5/16=28\%$ de los ingresos.
+\end{dato}
+
+\section{Dinámica de la deuda pública}
+Con $d_t$ la deuda sobre el PIB, $i$ la tasa de interés nominal implícita, $\gamma$ el crecimiento del PIB nominal y
+$pb_t$ el balance primario (en \% del PIB):
+\[
+d_t=d_{t-1}\,\frac{1+i}{1+\gamma}-pb_t\quad(\text{sin otros flujos que generan deuda}).
+\]
+Si $i>\gamma$, se necesita un superávit primario para estabilizar la deuda; si $i<\gamma$, la deuda puede estabilizarse con
+un déficit primario moderado (Blanchard, 2019). La deuda en moneda extranjera agrega el efecto de la tasa de cambio.
+
+\begin{dato}[Ejemplo ilustrativo]
+Con $d_{t-1}=60\%$, $i=8\%$, $\gamma=9\%$ y un déficit primario de 1,5\% ($pb=-1{,}5$):
+$d_t=60\times1{,}08/1{,}09+1{,}5=61{,}0\%$. La deuda sube aunque el crecimiento nominal supere la tasa de interés,
+porque el déficit primario es mayor que el alivio de $\gamma>i$.
+\end{dato}
+
+\begin{alerta}
+El sitio presenta las cifras fiscales en metodología de caja. Las cifras oficiales en metodología de causación del
+Ministerio de Hacienda pueden diferir. La regla fiscal de Colombia (Ley 1473 de 2011 y Ley 2155 de 2021) usa sus
+propias definiciones.
+\end{alerta}
+
+% ---------------------------------------------------------------------
+\chapter{Revisiones y datos provisionales}
+\label{es:f:revisiones}
+
+\section{Por qué cambian los datos publicados}
+Las cifras oficiales se publican primero como \textbf{provisionales} y se revisan cuando llega información más
+completa:
+\begin{itemize}
+\item el PIB trimestral y el ISE se revisan en cada publicación (nueva información de encuestas y registros, nuevos
+  factores estacionales);
+\item el PIB anual y departamental pasa por versiones provisional, preliminar y definitiva;
+\item las cifras de comercio exterior del último año son provisionales;
+\item los cambios de año base o de metodología reescriben toda la historia.
+\end{itemize}
+Cada versión publicada de una serie es una \textbf{vintage}. El sitio guarda solo la vintage vigente: la historia que
+muestra es la de la última publicación, no lo que se sabía en cada fecha.
+
+\begin{dato}[Ejemplo ilustrativo]
+El crecimiento de un trimestre se publica como 3,0\% y, tres meses después, con más información, se revisa a 3,4\%. Con
+la serie revisada, la brecha del producto de ese trimestre y la fase del ciclo pueden cambiar.
+\end{dato}
+
+\begin{alerta}
+Las revisiones afectan sobre todo a los últimos datos, que son justamente los que más interesan. Una lectura que depende
+de una décima en el último trimestre es frágil. La brecha ``en tiempo real'' elimina el uso de información futura del
+filtro, pero no las revisiones de los datos del DANE.
+\end{alerta}
+
+\section{Datos que se sustituyen o se excluyen}
+\begin{itemize}
+\item La última inflación anual se toma de la cifra oficial del DANE (el índice con dos decimales puede diferir en una
+  centésima).
+\item Las observaciones aisladas que se alejan de forma anómala de sus dos vecinos (saltos de un día que se revierten)
+  se conservan en los datos originales, pero se excluyen de los cálculos derivados.
+\item Los meses incompletos de los registros (por ejemplo, matrículas de empresas del mes en curso) se descartan.
+\end{itemize}

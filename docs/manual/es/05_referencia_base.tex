@@ -1,0 +1,254 @@
+% =====================================================================
+% CODEX ColombiaMacro · Parte V · Referencia (español)
+% Fragmento para \input: sin preámbulo. Las referencias se agregan al final (05_referencia.tex).
+% =====================================================================
+\part{Referencia}
+
+% ---------------------------------------------------------------------
+\chapter{Limitaciones de los datos}
+\label{es:r:limitaciones}
+
+Conocer los límites de cada cifra es parte de leerla bien. Esta es la lista completa de limitaciones conocidas,
+agrupadas por tema.
+
+\section{Generales}
+\begin{enumerate}
+\item \textbf{Una sola versión de la historia.} Cada actualización reemplaza la historia con la última publicación de
+  cada entidad. Las cifras pasadas son las revisadas, no las que se conocían en su momento.
+\item \textbf{Datos provisionales.} Los últimos trimestres del PIB y las cuentas departamentales son provisionales;
+  las cuentas departamentales llegan con más de un año de rezago.
+\item \textbf{Fechas distintas en una misma página.} Cada fuente se publica en días diferentes; una página puede
+  combinar datos de meses distintos. Cada cifra lleva su fecha.
+\item \textbf{Volúmenes encadenados.} Los aportes sectoriales y de la demanda no suman exactamente el total; los
+  cálculos ``sin Gobierno'' o ``sin minería'' son aproximaciones.
+\end{enumerate}
+
+\section{Ciclo y capacidad}
+\begin{enumerate}
+\item La brecha del producto y la fase del ciclo dependen del método; el sitio muestra el rango entre métodos por esa
+  razón.
+\item El tratamiento de la pandemia (interpolación entre 2020-T2 y 2021-T2 para estimar la tendencia) es una decisión
+  de modelado.
+\item El fechado de expansiones y recesiones usa meses posteriores: el último punto de giro puede moverse o desaparecer
+  con datos nuevos.
+\end{enumerate}
+
+\section{Precios, tasas y curva}
+\begin{enumerate}
+\item La tasa neutral es una estimación externa con incertidumbre considerable; la clasificación de la postura depende
+  de ella.
+\item La inflación implícita contiene primas por riesgo inflacionario y por liquidez y el rezago de indexación de la
+  UVR; no es una expectativa pura y las primas pueden tener cualquier signo.
+\item Las tasas cero cupón de los TES son salidas de un modelo estimado por el Banco (Nelson-Siegel), no precios
+  negociados.
+\end{enumerate}
+
+\section{Mercados y empresas}
+\begin{enumerate}
+\item El COLCAP y los índices equiponderado y de 7 Magníficas son índices de precios sin dividendos.
+\item La sección ``bolsa por dentro'' usa fuentes auxiliares no oficiales (composición de un fondo que replica el
+  índice y precios de un proveedor comercial); aplicar la canasta vigente hacia atrás introduce sesgo de supervivencia.
+\item La lista de las 10.000 empresas cambia cada año y excluye bancos y aseguradoras; las variaciones no comparan las
+  mismas empresas y la región es la del domicilio, no la de producción.
+\item Las cancelaciones del registro mercantil incluyen depuraciones administrativas; el último mes puede estar
+  incompleto.
+\item La volatilidad de algunas monedas se calcula con series que repiten el último valor en fines de semana y
+  festivos, lo que puede subestimarla frente a series de días hábiles.
+\end{enumerate}
+
+\section{Cuentas externas, fiscales y comercio}
+\begin{enumerate}
+\item Las balanzas comercial y bilateral restan importaciones CIF de exportaciones FOB: el déficit resulta algo mayor
+  que en la balanza de pagos.
+\item El volumen de comercio es un residuo entre el valor del DANE y los índices de precios del Banco.
+\item Las cuentas del Gobierno son de caja: la serie de intereses puede tener meses negativos y subestimar el costo de
+  la deuda frente a las cifras en causación.
+\item Las razones al PIB en dólares dependen de la tasa de cambio usada para convertir el PIB.
+\end{enumerate}
+
+\section{Mercado laboral}
+\begin{enumerate}
+\item La serie de informalidad empieza en 2021 (nuevo marco muestral) y no es comparable con la anterior.
+\item Las series de detalle (ramas, ciudades, jóvenes, sexo) no están desestacionalizadas y tienen más error de
+  muestreo que el total nacional.
+\end{enumerate}
+
+% ---------------------------------------------------------------------
+\chapter{Glosario}
+\label{es:r:glosario}
+
+\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash\itshape}p{3.2cm}>{\raggedright\arraybackslash}p{8.2cm}}
+\toprule
+\textbf{Término} & \textbf{\upshape En inglés} & \textbf{Definición}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Término} & \textbf{\upshape En inglés} & \textbf{Definición}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Amplitud (difusión) & Breadth (diffusion) & Proporción de componentes (sectores, subclases) que cumplen una condición, por ejemplo estar sobre su tendencia.\\
+Año corrido & Year to date & Período desde enero hasta el último mes disponible, comparado con el mismo período del año anterior.\\
+Apertura comercial & Trade openness & (Exportaciones + importaciones de bienes) / PIB.\\
+Apreciación & Appreciation & Aumento del valor de una moneda: se necesitan menos pesos por dólar.\\
+Aporte al crecimiento & Contribution to growth & Parte del crecimiento total explicada por un componente: su crecimiento por su peso.\\
+Asalariado & Wage employee & Ocupado que trabaja para un empleador a cambio de un salario.\\
+Balance primario & Primary balance & Balance fiscal sin el pago de intereses de la deuda.\\
+Balanza cambiaria & FX balance & Registro de las divisas que entran y salen por el mercado cambiario regulado.\\
+Balanza comercial & Trade balance & Exportaciones menos importaciones de bienes.\\
+Balanza de pagos & Balance of payments & Registro de todas las transacciones entre residentes y no residentes en un período.\\
+Base 100 & Index base 100 & Índice que divide cada valor por el de una fecha de referencia y multiplica por 100.\\
+Bienes de capital & Capital goods & Maquinaria y equipo usados para producir otros bienes; anticipan inversión.\\
+Brecha del producto & Output gap & Diferencia porcentual entre el PIB observado y su capacidad (potencial).\\
+Breakeven (inflación implícita) & Breakeven inflation & Inflación que iguala el rendimiento de un TES en pesos y uno en UVR del mismo plazo.\\
+Capacidad (PIB potencial) & Potential output & Producción sostenible sin presiones sobre los precios; se estima como tendencia.\\
+Cartera & Loan book & Saldo de los créditos otorgados por el sistema financiero.\\
+CDT & Certificate of deposit & Certificado de depósito a término: ahorro a plazo fijo en un banco.\\
+CIF & CIF & Valor de una importación con costo, seguro y flete hasta el puerto de destino.\\
+Ciclo económico & Business cycle & Fluctuaciones de la actividad alrededor de su tendencia.\\
+COLCAP & COLCAP & Índice de precios de las acciones más líquidas de la Bolsa de Valores de Colombia (MSCI COLCAP desde 2021).\\
+Cobertura (comercio) & Export/import coverage & Exportaciones / importaciones, en porcentaje.\\
+Cuenta corriente & Current account & Balance de bienes, servicios, ingresos primarios y transferencias con el exterior.\\
+Cuenta financiera & Financial account & Flujos de inversión y préstamos entre residentes y no residentes.\\
+CUODE & CUODE & Clasificación de las importaciones por uso económico: consumo, materias primas y bienes de capital.\\
+Curva de rendimientos & Yield curve & Tasas de los bonos del Gobierno para distintos plazos en una misma fecha.\\
+Curva invertida & Inverted curve & Curva en la que el plazo largo rinde menos que el corto.\\
+Deflactor & Deflator & Índice de precios implícito que convierte valores nominales en reales.\\
+Depreciación & Depreciation & Pérdida de valor de una moneda: se necesitan más pesos por dólar.\\
+Desestacionalizar & Seasonal adjustment & Quitar a una serie los patrones que se repiten cada año en las mismas fechas.\\
+Desempleo (tasa) & Unemployment rate & Desocupados / fuerza de trabajo.\\
+Dólar global & Broad dollar index & Índice de la Reserva Federal del valor del dólar frente a una canasta de monedas.\\
+DTF & DTF & Tasa promedio de captación de los CDT a 90 días.\\
+Efecto base & Base effect & Cambio de una variación anual explicado por lo que ocurrió hace doce meses.\\
+Endeudamiento & Leverage & Pasivos / activos.\\
+Equiponderado & Equal-weighted & Índice que da el mismo peso a cada acción.\\
+Expectativas ancladas & Anchored expectations & Expectativas de inflación de largo plazo cercanas a la meta y poco sensibles a choques.\\
+Expansión & Expansion & Fase con brecha positiva y creciente.\\
+Contracción & Contraction & Fase con brecha negativa y decreciente.\\
+Desaceleración & Slowdown & Fase con brecha positiva pero decreciente.\\
+Recuperación & Recovery & Fase con brecha negativa pero creciente.\\
+FOB & FOB & Valor de una exportación puesta a bordo en el puerto de salida, sin fletes ni seguros internacionales.\\
+Forward 5y5y & 5y5y forward & Inflación implícita promedio entre los años 5 y 10.\\
+Fuerza de trabajo & Labour force & Ocupados más desocupados.\\
+GEIH & GEIH & Gran Encuesta Integrada de Hogares del DANE: fuente del mercado laboral.\\
+Gobierno nacional central (GNC) & Central government & Nación y sus entidades del orden central, sin empresas públicas ni gobiernos locales.\\
+Herfindahl (índice) & Herfindahl index & Suma de las participaciones al cuadrado; mide concentración.\\
+IBR & IBR & Indicador Bancario de Referencia: tasa interbancaria de corto plazo.\\
+IED & FDI & Inversión extranjera directa: inversión con control o influencia duradera en empresas residentes.\\
+Inflación & Inflation & Aumento generalizado de los precios; se mide con el IPC.\\
+Inflación de fondo (básica) & Core inflation & Inflación sin los rubros más volátiles (alimentos y regulados).\\
+Informalidad & Informality & Ocupados sin protección social o en unidades no registradas, según la definición del DANE.\\
+IPC & CPI & Índice de precios al consumidor.\\
+ISE & ISE & Indicador de Seguimiento a la Economía: actividad mensual del DANE.\\
+ITCR & Real effective exchange rate & Índice de tasa de cambio real: precios de los socios en pesos frente a los precios de Colombia.\\
+Logaritmo $\times$100 & Log points & Transformación en la que diferencias pequeñas equivalen a variaciones porcentuales.\\
+Margen neto & Net margin & Utilidad / ingresos.\\
+Meta de inflación & Inflation target & 3\% con un rango de $\pm1$ pp fijado por el Banco de la República.\\
+Nominal & Nominal & Medido en pesos corrientes, sin descontar la inflación.\\
+Número equivalente & Equivalent number & 1 / Herfindahl: cuántos componentes iguales darían la misma concentración.\\
+Ocupados & Employed & Personas que trabajaron al menos una hora remunerada en la semana de referencia.\\
+Pendiente de la curva & Curve slope & TES a 10 años menos TES a 1 año.\\
+Percentil & Percentile & Proporción de observaciones históricas menores o iguales al dato actual.\\
+PIB & GDP & Producto interno bruto: valor de los bienes y servicios finales producidos en el país.\\
+PII & IIP & Posición de inversión internacional: activos menos pasivos externos del país.\\
+Postura monetaria & Monetary stance & Tasa real frente a la neutral: restrictiva, neutral o expansiva.\\
+pp & pp & Puntos porcentuales: diferencia entre dos porcentajes.\\
+Prima por plazo & Term premium & Compensación adicional por mantener un bono de largo plazo.\\
+Real & Real & Medido descontando la inflación.\\
+Rebase & Rebasing & Volver a dividir un índice para que valga 100 en otra fecha.\\
+Regulados & Administered prices & Precios fijados o supervisados por el Estado: energía, gas, transporte, combustibles.\\
+Remesas & Remittances & Transferencias de trabajadores en el exterior a sus hogares en Colombia.\\
+Rentabilidad del patrimonio & Return on equity & Utilidad / patrimonio.\\
+Reservas internacionales & International reserves & Activos externos líquidos en poder del Banco de la República.\\
+Subutilización laboral & Labour underutilisation & Desocupados, subocupados y fuerza potencial sobre la fuerza de trabajo ampliada.\\
+Suma de 12 meses & 12-month sum & Total de los últimos doce meses; elimina la estacionalidad.\\
+Tasa de política (TPM) & Policy rate & Tasa con la que el Banco de la República suministra liquidez a los bancos.\\
+Tasa neutral & Neutral rate & Tasa real que ni estimula ni frena la economía.\\
+Tasa real ex ante & Ex ante real rate & Tasa nominal descontada la inflación esperada.\\
+Tasa real ex post & Ex post real rate & Tasa nominal descontada la inflación observada.\\
+Términos de intercambio & Terms of trade & Precio de las exportaciones / precio de las importaciones.\\
+TES & TES & Títulos de deuda pública interna del Gobierno colombiano.\\
+Traspaso & Pass-through & Proporción del cambio de la tasa de política que llega a otras tasas.\\
+TRM & Representative market rate & Tasa de cambio representativa del mercado (pesos por dólar), certificada por la Superfinanciera.\\
+Tendencia & Trend & Componente de largo plazo de una serie, estimado con un filtro.\\
+UVR & UVR & Unidad de valor real: unidad indexada a la inflación; los TES UVR pagan tasa real.\\
+Variación anual & Year-on-year change & Cambio frente al mismo período del año anterior.\\
+Variación trimestral anualizada & Annualised quarterly change & Cambio de un trimestre llevado a ritmo anual: $(1+g)^4-1$.\\
+Volatilidad & Volatility & Desviación estándar de los cambios diarios, anualizada.\\
+Volumen implícito & Implied volume & Cambio del valor descontado el cambio de precio.\\
+\end{longtable}
+\normalsize
+
+% ---------------------------------------------------------------------
+\chapter{Siglas}
+\label{es:r:siglas}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+\textbf{Sigla} & \textbf{Significado}\\
+\midrule
+BanRep & Banco de la República\\
+BVC & Bolsa de Valores de Colombia\\
+CARF & Comité Autónomo de la Regla Fiscal\\
+CIIU & Clasificación Industrial Internacional Uniforme\\
+DANE & Departamento Administrativo Nacional de Estadística\\
+DIAN & Dirección de Impuestos y Aduanas Nacionales\\
+EIA & Administración de Información Energética de los Estados Unidos\\
+FMI & Fondo Monetario Internacional\\
+FRED & Base de datos económicos de la Reserva Federal de San Luis\\
+GEIH & Gran Encuesta Integrada de Hogares\\
+GNC & Gobierno nacional central\\
+HP & Filtro de Hodrick y Prescott\\
+IBR & Indicador Bancario de Referencia\\
+IED & Inversión extranjera directa\\
+IPC & Índice de precios al consumidor\\
+ISE & Indicador de Seguimiento a la Economía\\
+ITCR & Índice de tasa de cambio real\\
+MBP6 & Manual de balanza de pagos, sexta edición (FMI)\\
+OCDE & Organización para la Cooperación y el Desarrollo Económicos\\
+PIB & Producto interno bruto\\
+PII & Posición de inversión internacional\\
+RUES & Registro Único Empresarial y Social\\
+SPNF & Sector público no financiero\\
+TES & Títulos de tesorería\\
+TIB & Tasa interbancaria\\
+TPM & Tasa de política monetaria\\
+TRM & Tasa representativa del mercado\\
+UVR & Unidad de valor real\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ---------------------------------------------------------------------
+\chapter{Calendario de las fuentes}
+\label{es:r:calendario}
+
+El calendario exacto lo fija cada entidad cada año. La tabla resume el patrón habitual de publicación, útil para saber
+cuándo esperar un dato nuevo en el sitio.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{2.4cm}X}
+\toprule
+\textbf{Dato} & \textbf{Frecuencia} & \textbf{Publicación habitual}\\
+\midrule
+PIB (producción y gasto) & Trimestral & DANE, unos 45 días después del cierre del trimestre\\
+ISE & Mensual & DANE, unos 50 días después del mes\\
+IPC & Mensual & DANE, primeros días hábiles del mes siguiente\\
+GEIH (desempleo, informalidad) & Mensual & DANE, a fin del mes siguiente\\
+Exportaciones e importaciones & Mensual & DANE, unos 45–60 días después del mes\\
+PIB departamental & Anual & DANE, con más de un año de rezago\\
+Tasa de política & Por decisión & Banco de la República, reuniones de la Junta Directiva\\
+TRM, IBR, curva TES, COLCAP & Diaria & Banco de la República / Superfinanciera, días hábiles\\
+Balanza de pagos & Trimestral & Banco de la República, cerca de 75–90 días después del trimestre\\
+Deuda externa, reservas, remesas & Mensual & Banco de la República\\
+Balance fiscal del Gobierno (caja) & Mensual & Banco de la República con datos del Ministerio de Hacienda\\
+10.000 empresas más grandes & Anual & Superintendencia de Sociedades, a mediados del año siguiente\\
+Registro mercantil & Mensual & Confecámaras (RUES), portal de datos abiertos\\
+\bottomrule
+\end{tabularx}
+\end{center}
