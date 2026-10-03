@@ -53,6 +53,21 @@ TX = {
                "El índice de competitividad en Estados Unidos (ITCR-C) está en {c}. Frente a su promedio, el ITCR bilateral va de {v1} con {p1} a {v2} con {p2} (negativo = peso más caro).",
                "The ITCR (weighted by total trade, deflated with CPI) stands at {r}, {d} against its average since 2000. "
                "The competitiveness index in the US market (ITCR-C) is {c}. Relative to its average, the bilateral ITCR ranges from {v1} with {p1} to {v2} with {p2} (negative = more expensive peso)."),
+    "r_petroleo2": ("Entre 2008 y 2019 el petróleo y el peso se movieron muy de la mano (correlación de {r1} entre sus cambios anuales): en promedio, un alza de 10% del Brent en un año coincidió con una TRM {s1} más baja. "
+                    "Desde 2020 el vínculo es más débil (correlación {r2}; {s2} por cada 10% del Brent). En el mismo periodo el petróleo pasó de {p0} a {p1} de las exportaciones en cinco años. "
+                    "Hoy el Brent está en US${b} ({bc} en 12 meses) y los términos de intercambio cambiaron {ti} en un año.",
+                    "Between 2008 and 2019 oil and the peso moved closely together (correlation of {r1} between their annual changes): on average, a 10% annual rise in Brent coincided with a TRM {s1} lower. "
+                    "Since 2020 the link is weaker (correlation {r2}; {s2} per 10% of Brent). Meanwhile, oil went from {p0} to {p1} of exports over five years. "
+                    "Today Brent is at US${b} ({bc} over 12 months) and the terms of trade changed {ti} in a year."),
+    "g_disp": ("Petróleo y peso: cambios anuales (cada punto es un mes)", "Oil and the peso: annual changes (each dot is a month)"),
+    "h_disp": ("Eje horizontal: cuánto cambió el Brent en 12 meses; eje vertical: cuánto cambió la TRM. Puntos abajo a la derecha = el petróleo subió y el peso se fortaleció. La línea resume la relación promedio de cada periodo; el punto grande es el dato más reciente.",
+               "Horizontal axis: how much Brent changed over 12 months; vertical axis: how much the TRM changed. Dots at the bottom right = oil rose and the peso strengthened. Each line summarises the average relationship in its period; the large dot is the latest observation."),
+    "x_disp": ("Cambio del Brent en 12 meses", "Brent change over 12 months"), "y_disp": ("Cambio de la TRM en 12 meses", "TRM change over 12 months"),
+    "lbl_p1": ("2008–2019", "2008–2019"), "lbl_p2": ("2020–hoy", "2020–today"), "lbl_hoy": ("Último dato", "Latest"),
+    "g_peso_pet": ("¿Cuánto pesa el petróleo en las exportaciones?", "How much does oil weigh in exports?"),
+    "h_peso_pet": ("Participación en el valor de las exportaciones de bienes (suma de 12 meses). Entre más pesa el petróleo, más depende de él la oferta de dólares; la línea de términos de intercambio (eje derecho) compara los precios de lo que Colombia vende con los de lo que compra.",
+                   "Share of goods export value (12-month sum). The more oil weighs, the more the supply of dollars depends on it; the terms-of-trade line (right axis) compares the prices of what Colombia sells with those of what it buys."),
+    "lbl_pet": ("Petróleo y derivados", "Oil and derivatives"), "lbl_carb": ("Carbón", "Coal"), "lbl_ti": ("Términos de intercambio", "Terms of trade"),
     "r_petroleo": ("El Brent cuesta US${b} por barril ({bc} en 12 meses) y los términos de intercambio cambiaron {ti} en un año. "
                    "En los últimos 12 meses la correlación semanal entre la TRM y el Brent fue {k1} y en los últimos 10 años {k10}: cuando el petróleo sube, el peso tiende a fortalecerse, pero el vínculo es parcial.",
                    "Brent costs US${b} per barrel ({bc} over 12 months) and the terms of trade changed {ti} in a year. "
@@ -90,8 +105,8 @@ TX = {
                 "Indexed to 100 at the start of the chosen horizon. The peso tends to strengthen (TRM falls) when oil rises: crude is Colombia's main export."),
     "lbl_brent": ("Brent", "Brent"),
     "g_corr": ("Correlación TRM–Brent y TRM–dólar global (52 semanas)", "TRM–Brent and TRM–global dollar correlation (52 weeks)"),
-    "h_corr": ("Correlación móvil de 52 semanas entre los cambios semanales de la TRM y del Brent o del dólar global. Negativa con el Brent: cuando el petróleo sube, la TRM baja.",
-               "52-week rolling correlation between weekly changes in the TRM and Brent or the global dollar. Negative with Brent: when oil rises, the TRM falls."),
+    "h_corr": ("Correlación de 52 semanas entre los cambios semanales de la TRM y del Brent (o del dólar global). Va de −1 a 1: cerca de −1, cuando el petróleo sube el peso casi siempre se fortalece; cerca de 0, no hay relación; positiva con el dólar global, el peso se debilita cuando el dólar se fortalece en el mundo. Las franjas marcan relaciones fuertes (|r| > 0,5).",
+               "52-week correlation between weekly changes in the TRM and Brent (or the global dollar). It ranges from −1 to 1: near −1, when oil rises the peso almost always strengthens; near 0, no relationship; positive with the global dollar, the peso weakens when the dollar strengthens worldwide. Bands mark strong relationships (|r| > 0.5)."),
     "lbl_c_brent": ("TRM y Brent", "TRM and Brent"), "lbl_c_dxy": ("TRM y dólar global", "TRM and global dollar"),
     "g_bc": ("Balanza cambiaria: suma de 12 meses", "Foreign-exchange balance: 12-month sum"),
     "h_bc": ("Dólares que entraron (+) o salieron (−) por el mercado cambiario, en miles de millones de dólares. La cuenta corriente incluye exportaciones, importaciones, servicios y remesas canalizadas.",
@@ -216,6 +231,7 @@ def construir_cambio(d, L):
     f1.update_layout(bargap=0.4, hovermode="closest")
     q_btn = (f'<button type="button" class="ex-q" data-dialog="exp-peso" aria-haspopup="dialog" '
              f'title="{"¿Cómo se calcula la TRM y qué es la tasa de cambio real?" if L == "es" else "How is the TRM computed and what is the real exchange rate?"}">?</button>')
+    cs.ejes(f1, y="Cambio en 12 meses" if L == "es" else "Change over 12 months")
     g1 = cs.bloque_grafico(tx("g_pares", L), cs.fig_html(f1, {"notime": True, "noy": True}, "g-tc-pares"), tx("h_pares", L))
     co = pd.DataFrame({"trm": trm, "dxy": C["dolar_global"]}).resample("W-FRI").last()
     co12 = (co / co.shift(52) - 1).mul(100).dropna()
@@ -223,6 +239,7 @@ def construir_cambio(d, L):
     cs.linea(f2, co12.index, co12["trm"], tx("lbl_trm", L), cs.C2, width=2.2, lang=L)
     cs.linea(f2, co12.index, co12["dxy"], tx("lbl_dxy", L), cs.C7, width=2.0, lang=L)
     f2.add_hline(y=0, line=dict(color=cs.INK2, width=1))
+    cs.ejes(f2, y="Variación anual" if L == "es" else "Annual change")
     g2 = cs.bloque_grafico(tx("g_co", L), cs.fig_html(f2, {}, "g-tc-dolar-global"), tx("h_co", L))
     k_dxy = float(co12["trm"].corr(co12["dxy"]))
     r1 = tx("r_global", L).format(c=pct(cop12), b=pct(p12["brl"]), m=pct(p12["mxn"]), s=pct(p12["pen"]), g=pct(dxy12),
@@ -238,6 +255,7 @@ def construir_cambio(d, L):
     f3 = cs.base(L, height=340, suffix="")
     for (c, col), w_ in zip([("usd", cs.C2), ("eur", cs.C1), ("cny", cs.C4), ("brl", cs.C3), ("mxn", cs.C7)], (2.6, 2, 1.8, 1.8, 1.8)):
         cs.linea(f3, wi.index, wi[c], mon(c), col, width=w_, fmt=".1f", suf="", lang=L)
+    cs.ejes(f3, y="Índice (inicio del horizonte = 100)" if L == "es" else "Index (start of horizon = 100)")
     g3 = cs.bloque_grafico(tx("g_idx", L), cs.fig_html(f3, {"rebase": True}, "g-tc-monedas"), tx("h_idx", L))
     cc = sorted(((c, cambio(s)) for c, s in cruces.items()), key=lambda x: x[1])
     f4 = cs.base(L, height=360, fecha_x=False)
@@ -248,6 +266,8 @@ def construir_cambio(d, L):
     f4.update_xaxes(range=[min(0, cc[0][1]) * 1.3 - 1, max(0, cc[-1][1]) * 1.3 + 1], showgrid=True, gridcolor=cs.GRID)
     f4.update_yaxes(ticksuffix="", tickfont=dict(size=12, color=cs.INK2))
     f4.update_layout(bargap=0.3, hovermode="closest")
+    f4.update_xaxes(ticksuffix="%")
+    cs.ejes(f4, x="Cambio en 12 meses de los pesos por unidad de moneda" if L == "es" else "12-month change in pesos per unit of currency")
     g4 = cs.bloque_grafico(tx("g_cruces", L), cs.fig_html(f4, {"notime": True, "noy": True}, "g-tc-cruces"), tx("h_cruces", L))
     gana = [x for x in cc if x[1] < 0]
     sel = gana if len(gana) >= len(cc) / 2 else [x for x in cc if x[1] >= 0]
@@ -264,6 +284,7 @@ def construir_cambio(d, L):
     cs.linea(f5, xm, wr["itcr_c"], tx("lbl_itcrc", L), cs.C4, width=1.8, fmt=".1f", suf="", lang=L)
     f5.add_hline(y=100, line=dict(color=cs.INK2, width=1))
     f5.add_hline(y=it_prom, line=dict(color=cs.C1, width=1, dash="dot"))
+    cs.ejes(f5, y="Índice, 2010 = 100" if L == "es" else "Index, 2010 = 100")
     g5 = cs.bloque_grafico(tx("g_itcr", L), cs.fig_html(f5, {}, "g-tc-itcr"), tx("h_itcr", L))
     g5 = g5.replace("</figcaption>", f" {q_btn}</figcaption>", 1)
     bil = {p: (float(C[f"itcr_{p}"].iloc[-1]) / float(C[f"itcr_{p}"].loc["2000":].mean()) - 1) * 100 for p in ("eeuu", "china", "brasil", "mexico")}
@@ -276,6 +297,8 @@ def construir_cambio(d, L):
     f6.update_xaxes(range=[min(0, bo[0][1]) * 1.35 - 2, max(0, bo[-1][1]) * 1.35 + 2], showgrid=True, gridcolor=cs.GRID)
     f6.update_yaxes(ticksuffix="", tickfont=dict(size=12, color=cs.INK2))
     f6.update_layout(bargap=0.35, hovermode="closest")
+    f6.update_xaxes(ticksuffix="%")
+    cs.ejes(f6, x="Diferencia frente al promedio desde 2000" if L == "es" else "Gap from the average since 2000")
     g6 = cs.bloque_grafico(tx("g_bil", L), cs.fig_html(f6, {"notime": True, "noy": True}, "g-tc-bilateral"), tx("h_bil", L))
     p1, p2 = bo[0], bo[-1]
     r3 = tx("r_real", L).format(r=num(float(it.iloc[-1]), 1, L), d=pct((float(it.iloc[-1]) / it_prom - 1) * 100), c=num(float(itc.iloc[-1]), 1, L),
@@ -283,26 +306,72 @@ def construir_cambio(d, L):
     s_real = seccion("tc-real", tx("s_real", L), r3, f'<div class="grid">{g5}{g6}</div>') + ventana_peso(trm, it, L, num, fecha)
 
     # ------------------------------------------------ petroleo y terminos de intercambio
-    wb = pd.DataFrame({"brent": C["brent"], "trm": trm}).loc["2008":].resample("W-FRI").last().dropna()
-    f7 = cs.base(L, height=340, suffix="")
-    cs.linea(f7, wb.index, wb["brent"], tx("lbl_brent", L), cs.C4, width=2.0, fmt=".1f", suf="", lang=L)
-    cs.linea(f7, wb.index, wb["trm"], tx("lbl_trm", L), cs.C2, width=2.2, fmt=".1f", suf="", lang=L)
-    g7 = cs.bloque_grafico(tx("g_brent", L), cs.fig_html(f7, {"rebase": True}, "g-tc-brent"), tx("h_brent", L))
+    mm = pd.DataFrame({"t": trm, "b": C["brent"]}).resample("MS").mean()
+    ya = ((mm / mm.shift(12) - 1) * 100).dropna().loc["2008":]
+    per1, per2 = ya.loc[:"2019"], ya.loc["2020":]
+    ajuste = lambda z: (np.polyfit(z["b"], z["t"], 1), float(np.corrcoef(z["b"], z["t"])[0, 1]))
+    (m1, c1), r1 = ajuste(per1)
+    (m2, c2), r2 = ajuste(per2)
+    f7 = cs.base(L, height=380, fecha_x=False)
+    for z, (m_, c_), lbl, col in ((per1, (m1, c1), "lbl_p1", cs.C1), (per2, (m2, c2), "lbl_p2", cs.C2)):
+        f7.add_trace(go.Scatter(x=z["b"].round(1), y=z["t"].round(1), mode="markers", name=tx(lbl, L),
+                                marker=dict(color=col, size=6, opacity=0.55, line=dict(width=0)),
+                                customdata=[fecha(f_, "m", L) for f_ in z.index],
+                                hovertemplate="%{customdata}<br>Brent %{x:+.1f}% · TRM %{y:+.1f}%<extra></extra>"))
+        xs = np.linspace(z["b"].min(), z["b"].max(), 20)
+        f7.add_trace(go.Scatter(x=xs.round(1), y=(m_ * xs + c_).round(2), mode="lines", showlegend=False, hoverinfo="skip",
+                                line=dict(color=col, width=2.4)))
+    u_ = ya.iloc[-1]
+    f7.add_trace(go.Scatter(x=[round(u_["b"], 1)], y=[round(u_["t"], 1)], mode="markers+text", name=tx("lbl_hoy", L),
+                            marker=dict(color=cs.C4, size=13, line=dict(width=1.5, color="#ffffff")),
+                            text=[fecha(ya.index[-1], "m", L)], textposition="top center", cliponaxis=False,
+                            hovertemplate=fecha(ya.index[-1], "m", L) + "<br>Brent %{x:+.1f}% · TRM %{y:+.1f}%<extra></extra>"))
+    f7.add_hline(y=0, line=dict(color=cs.INK2, width=1))
+    f7.add_vline(x=0, line=dict(color=cs.INK2, width=1))
+    f7.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=cs.GRID)
+    f7.update_layout(hovermode="closest")
+    cs.ejes(f7, y=tx("y_disp", L), x=tx("x_disp", L))
+    g7 = cs.bloque_grafico(tx("g_disp", L), cs.fig_html(f7, {"notime": True, "noy": True}, "g-tc-brent"), tx("h_disp", L))
+
     cb_ = correlacion_movil(trm, C["brent"]).dropna()
     cd_ = correlacion_movil(trm, C["dolar_global"]).dropna()
-    f8 = cs.base(L, height=340, suffix="")
+    f8 = cs.base(L, height=380, suffix="")
+    f8.add_hrect(y0=-1, y1=-0.5, fillcolor="rgba(42,120,214,0.08)", line_width=0, layer="below")
+    f8.add_hrect(y0=0.5, y1=1, fillcolor="rgba(74,58,167,0.08)", line_width=0, layer="below")
     cs.linea(f8, cb_.index, cb_, tx("lbl_c_brent", L), cs.C4, width=2.0, fmt=".2f", suf="", lang=L)
     cs.linea(f8, cd_.index, cd_, tx("lbl_c_dxy", L), cs.C7, width=2.0, fmt=".2f", suf="", lang=L)
     f8.add_hline(y=0, line=dict(color=cs.INK2, width=1))
-    f8.update_yaxes(range=[-1, 1])
+    f8.update_yaxes(range=[-1, 1], dtick=0.5)
+    cs.ejes(f8, y="Correlación (−1 a 1)" if L == "es" else "Correlation (−1 to 1)")
     g8 = cs.bloque_grafico(tx("g_corr", L), cs.fig_html(f8, {"noy": True}, "g-tc-correlacion"), tx("h_corr", L))
-    wk = pd.DataFrame({"t": trm, "b": C["brent"]}).resample("W-FRI").last().pct_change(fill_method=None).dropna()
-    k1 = float(wk.loc[wk.index[-1] - pd.DateOffset(years=1):].corr().iloc[0, 1])
-    k10 = float(wk.loc[wk.index[-1] - pd.DateOffset(years=10):].corr().iloc[0, 1])
+
+    ex = pd.read_csv(cs.DATA_DIR / "exportaciones_mensuales.csv", parse_dates=["fecha"]).set_index("fecha").sort_index() \
+        if (cs.DATA_DIR / "exportaciones_mensuales.csv").exists() else None
     ti = d.extra["terminos_intercambio"].set_index("fecha")["terminos_intercambio"].sort_index()
-    r4 = tx("r_petroleo", L).format(b=num(float(C["brent"].iloc[-1]), 1, L), bc=pct(cambio(C["brent"])), ti=pct(cambio(ti)),
-                                    k1=num(k1, 2, L), k10=num(k10, 2, L))
-    s_pet = seccion("tc-petroleo", tx("s_petroleo", L), r4, f'<div class="grid">{g7}{g8}</div>')
+    g_pp, p0, p1 = "", np.nan, np.nan
+    if ex is not None:
+        s12 = ex.rolling(12).sum().dropna().loc["2000":]
+        sh_p, sh_c = s12["petroleo"] / s12["total"] * 100, s12["carbon"] / s12["total"] * 100
+        p1 = float(sh_p.iloc[-1])
+        p0 = float(sh_p.loc[:sh_p.index[-1] - pd.DateOffset(years=5)].iloc[-1])
+        xe = s12.index + pd.offsets.MonthEnd(0)
+        f9p = cs.base(L, height=360)
+        cs.linea(f9p, xe, sh_p, tx("lbl_pet", L), cs.C4, width=2.4, lang=L)
+        cs.linea(f9p, xe, sh_c, tx("lbl_carb", L), cs.C7, width=1.8, lang=L)
+        tt_ = ti.loc["2000":]
+        f9p.add_trace(go.Scatter(x=list(tt_.index + pd.offsets.MonthEnd(0)), y=tt_.round(1).tolist(), yaxis="y2", mode="lines",
+                                 name=tx("lbl_ti", L), line=dict(color=cs.C1, width=1.6, dash="dot"),
+                                 hovertemplate=tx("lbl_ti", L) + ": %{y:.1f}<extra></extra>"))
+        f9p.update_layout(yaxis2=dict(overlaying="y", side="right", showgrid=False, zeroline=False, fixedrange=True,
+                                      tickfont=dict(size=11.5, color=cs.MUTED)))
+        cs.ejes(f9p, y="% de las exportaciones" if L == "es" else "% of exports",
+                y2="Términos de intercambio (índice)" if L == "es" else "Terms of trade (index)")
+        g_pp = cs.bloque_grafico(tx("g_peso_pet", L), cs.fig_html(f9p, {"noy": True}, "g-tc-petroleo-exportaciones"), tx("h_peso_pet", L), ancho=True)
+    fmt_s = lambda m_: pct(m_ * 10)
+    r4 = tx("r_petroleo2", L).format(r1=num(r1, 2, L), s1=pct(abs(m1 * 10), 1, False), r2=num(r2, 2, L), s2=fmt_s(m2),
+                                     p0=pct(p0, 0, False), p1=pct(p1, 0, False), b=num(float(C["brent"].iloc[-1]), 1, L),
+                                     bc=pct(cambio(C["brent"])), ti=pct(cambio(ti)))
+    s_pet = seccion("tc-petroleo", tx("s_petroleo", L), r4, f'<div class="grid">{g7}{g8}{g_pp}</div>')
 
     # ------------------------------------------------ flujos y reservas
     bc = pd.DataFrame({c: C[c] for c in ("bc_cuenta_corriente", "bc_capital", "bc_reservas")}).sort_index()
@@ -312,6 +381,7 @@ def construir_cambio(d, L):
     for col, lbl, color, w_ in (("bc_cuenta_corriente", "lbl_cc", cs.C1, 2.2), ("bc_capital", "lbl_cap", cs.C2, 2.2), ("bc_reservas", "lbl_res", cs.C3, 1.8)):
         cs.linea(f9, xb, b12[col], tx(lbl, L), color, width=w_, fmt=".1f", suf=" mil M" if L == "es" else " bn", lang=L)
     f9.add_hline(y=0, line=dict(color=cs.INK2, width=1))
+    cs.ejes(f9, y="Miles de millones de dólares (12 meses)" if L == "es" else "Billions of dollars (12 months)")
     g9 = cs.bloque_grafico(tx("g_bc", L), cs.fig_html(f9, {}, "g-tc-balanza"), tx("h_bc", L))
     f10 = cs.base(L, height=340, suffix="")
     rr = (res.loc["2000":] / 1000)
@@ -319,6 +389,7 @@ def construir_cambio(d, L):
                          name=tx("lbl_put", L), marker=dict(color=cs.C4, line=dict(width=0)), width=1000 * 3600 * 24 * 200,
                          hovertemplate="%{x|%Y}: US$%{y:.2f} " + ("mil M" if L == "es" else "bn") + "<extra></extra>"))
     cs.linea(f10, rr.index + pd.offsets.MonthEnd(0), rr, tx("lbl_rn", L), cs.C1, width=2.4, fmt=".1f", suf=" mil M" if L == "es" else " bn", lang=L)
+    cs.ejes(f10, y="Miles de millones de dólares" if L == "es" else "Billions of dollars")
     g10 = cs.bloque_grafico(tx("g_res", L), cs.fig_html(f10, {}, "g-tc-reservas"), tx("h_res", L))
     u12 = bc.tail(12).sum()
     usd = lambda v: ("+" if v >= 0 else "−") + "US$" + num(abs(float(v)), 0, L) + (" millones" if L == "es" else " million")
@@ -334,6 +405,7 @@ def construir_cambio(d, L):
     cs.linea(f11, wv.index, wv["cop"], mon("cop"), cs.C2, width=2.4, lang=L)
     cs.linea(f11, wv.index, wv["brl"], mon("brl"), cs.C3, width=1.6, lang=L)
     cs.linea(f11, wv.index, wv["mxn"], mon("mxn"), cs.C7, width=1.6, lang=L)
+    cs.ejes(f11, y="Volatilidad anualizada" if L == "es" else "Annualised volatility")
     g11 = cs.bloque_grafico(tx("g_vol", L), cs.fig_html(f11, {}, "g-tc-volatilidad"), tx("h_vol", L), ancho=True)
     r6 = tx("r_vol", L).format(v=pct(vol.iloc[-1], 1, False), cmp=tx("mayor" if vol.iloc[-1] > vol.mean() else "menor", L),
                                vh=pct(vol.mean(), 1, False), b=pct(vb.iloc[-1], 1, False), m=pct(vm.iloc[-1], 1, False))

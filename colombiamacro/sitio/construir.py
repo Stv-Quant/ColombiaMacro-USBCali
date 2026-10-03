@@ -197,6 +197,18 @@ def base(lang, height=330, suffix="%", fecha_x=True, delta=False):
     return fig
 
 
+def ejes(fig, y=None, x=None, y2=None):
+    """Titulos de los ejes en letra pequena (la unidad o lo que mide cada eje)."""
+    estilo = dict(font=dict(size=11, color=MUTED), standoff=8)
+    if y:
+        fig.update_layout(yaxis_title=dict(text=y, **estilo))
+    if x:
+        fig.update_layout(xaxis_title=dict(text=x, **estilo))
+    if y2:
+        fig.update_layout(yaxis2_title=dict(text=y2, **estilo))
+    return fig
+
+
 # Cambio que acompana cada dato en el recuadro flotante y en la franja de resumen.
 #   "pp"  diferencia en puntos porcentuales (tasas, inflacion, desempleo)
 #   "pct" variacion porcentual (dolar, bolsa, indices)
@@ -436,6 +448,7 @@ class Graficos:
         xi = d.inflacion["fecha"] + pd.offsets.MonthEnd(0)
         self._l(fig, xi, d.inflacion["inflacion_anual"], t("inf_total", L), C2, fmt=".2f", cambio=("pp", "a"))
         fig.add_hline(y=3, line=dict(color=C3, width=1, dash="dot"))
+        ejes(fig, y="% anual" if L == "es" else "% a year", y2="Cambio anual (pp)" if L == "es" else "Annual change (pp)")
         an = (self.s.get("tasas") or {}).get("tpm_anunciada")
         if an:
             fig.add_trace(go.Scatter(x=[an["vigente"]], y=[an["tasa"]], mode="markers+text", name=t("an_marca", L),
@@ -457,6 +470,7 @@ class Graficos:
         panel_cambio(fig, w["fecha"], w["trm"], "pct", "a", L, t("trm_linea", L))
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
         self._l(fig, w["fecha"], w["trm"], t("trm_linea", L), C1, fmt=",.0f", suf="", cambio=("pct", "a"))
+        ejes(fig, y="Pesos por dólar" if L == "es" else "Pesos per dollar", y2="Cambio anual" if L == "es" else "Annual change")
         fig.update_xaxes(range=rango_inicial(w["fecha"].max()))
         return fig, {"franja": franja(L, [(t("trm_linea", L), trm["fecha"], trm["trm"], "pct", ("a", "m"), "d", 0, "$")])}
 
@@ -798,6 +812,7 @@ class Graficos:
                            text=t("neutral_label", L), font=dict(size=11, color=INK2))
         self._l(fig, w["fecha"], w["tpm_real_exante"], t("tasa_real", L), C1, fmt=".1f", cambio=("pp", "a"))
         fig.add_hline(y=0, line=dict(color=INK2, width=1))
+        ejes(fig, y="Tasa real (% anual)" if L == "es" else "Real rate (% a year)", y2="Cambio anual (pp)" if L == "es" else "Annual change (pp)")
         fig.update_xaxes(range=rango_inicial(w["fecha"].max()))
         return fig, {"franja": franja(L, [(t("tasa_real", L), w["fecha"], w["tpm_real_exante"], "pp", "a", "d", 1, "%")])}
 
@@ -866,6 +881,7 @@ class Graficos:
         panel_cambio(fig, x, it["itcr_ipc"], "pct", "a", L, t("itcr_linea", L))
         self._l(fig, x, it["itcr_ipc"], t("itcr_linea", L), C1, fmt=".1f", suf="", cambio=("pct", "a"))
         fig.add_hline(y=100, line=dict(color=INK2, width=1))
+        ejes(fig, y="Índice, 2010 = 100" if L == "es" else "Index, 2010 = 100", y2="Cambio anual" if L == "es" else "Annual change")
         fig.update_xaxes(range=rango_inicial(it["fecha"].max()))
         return fig, {"franja": franja(L, [(t("itcr_linea", L), x, it["itcr_ipc"], "pct", "a", "m", 1, "")])}
 
@@ -1487,6 +1503,8 @@ def pagina(d, s, lang, generado):
     from colombiamacro.sitio.inflacion_extra import construir_inflacion
     from colombiamacro.sitio.curva_extra import construir_curva
     from colombiamacro.sitio.cambio_extra import construir_cambio
+    from colombiamacro.sitio.tasas_extra import construir_tasas
+    ts_antes, ts_despues = construir_tasas(d_es, L)
     tc_antes, tc_despues = construir_cambio(d_es, L)
     cv_antes, cv_despues = construir_curva(d_es, L)
     inf_antes, inf_despues = construir_inflacion(d_es, L)
@@ -1535,7 +1553,7 @@ def pagina(d, s, lang, generado):
         "capacidad": (t("nav_cap", L), t("pg_capacidad", L), t("pl_capacidad", L), [cap_antes, s_cap, cap_despues], True),
         "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [emp_antes, s_inf, emp_despues], True),
         "inflacion": (t("nav_inflacion", L), t("pg_inflacion", L), t("pl_inflacion", L), [inf_antes, s2, inf_despues], True),
-        "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [s3], True),
+        "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [ts_antes, s3, ts_despues], True),
         "curva-tes": (t("nav_curva", L), t("pg_curva", L), t("pl_curva", L), [cv_antes, s_curva, cv_despues], False),
         "mercados": (t("nav_mercados", L), t("pg_mercados", L), t("pl_mercados", L), [tc_antes, s4, tc_despues], True),
         "empresas": (t("nav_empresas", L), t("pg_empresas", L), t("pl_empresas", L), [s_emp], True),
