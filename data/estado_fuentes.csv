@@ -6,8 +6,8 @@ Bolsa – COLCAP (BanRep),colcap_oficial.csv,diaria_mercado,2026-10-02,2026-10-0
 Actividad mensual – ISE (DANE),ise_mensual.csv,mensual,2026-07-01,2026-07-01,vigente
 Desempleo – GEIH (DANE),mercado_laboral.csv,mensual,2026-08-01,2026-08-01,vigente
 Informalidad – GEIH (DANE),informalidad.csv,mensual,2026-07-01,2026-07-01,vigente
-Tasa de política (BanRep),series_banrep.csv,diaria,2026-10-02,2026-10-02,vigente
-Dólar – TRM (BanRep),series_banrep.csv,diaria,2026-10-02,2026-10-02,vigente
+Tasa de política (BanRep),series_banrep.csv,diaria,2026-10-03,2026-10-03,vigente
+Dólar – TRM (BanRep),series_banrep.csv,diaria,2026-10-03,2026-10-03,vigente
 Inflación básica (BanRep),series_banrep.csv,mensual,2026-08-01,2026-08-01,vigente
 Tasa de cambio real (BanRep),series_banrep.csv,mensual,2026-08-01,2026-08-01,vigente
 Cuenta corriente (BanRep),series_banrep.csv,trimestral,2026-04-01,2026-04-01,vigente
