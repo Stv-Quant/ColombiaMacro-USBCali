@@ -1387,7 +1387,7 @@ def pagina(d, s, lang, generado):
                          bloque_grafico(t("g_inf_ramas", L).format(p=ventana + " " + str(ult["fecha"].year)),
                                         fig_html(fir, mir, "g-inf-ramas"), t("h_inf_ramas", L)),
                          bloque_grafico(t("g_inf_ciudades", L).format(p=ventana + " " + str(ult["fecha"].year)),
-                                        fig_html(fic, mic, "g-inf-ciudades"), t("h_inf_ciudades", L), ancho=True)],
+                                        fig_html(fic, mic, "g-informal-ciudades"), t("h_inf_ciudades", L), ancho=True)],
                         f'<p>{t("x_informal", L).format(lista=trece_txt)}</p>', L)
 
     fi, mi = g.inflacion()
@@ -1630,7 +1630,7 @@ def pagina(d, s, lang, generado):
 <footer class="foot"><div class="wrap foot-in">
   <div><b class="foot-brand">Colombia<i>Macro</i></b><p>{t("aviso", L)}</p>
     <p class="aliados"><img src="{aroot}assets/logo_usb.png" alt="Universidad de San Buenaventura Cali" height="34"><img src="{aroot}assets/logo_financialtools.png" alt="FinancialTools.io" height="34"><span>{t("aliados", L)}</span></p></div>
-  <nav class="foot-nav">{"".join(f'<div><b>{esc(g)}</b>' + "".join(f'<a href="{base}{x}/">{esc(P[x][0])}</a>' for x in sl) + '</div>' for g, sl in GRUPOS)}<div><b>{esc(P["indicadores"][0])}</b><a href="{base}indicadores/">{t("q_todos", L)}</a><a href="{base}indicadores/#fuentes">{t("q_fuentes", L)}</a><a href="{base}#descargas">{t("descargar", L)}</a></div></nav>
+  <nav class="foot-nav">{"".join(f'<div><b>{esc(g)}</b>' + "".join(f'<a href="{base}{x}/">{esc(P[x][0])}</a>' for x in sl) + '</div>' for g, sl in GRUPOS)}<div><b>{esc(P["indicadores"][0])}</b><a href="{base}indicadores/">{t("q_todos", L)}</a><a href="{base}indicadores/#fuentes">{t("q_fuentes", L)}</a><a href="{base}indicadores/#fuentes">{t("descargar", L)}</a></div></nav>
   <p class="foot-meta">DANE · Banco de la República · BVC/MSCI · Ministerio de Hacienda · {t("generado", L)} {fecha(generado, "d", L)} · Universidad de San Buenaventura Cali · FinancialTools.io</p>
 </div></footer>
 </body></html>"""
@@ -1650,7 +1650,8 @@ def pagina(d, s, lang, generado):
                   f'<nav class="pager"><a class="pg-prev" href="../{ant}/"><small>{t("anterior", L)}</small>{esc(P[ant][0])}</a>'
                   f'<a class="pg-home" href="../">{t("volver_tablero", L)}</a>'
                   f'<a class="pg-next" href="../{sig}/"><small>{t("siguiente", L)}</small>{esc(P[sig][0])}</a></nav>')
-        salida[slug] = numerar_secciones(documento(slug, f"{titulo_pg} · ColombiaMacro", cuerpo))
+        from colombiamacro.sitio import lupas as lp_
+        salida[slug] = lp_.inyectar(numerar_secciones(documento(slug, f"{titulo_pg} · ColombiaMacro", cuerpo)), L)
 
     # --- portada: lectura en un vistazo, sin graficos
     sen = {r["clave"]: r for r in tabla_portada(d, s, L)}
@@ -1681,6 +1682,37 @@ def pagina(d, s, lang, generado):
         sen["tpm_real"] = {"nombre": t("tpm_real_corta", L), "valor": num(tt["tpm_real_exante"], 1, L, suf="%"),
                            "cambio": t("neutral_ref", L), "clase": "flat", "ventana": "", "fecha": ""}
 
+    def lecturas_de(slug_):
+        """Tarjetas de medidas (lec) ya construidas en la pagina de un tema: titulo, valor y descripcion."""
+        html_ = salida.get(slug_) or ""
+        out_ = []
+        for k_, v_, d_ in re.findall(r'<a class="lec[^"]*" href="[^"]*"><span class="lec-k">(.*?)</span><b class="lec-v">(.*?)</b>'
+                                     r'<span class="lec-d">(.*?)</span>', html_, re.S):
+            out_.append({"k": re.sub(r"<[^>]+>", "", k_).strip(), "v": v_.strip(), "d": re.sub(r"<[^>]+>", "", d_).strip()})
+        return out_
+
+    def tomar(slug_, nombre_, clave_):
+        """Agrega a sen una cifra tomada de las medidas de la pagina (busca por el inicio del titulo)."""
+        for r_ in lecturas_de(slug_):
+            if r_["k"].lower().startswith(nombre_.lower()):
+                sen[clave_] = {"nombre": r_["k"].split(" · ")[0], "valor": r_["v"], "cambio": "", "clase": "flat",
+                               "ventana": r_["d"], "fecha": ""}
+                return
+
+    es_ = L == "es"
+    tomar("ciclo", "Fase trimestral" if es_ else "Quarterly phase", "ciclo_fase")
+    tomar("ciclo", "Consenso de métodos" if es_ else "Method consensus", "ciclo_consenso")
+    tomar("capacidad", "Brecha del producto" if es_ else "Output gap", "cap_brecha")
+    tomar("capacidad", "Subutilización laboral" if es_ else "Labour underutilisation", "cap_subu")
+    tomar("mercados", "Tasa de cambio real" if es_ else "Real exchange rate", "itcr")
+    tomar("empresas", "Utilidades" if es_ else "Profits", "utilidades")
+    if "utilidades" in sen:
+        sen["utilidades"]["nombre"] = "Utilidades de las 10.000 más grandes" if es_ else "Profits of the 10,000 largest"
+
+    def primera_pagina(slug_):
+        m_ = re.search(r'<ul class="ans-list"><li>(.*?)</li>', salida.get(slug_) or "", re.S)
+        return re.sub(r"<[^>]+>", "", m_.group(1)).strip() if m_ else ""
+
     def dato(clave):
         r = sen.get(clave)
         if not r:
@@ -1696,15 +1728,17 @@ def pagina(d, s, lang, generado):
 
     el_ = mt.estado_desempleo(s["laboral"]["td"], s["laboral"]["td_hace_12m"]) if s.get("laboral") else None
     temas = [
+        ("ciclo", "@ciclo", ["ciclo_fase", "ciclo_consenso"], None),
         ("crecimiento", "crecimiento", ["pib", "ise"], (t(f"ec_{ec}", L), tono_c)),
+        ("capacidad", "capacidad", ["cap_brecha", "cap_subu"], None),
         ("crecimiento#sectores", "sectores", ["sec_alto", "sec_bajo"], None),
         ("empleo", "informalidad", ["desempleo", "informalidad"],
          (t(f"el_{el_}", L), {"mejora": "ok", "estable": "ok", "empeora": "warn"}[el_]) if el_ else None),
         ("inflacion", "precios", ["ipc", "ipc_basica"], (t(f"ei_{ei}", L), tono_i)),
         ("tasas", "banco", ["tpm", "tpm_real"], (t(f"ep_{post}", L), {"restrictiva": "warn", "neutral": "ok", "expansiva": "warn"}.get(post, "neutral")) if post else None),
         ("curva-tes", "curva", ["tes10", "pendiente"], None),
-        ("mercados", "mercados", ["trm"], None),
-        ("empresas", "empresas", ["colcap"], None),
+        ("mercados", "mercados", ["trm", "itcr"], None),
+        ("empresas", "empresas", ["colcap", "utilidades"], None),
         ("externo", "externo", ["cc", "deuda"], None),
         ("comercio", "comercio", ["expo12", "bal12"], None),
     ]
@@ -1719,7 +1753,7 @@ def pagina(d, s, lang, generado):
         tid = ancla or slug
         tiles.append(
             f'<article class="tile" id="p-{tid}"><header class="tile-h"><span class="tile-k">{esc(grupo)} · {esc(nombre_t)}</span>{chip}</header>'
-            f'<p class="tile-r">{primera(sid)}</p><div class="tile-d">{"".join(dato(c_) for c_ in claves)}</div>'
+            f'<p class="tile-r">{primera_pagina(sid[1:]) if sid.startswith("@") else (primera(sid) or primera_pagina(slug))}</p><div class="tile-d">{"".join(dato(c_) for c_ in claves)}</div>'
             f'<a class="tile-go" href="{slug}/{"#" + ancla if ancla else ""}">{t("ver_analisis", L)} <span aria-hidden="true">→</span></a></article>')
 
     portada = f"""<section class="hero">
@@ -1745,8 +1779,8 @@ def pagina(d, s, lang, generado):
   {tabla}
 </section>
 <section class="bloque" id="descargas" aria-labelledby="descargas-t">
-  <div class="bloque-h"><span class="sec-num">03</span><h2 id="descargas-t">{t("fuentes_descargas", L)}</h2><p>{t("resp_fuentes", L)}</p></div>
-  <div class="fd-grid"><div>{fuentes}</div><div><h3 class="sub dl-t">{t("descargar", L)}</h3>{descargas_html("@@AROOT@@")}{documentos_html()}</div></div>
+  <div class="bloque-h"><span class="sec-num">03</span><h2 id="descargas-t">{t("fuentes_t", L)}</h2><p>{t("resp_fuentes", L)}</p></div>
+  <div class="fd-solo">{fuentes}{documentos_html()}<p class="fd-datos"><a href="indicadores/#fuentes">{t("ir_datos", L)} →</a></p></div>
 </section>
 {bloque_noticias(d, s, L, n=5).replace('id="noticias" class="notes"', 'id="noticias" class="notes corta"')}"""
     salida[None] = documento(None, t("titulo_pagina", L), portada, graficos=False)

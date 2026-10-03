@@ -69,8 +69,8 @@ TX = {
               "This is how it adjusts the amount of pesos so the overnight rate stays close to the policy rate."),
     # graficos
     "g_ciclos": ("Tasa del Banco y sus ciclos desde 2000", "Policy rate and its cycles since 2000"),
-    "h_ciclos": ("Tasa de política monetaria diaria. Las franjas rojas son ciclos de subidas y las azules de bajadas (desde la primera hasta la última decisión en la misma dirección).",
-                 "Daily monetary policy rate. Red bands are hiking cycles and blue bands easing cycles (from the first to the last decision in the same direction)."),
+    "h_ciclos": ("Tasa de política monetaria (último dato de cada semana). Las franjas naranjas son ciclos de subidas y las azules de bajadas (desde la primera hasta la última decisión en la misma dirección).",
+                 "Monetary policy rate (last value of each week). Orange bands are hiking cycles and blue bands easing cycles (from the first to the last decision in the same direction)."),
     "tab_ciclos": ("Ciclos de la tasa del Banco", "Policy-rate cycles"),
     "th_ciclos": (("Desde", "Hasta", "Dirección", "Decisiones", "De → a", "Cambio", "Meses"),
                   ("From", "To", "Direction", "Decisions", "From → to", "Change", "Months")),

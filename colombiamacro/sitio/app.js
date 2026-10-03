@@ -693,8 +693,57 @@
       });
       fig.appendChild(btn);
     });
-    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') cerrar(); });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !document.querySelector('dialog[open]')) cerrar(); });
     window.addEventListener('resize', function () { if (activo) ajustar(); });
+  }
+
+  // ---------------------------------------------------------------- lupa: como leer e interpretar cada grafico
+  function lupas() {
+    var nodo = document.getElementById('lupa-datos'), dlg = document.getElementById('dlg-lupa');
+    if (!nodo || !dlg) return;
+    var J = JSON.parse(nodo.textContent), T = J.t, D = J.d;
+    var ICONO = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.6 15.6 21 21"/><path d="M8 10.5h5M10.5 8v5"/></svg>';
+    function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+    function bloque(c, titulo, nodoHijo) { c.appendChild(el('h3', null, titulo)); c.appendChild(nodoHijo); }
+    function abrir(fig, k) {
+      var d = D[k], cab = fig.querySelector('figcaption'), titulo = '';
+      if (cab) { var cc = cab.cloneNode(true); cc.querySelectorAll('button,.amp-n').forEach(function (x) { x.remove(); }); titulo = cc.textContent.replace(/\s+/g, ' ').trim(); }
+      dlg.querySelector('h2').textContent = titulo;
+      var c = dlg.querySelector('.ex-cuerpo'); c.innerHTML = '';
+      bloque(c, T.que, el('p', 'ex-lede', d.que));
+      var ans = fig._seccion && fig._seccion.querySelector('.answer .ans-list');
+      if (ans) { var hoy = el('div', 'lp-hoy'); hoy.appendChild(ans.cloneNode(true)); bloque(c, T.hoy, hoy); }
+      bloque(c, T.leer, el('p', null, d.leer));
+      bloque(c, T.importa, el('p', null, d.importa));
+      var ul = el('ul', 'ex-lista'); (d.interpretar || []).forEach(function (x) { ul.appendChild(el('li', null, x)); });
+      bloque(c, T.interpretar, ul);
+      if (d.formulas && d.formulas.length) {
+        var fs = el('div');
+        d.formulas.forEach(function (f) {
+          var b = el('div', 'lp-f'); b.appendChild(el('span', 'lp-fn', f[0])); b.appendChild(el('div', 'lp-fx', f[1])); if (f[2]) b.appendChild(el('span', 'lp-fd', f[2])); fs.appendChild(b);
+        });
+        bloque(c, T.formulas, fs);
+      }
+      if (d.metodo || d.fuente) {
+        var m = el('div'); if (d.metodo) m.appendChild(el('p', null, '')).textContent = d.metodo;
+        if (d.fuente) { var p = el('p', 'lp-src'); p.appendChild(el('b', null, '')).textContent = T.fuente + ': '; p.appendChild(document.createTextNode(d.fuente)); m.appendChild(p); }
+        bloque(c, T.metodo, m);
+      }
+      c.scrollTop = 0;
+      dlg.showModal(); document.body.classList.add('con-dialogo');
+      var x = dlg.querySelector('[data-cerrar]'); if (x) x.focus();
+    }
+    document.querySelectorAll('figure.chart').forEach(function (fig) {
+      var pl = fig.querySelector('.plot[id]'), k = fig.getAttribute('data-lupa') || (pl && pl.id);
+      if (!k || !D[k]) return;
+      fig._seccion = fig.closest('section');
+      var b = el('button', 'lupa-btn', ICONO);
+      b.type = 'button'; b.setAttribute('aria-label', T.abrir); b.title = T.abrir; b.setAttribute('aria-haspopup', 'dialog');
+      b.addEventListener('click', function (ev) { ev.stopPropagation(); abrir(fig, k); });
+      fig.classList.add('con-lupa');
+      if (!pl) fig.classList.add('sin-amp');
+      fig.appendChild(b);
+    });
   }
 
   function dialogos() {
@@ -754,6 +803,7 @@
     seguro(sectoresSelector);
     seguro(mapaRegiones);
     seguro(ampliar);
+    seguro(lupas);
     seguro(dialogos);
   }
 

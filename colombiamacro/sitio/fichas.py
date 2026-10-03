@@ -68,7 +68,7 @@ FICHAS = {
                     "Rolling quarters since 2021; not comparable with the earlier series.")),
     "g-inf-ramas": (DANE_INF, ("Informales / ocupados de cada rama, total nacional. La raya vertical es el dato de un año antes.",
                                "Informal / employed in each sector, national total. The vertical tick is the figure a year before.")),
-    "g-inf-ciudades": (DANE_INF, ("Proporción de ocupados informales en cada una de las 23 ciudades y áreas metropolitanas "
+    "g-informal-ciudades": (DANE_INF, ("Proporción de ocupados informales en cada una de las 23 ciudades y áreas metropolitanas "
                                   "(A.M.); en azul las 13 principales. La raya es el dato de un año antes.",
                                   "Share of informal workers in each of the 23 cities and metropolitan areas (A.M.); the 13 "
                                   "main ones in blue. The tick is the figure a year before.")),
@@ -88,9 +88,9 @@ FICHAS = {
                 "[(1+b10)^10/(1+b5)^5]^(1/5) − 1 (la «5y5y»). Encadenan exactamente el breakeven a 10 años.",
                 "Implied segments: year 1 = b1; years 1–5 = [(1+b5)^5/(1+b1)]^(1/4) − 1; years 5–10 = "
                 "[(1+b10)^10/(1+b5)^5]^(1/5) − 1 (the \"5y5y\"). They chain exactly to the 10-year breakeven.")),
-    "g-anclaje": (BR_TES, ("Forward 5y5y = [(1+b10)^10/(1+b5)^5]^(1/5) − 1, promedio semanal. Mide la inflación que el "
+    "g-anclaje": (BR_TES, ("Forward 5y5y = [(1+b10)^10/(1+b5)^5]^(1/5) − 1, último dato de cada semana. Mide la inflación que el "
                            "mercado espera entre 5 y 10 años adelante.",
-                           "5y5y forward = [(1+b10)^10/(1+b5)^5]^(1/5) − 1, weekly average. Measures the inflation the "
+                           "5y5y forward = [(1+b10)^10/(1+b5)^5]^(1/5) − 1, last value of each week. Measures the inflation the "
                            "market expects between 5 and 10 years ahead.")),
     "g-politica": (("Banco de la República, tasa de política monetaria; DANE, IPC",
                     "Banco de la República, policy rate; DANE, CPI"),
@@ -104,8 +104,8 @@ FICHAS = {
                 "estimated by the Bank's staff: 2.7%–3.0%.")),
     "g-dolar": (("Banco de la República, Tasa Representativa del Mercado (TRM), certificada por la Superfinanciera",
                  "Banco de la República, market exchange rate (TRM), certified by the Financial Superintendence"),
-                ("Pesos por dólar, promedio semanal. Panel inferior: variación porcentual frente a un año antes.",
-                 "Pesos per dollar, weekly average. Lower panel: percent change versus a year earlier.")),
+                ("Pesos por dólar, último dato de cada semana. Panel inferior: variación porcentual frente a un año antes.",
+                 "Pesos per dollar, last value of each week. Lower panel: percent change versus a year earlier.")),
     "g-bolsa": (("Bolsa de Valores de Colombia (BVC), índice COLCAP, publicado por el Banco de la República",
                  "Colombian Stock Exchange (BVC), COLCAP index, published by Banco de la República"),
                 ("Índice de capitalización de las acciones más líquidas, sin dividendos; cierre semanal.",

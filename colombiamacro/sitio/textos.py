@@ -467,6 +467,8 @@ T = {
                   "Each topic in one sentence, with its two key figures. Open the analysis for charts and detail."),
     "ver_analisis": ("Ver análisis", "Open analysis"),
     "fuentes_descargas": ("Fuentes y descargas", "Sources and downloads"),
+    "fuentes_t": ("Fuentes oficiales", "Official sources"),
+    "ir_datos": ("Las tablas para descargar (CSV) están en la sección Datos", "Downloadable tables (CSV) are in the Data section"),
     "aliados": ("Proyecto académico de la Universidad de San Buenaventura Cali, con el apoyo de FinancialTools.io en el Laboratorio de Trading.",
                 "Academic project of Universidad de San Buenaventura Cali, supported by FinancialTools.io at the Trading Lab."),
     "sec_mas": ("Sector más dinámico", "Fastest-growing sector"), "sec_menos": ("Sector más débil", "Weakest sector"),

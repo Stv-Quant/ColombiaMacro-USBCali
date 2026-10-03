@@ -256,7 +256,7 @@ def construir_ciclo(d, s, L):
     casillas = "".join(
         f'<div class="sq {"sq-up" if v > 0 else "sq-dn"}"><span class="sq-n">{esc(n)}</span><b class="sq-v">{num(v, 1, L, True, "%")}</b></div>'
         for n, v in bsu.sort_values(ascending=False).items())
-    g_amp = (f'<figure class="chart wide"><figcaption>{tx("g_amplitud", L).format(q=fecha(bs.index[-1], "q", L))}'
+    g_amp = (f'<figure class="chart wide" data-lupa="v-amplitud-sectores"><figcaption>{tx("g_amplitud", L).format(q=fecha(bs.index[-1], "q", L))}'
              f' <span class="amp-n">{tx("de_12", L).format(n=k_sobre)}</span></figcaption><div class="sq-grid">{casillas}</div>'
              f'<p class="how"><span>?</span>{tx("h_amplitud", L)}</p>{cs.pie_ficha("g-amplitud", L)}</figure>')
     r_top = sorted(rv, key=lambda r: -abs(r[1]))[0]
@@ -287,7 +287,7 @@ def construir_ciclo(d, s, L):
                      f"<td>{fecha(e['desde'], 'm', L)}</td><td>{hasta}</td><td class='n'>{e['meses']}</td>"
                      f"<td class='n'><span class='chg {'up' if e['variacion'] >= 0 else 'down'}'>{num(e['variacion'], 1, L, True, '%')}</span></td></tr>")
     head = "".join(f"<th>{tx(k, L)}</th>" for k in ("col_tipo", "col_desde", "col_hasta", "col_meses", "col_var"))
-    g_exp = (f'<figure class="chart"><figcaption>{tx("t_expansiones", L)}</figcaption><div class="table-wrap plano"><table class="tbl">'
+    g_exp = (f'<figure class="chart" data-lupa="v-fases-ciclo"><figcaption>{tx("t_expansiones", L)}</figcaption><div class="table-wrap plano"><table class="tbl">'
              f'<thead><tr>{head}</tr></thead><tbody>{"".join(filas)}</tbody></table></div>'
              f'<p class="how"><span>?</span>{tx("h_expansiones", L)}</p>{cs.pie_ficha("g-expansiones", L)}</figure>')
     ur = rt.iloc[-1]

@@ -60,15 +60,17 @@ class TestSitio(unittest.TestCase):
             for sid in ("lectura", "monitor", "descargas", "noticias"):
                 self.assertIn(f'id="{sid}"', html_)
             self.assertIn("class='tbl'", html_)                      # indicadores y fuentes
-            self.assertIn('datos/inflacion_clean.csv" download', html_)
+            self.assertNotIn('.csv" download', html_)                 # la portada solo cita fuentes; descargas en Datos
+            self.assertIn('href="indicadores/#fuentes"', html_)
+            self.assertEqual(html_.count('class="tile"'), 12)        # rejilla completa (4 filas de 3)
             self.assertNotIn('data-for="', html_)                     # sin graficos en la portada
             self.assertNotIn("plotly.min.js", html_)
             self.assertIn("logo_financialtools.png", html_)
             self.assertIn('href="ciclo/"', html_)
         self.assertIn('lang="es"', self.leer())
         self.assertIn('lang="en"', self.leer("en"))
-        self.assertIn('href="datos/', self.leer())
-        self.assertIn('href="../datos/', self.leer("en"))
+        self.assertIn('datos/inflacion_clean.csv" download', self.leer("indicadores"))
+        self.assertIn('href="../../datos/', self.leer("en", "indicadores"))
 
     def test_paginas_de_detalle_en_dos_idiomas(self):
         for slug, ids in self.PAGINAS.items():

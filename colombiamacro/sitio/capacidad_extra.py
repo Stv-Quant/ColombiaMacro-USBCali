@@ -333,7 +333,7 @@ def construir_capacidad(d, s, L):
                       for m in ("crec", "v19", "pc", "td"))
     leyendas = "".join(f'<span class="tm-leg" data-m="{m}">{tx("leg_" + ("2019" if m == "v19" else m), L)}</span>' for m in ("crec", "v19", "pc", "td"))
     escala = "".join(f'<i class="tm-b{b}"></i>' for b in ("-3", "-2", "-1", "0", "1", "2", "3"))
-    mapa = (f'<figure class="chart"><figcaption>{tx("g_mapa", L)}</figcaption>'
+    mapa = (f'<figure class="chart" data-lupa="v-mapa-regiones"><figcaption>{tx("g_mapa", L)}</figcaption>'
             f'<div class="tmapa" data-m="v19"><div class="tm-btn" role="group">{botones}</div>'
             f'<div class="tm-grid">{"".join(celdas)}</div><div class="tm-pie">{leyendas}<span class="tm-esc">{escala}</span></div></div>'
             f'<p class="how"><span>?</span>{tx("h_mapa", L)}</p>{cs.pie_ficha("g-cap-mapa", L)}</figure>')
