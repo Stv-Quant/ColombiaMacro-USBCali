@@ -1,4 +1,34 @@
-Actualizacion ColombiaMacro — 2026-10-03 01:08 UTC (rapida: series diarias de BanRep y mercado)
+Actualizacion ColombiaMacro — 2026-10-03 05:37 UTC
+
+============================================================
+  IPC — DANE y BanRep
+============================================================
+=======================================================
+  Actualizador Inflacion Colombia - BanRep
+=======================================================
+CSV actual: 248 meses, ultimo: 2026-08-01
+Descargando IPC de BanRep...
+OK - 866 meses descargados (1954-07-01 -> 2026-08-01)
+Sin cambios de IPC
+
+=======================================================
+  Estado actual Inflacion Colombia
+=======================================================
+  Total meses    : 248
+  Primer dato    : 2006-01-01
+  Ultimo dato    : 2026-08-01
+  Inf. mensual   : 0.39%
+  Inf. anual     : 6.24%
+=======================================================
+
+Ultimos 6 meses:
+     fecha  inflacion_mensual  inflacion_anual
+2026-03-01               0.78             5.56
+2026-04-01               0.78             5.69
+2026-05-01               0.47             5.84
+2026-06-01               0.39             6.14
+2026-07-01               0.17             6.02
+2026-08-01               0.39             6.24
 
 ============================================================
   Curvas TES — BanRep
@@ -34,6 +64,12 @@ Ultimos 5 dias:
 2026-09-25         12.42         12.90          13.06        4.99        6.48         6.64
 
 ============================================================
+  PIB real y nominal — DANE
+============================================================
+PIB por sectores: 12 agrupaciones hasta 2026-04-01
+PIB: sin cambios
+
+============================================================
   COLCAP — BanRep
 ============================================================
 COLCAP: sin cambios
@@ -57,9 +93,135 @@ tpm                        id 59      10460 obs hasta 2026-10-04
   ied_musd                   id 15133     106 obs hasta 2026-06-30
   deuda_bruta_gnc_pct_pib    id 15328      31 obs hasta 2025-12-01
   salario_minimo_var         id 15418      42 obs hasta 2026-12-31
-series_banrep.csv: actualizado (16 de 16 series)
+series_banrep.csv: sin cambios (16 de 16 series)
+
+============================================================
+  ISE y mercado laboral — DANE
+============================================================
+ISE: 259 meses hasta 2026-07-01 (sin cambios)
+Mercado laboral: 308 meses hasta 2026-08-01 (sin cambios)
+
+============================================================
+  Informalidad laboral — DANE
+============================================================
+informalidad: 65 trimestres moviles hasta 2026-07 (nacional 54.6%); 13 ramas — https://www.dane.gov.co/files/operaciones/GEIH/anex-GEIHEISS-may-jul2026.xlsx
+
+============================================================
+  PIB por el gasto y poblacion — DANE
+============================================================
+pib_gasto.csv: 1118 filas hasta 2026-04-01 (sin cambios)
+pib_inversion.csv: 430 filas hasta 2026-04-01 (sin cambios)
+pib_consumo_hogares.csv: 1376 filas hasta 2026-04-01 (sin cambios)
+poblacion.csv: 1950–2026 (sin cambios)
+
+============================================================
+  PIB por departamento y mercado laboral regional — DANE
+============================================================
+pib_departamentos.csv: 714 filas (sin cambios)
+pib_departamentos_ramas.csv: 9282 filas (sin cambios)
+laboral_ciudades.csv: 1824 filas (sin cambios)
+laboral_subutilizacion.csv: 308 filas (sin cambios)
+
+============================================================
+  Mercado laboral en detalle (ramas, posicion, sexo, jovenes) — DANE
+============================================================
+empleo_ramas.csv: 1820 filas hasta 2026-08-01 (sin cambios)
+empleo_posicion.csv: 1600 filas hasta 2026-08-01 (sin cambios)
+empleo_sexo.csv: 400 filas hasta 2026-08-01 (sin cambios)
+empleo_fuera_ft.csv: 200 filas hasta 2026-08-01 (sin cambios)
+empleo_area.csv: 681 filas hasta 2026-08-01 (sin cambios)
+empleo_jovenes.csv: 233 filas hasta 2026-07-01 (sin cambios)
+
+============================================================
+  IPC en detalle (divisiones, subclases, ciudades, ingresos) — DANE
+============================================================
+ipc_ponderaciones.csv: 188 subclases (sin cambios)
+ipc_divisiones.csv: 13 filas hasta 2026-08-01 (sin cambios)
+ipc_ingresos.csv: 5 filas hasta 2026-08-01 (sin cambios)
+ipc_ciudades.csv: 312 filas hasta 2026-08-01 (sin cambios)
+ipc_subclases.csv: 188 filas hasta 2026-08-01 (sin cambios)
+ipc_clasificaciones.csv: 1272 filas hasta 2026-08-01 (sin cambios)
+
+============================================================
+  Tasas de mercado, credito y liquidez — BanRep
+============================================================
+tasas_mercado.csv: 25 de 25 series (sin cambios)
+
+============================================================
+  Tasa de cambio: otras monedas, ITCR bilateral, balanza cambiaria, dolar global y petroleo — BanRep y Reserva Federal
+============================================================
+cambiario.csv: 21 de 21 series (sin cambios)
+  ERROR dolar_global: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=60)
+  ERROR mxn_usd: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=60)
+  ERROR brent: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=60)
+
+============================================================
+  Sector empresarial: 10.000 empresas (Supersociedades), registro mercantil (RUES) y cuentas financieras — datos.gov.co y BanRep
+============================================================
+empresas_10000_agregados.csv: 140 filas, anos 2021–2025 (sin cambios)
+empresas_10000_top.csv: 125 filas, anos 2021–2025 (sin cambios)
+empresas_registro.csv: 402 filas (sin cambios)
+empresas_banrep.csv: 5 series (sin cambios)
+
+============================================================
+  Cuentas externas y fiscales: balanza de pagos, deuda externa, PII y balance fiscal — BanRep
+============================================================
+externo_fiscal.csv: 52 de 52 series (sin cambios)
+
+============================================================
+  Comercio exterior — DANE (DIAN-DANE)
+============================================================
+Exportaciones: 415 meses hasta 2026-07 (sin cambios)
+Destinos de exportacion: 223 meses, 18 columnas (sin cambios)
+Importaciones: 211 meses hasta 2026-07 (sin cambios)
+Importaciones por uso (CUODE, Enero - julio 2026): 15 grupos (actualizado)
+CUODE anual: 1999–2026 (sin cambios)
+Origen de importaciones: 33 paises (sin cambios)
+
+============================================================
+  Canasta COLCAP (iShares) y acciones (Yahoo Finance)
+============================================================
+canasta COLCAP: 23 acciones al 2026-10-01
+  PFCIBEST     874 semanas hasta 2026-09-25
+  CIBEST       874 semanas hasta 2026-09-25
+  ISA          874 semanas hasta 2026-09-25
+  ECOPETROL    874 semanas hasta 2026-09-25
+  PFGRUPSURA   774 semanas hasta 2026-10-02
+  GRUPOSURA    874 semanas hasta 2026-09-25
+  GEB          874 semanas hasta 2026-09-25
+  GRUPOARGOS   874 semanas hasta 2026-09-25
+  CEMARGOS     874 semanas hasta 2026-09-25
+  PFGRUPOARG   748 semanas hasta 2026-10-02
+  PFDAVIGRP    835 semanas hasta 2026-10-02
+  PFAVAL       804 semanas hasta 2026-10-02
+  CELSIA       874 semanas hasta 2026-09-25
+  PEI          113 semanas hasta 2026-10-02
+  MINEROS      874 semanas hasta 2026-09-25
+  CORFICOLCF   874 semanas hasta 2026-09-25
+  GRUBOLIVAR   874 semanas hasta 2026-09-25
+  BOGOTA       874 semanas hasta 2026-09-25
+  TERPEL       633 semanas hasta 2026-10-02
+  EXITO        874 semanas hasta 2026-09-25
+  PROMIGAS     874 semanas hasta 2026-09-25
+  PFCORFICOL   874 semanas hasta 2026-09-25
+  CNEC         846 semanas hasta 2026-10-02
+  acciones actualizadas: 23 de 23
 
 RESUMEN
+  [OK] IPC — DANE y BanRep
   [OK] Curvas TES — BanRep
+  [OK] PIB real y nominal — DANE
   [OK] COLCAP — BanRep
   [OK] Politica, TRM, inflacion basica, externo — BanRep
+  [OK] ISE y mercado laboral — DANE
+  [OK] Informalidad laboral — DANE
+  [OK] PIB por el gasto y poblacion — DANE
+  [OK] PIB por departamento y mercado laboral regional — DANE
+  [OK] Mercado laboral en detalle (ramas, posicion, sexo, jovenes) — DANE
+  [OK] IPC en detalle (divisiones, subclases, ciudades, ingresos) — DANE
+  [OK] Tasas de mercado, credito y liquidez — BanRep
+  [FALLO] Tasa de cambio: otras monedas, ITCR bilateral, balanza cambiaria, dolar global y petroleo — BanRep y Reserva Federal
+  [OK] Sector empresarial: 10.000 empresas (Supersociedades), registro mercantil (RUES) y cuentas financieras — datos.gov.co y BanRep
+  [OK] Cuentas externas y fiscales: balanza de pagos, deuda externa, PII y balance fiscal — BanRep
+  [OK] Comercio exterior — DANE (DIAN-DANE)
+  [OK] Canasta COLCAP (iShares) y acciones (Yahoo Finance)
