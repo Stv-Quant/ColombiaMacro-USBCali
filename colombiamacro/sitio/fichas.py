@@ -373,6 +373,23 @@ FICHAS = {
                               "CPI computed with the basket of each income level defined by DANE (poor, vulnerable, middle class and high income, based on the poverty line).")),
     "g-inf-ciudades": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Variación anual del IPC total en las 23 ciudades capitales con canasta propia.", "Annual change in total CPI in the 23 capital cities with their own basket.")),
     "g-inf-ciudad-division": (("DANE, IPC base diciembre 2018 (anexos mensuales)", "DANE, CPI base December 2018 (monthly annexes)"), ("Variación anual por ciudad y división de gasto (cuadro 6 del anexo).", "Annual change by city and spending division (table 6 of the annex).")),
+    "g-cv-factores": (("Banco de la República, curva cero cupón TES (SEN y MEC, Nelson-Siegel)", "Banco de la República, TES zero-coupon curve (SEN and MEC, Nelson-Siegel)"), ("Factores calculados con las tasas cero cupón en pesos a 1, 5 y 10 años: nivel = promedio; pendiente = 10a − 1a; curvatura = 2×5a − 1a − 10a. Serie semanal (último dato de cada viernes).",
+                      "Factors computed from the 1-, 5- and 10-year peso zero-coupon rates: level = average; slope = 10y − 1y; curvature = 2×5y − 1y − 10y. Weekly series (last value each Friday).")),
+    "g-cv-invertida": (("Banco de la República, curva cero cupón TES (SEN y MEC, Nelson-Siegel)", "Banco de la República, TES zero-coupon curve (SEN and MEC, Nelson-Siegel)"), ("Episodios: tramos de al menos 5 días hábiles consecutivos con pendiente 10a − 1a negativa (datos diarios).",
+                       "Episodes: runs of at least 5 consecutive business days with a negative 10y − 1y slope (daily data).")),
+    "g-cv-cambios": (("Banco de la República, curva cero cupón TES (SEN y MEC, Nelson-Siegel)", "Banco de la República, TES zero-coupon curve (SEN and MEC, Nelson-Siegel)"), ("Diferencia entre la tasa cero cupón del último día y la del último día hábil disponible hace 1, 3 y 12 meses, en puntos básicos.",
+                     "Difference between the latest zero-coupon rate and the one on the last available business day 1, 3 and 12 months earlier, in basis points.")),
+    "g-cv-descomposicion": (("Banco de la República, curva cero cupón TES (SEN y MEC, Nelson-Siegel)", "Banco de la República, TES zero-coupon curve (SEN and MEC, Nelson-Siegel)"), ("Cambio en 12 meses de la tasa en pesos = cambio de la tasa UVR (real) + cambio de la diferencia nominal − real.",
+                            "12-month change in the peso rate = change in the UVR (real) rate + change in the nominal − real gap.")),
+    "g-cv-fisher": (("Banco de la República, curva cero cupón TES (SEN y MEC, Nelson-Siegel)", "Banco de la República, TES zero-coupon curve (SEN and MEC, Nelson-Siegel)"), ("Tasa UVR más la diferencia hasta la tasa en pesos. La compensación por inflación exacta es (1 + nominal)/(1 + real) − 1 (Fisher) e incluye primas por riesgo y liquidez.",
+                    "UVR rate plus the gap to the peso rate. Exact inflation compensation is (1 + nominal)/(1 + real) − 1 (Fisher) and includes risk and liquidity premia.")),
+    "g-cv-real": (("Banco de la República, curva cero cupón TES (SEN y MEC, Nelson-Siegel)", "Banco de la República, TES zero-coupon curve (SEN and MEC, Nelson-Siegel)"), ("Tasa cero cupón UVR a 10 años y compensación por inflación implícita (Fisher) a 10 años. Serie semanal.",
+                  "10-year UVR zero-coupon rate and 10-year implied inflation compensation (Fisher). Weekly series.")),
+    "g-cv-prima": (("Banco de la República (curva cero cupón TES y tasa de política monetaria)", "Banco de la República (TES zero-coupon curve and monetary policy rate)"),
+                   ("Tasa cero cupón en pesos menos la tasa de política monetaria vigente ese día, en puntos porcentuales. Serie semanal.",
+                    "Peso zero-coupon rate minus the monetary policy rate in force that day, in percentage points. Weekly series.")),
+    "g-cv-volatilidad": (("Banco de la República, curva cero cupón TES (SEN y MEC, Nelson-Siegel)", "Banco de la República, TES zero-coupon curve (SEN and MEC, Nelson-Siegel)"), ("Desviación estándar móvil de 60 días hábiles de los cambios diarios de la tasa a 10 años, × √252, en puntos básicos. La línea punteada es el promedio desde 2003.",
+                         "60-business-day rolling standard deviation of daily changes in the 10-year rate, × √252, in basis points. The dotted line is the average since 2003.")),
 }
 
 

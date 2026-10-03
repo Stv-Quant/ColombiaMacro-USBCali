@@ -387,6 +387,7 @@ T = {
     "tes_volver": ("Volver al último dato", "Back to latest"),
     "tes_comparar": ("Comparar con el cierre de:", "Compare with year-end:"),
     "tes_g_curva": ("Curva cero cupón de los TES (BanRep)", "TES zero-coupon yield curve (BanRep)"),
+    "tes_q": ("¿Qué es la curva cero cupón de los TES?", "What is the TES zero-coupon curve?"),
     "tes_h_curva": ("Cada línea es una fecha: la línea azul gruesa es la fecha elegida y las demás son los años marcados. Una curva que sube de izquierda a derecha es lo normal; si baja, el mercado espera tasas menores en el futuro.",
                     "Each line is one date: the thick blue line is the selected date and the others are the ticked years. A curve rising from left to right is normal; if it falls, the market expects lower rates ahead."),
     "tes_g_hist": ("Historia de las tasas a 1, 5 y 10 años", "History of 1-, 5- and 10-year yields"),

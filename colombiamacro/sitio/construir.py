@@ -71,13 +71,14 @@ DESCRIPCION_CSV = {
     "empleo_fuera_ft.csv": ("Población fuera de la fuerza de trabajo (DANE)", "Population outside the labour force (DANE)"),
     "ipc_divisiones.csv": ("IPC por divisiones: variación y aporte (DANE)", "CPI by division: change and contribution (DANE)"),
     "ipc_subclases.csv": ("IPC por 188 subclases (DANE)", "CPI by 188 subclasses (DANE)"),
+    "tasas_mercado.csv": ("IBR por plazos, tasa interbancaria, DTF y CDT, tasas de colocación por modalidad, cartera y liquidez del Banco (BanRep)", "IBR by tenor, interbank rate, DTF and CDT, lending rates by type, loan book and Bank liquidity (BanRep)"),
     "ipc_ponderaciones.csv": ("Ponderaciones oficiales de las 188 subclases por nivel de ingreso (DANE, canasta 2018)", "Official weights of the 188 subclasses by income level (DANE, 2018 basket)"),
     "ipc_ciudades.csv": ("IPC por ciudad y división (DANE)", "CPI by city and division (DANE)"),
     "ipc_ingresos.csv": ("IPC por nivel de ingreso (DANE)", "CPI by income level (DANE)"),
     "ipc_clasificaciones.csv": ("IPC de servicios, bienes y energéticos (DANE)", "CPI for services, goods and energy (DANE)"),
     "estado_fuentes.csv": ("Estado de las fuentes", "Source status"),
 }
-DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "colcap_oficial.csv",
+DESCARGAS = ["pib_colombia.csv", "pib_sectores.csv", "informalidad.csv", "informalidad_ramas.csv", "informalidad_ciudades.csv", "inflacion_clean.csv", "tasas_interes_clean.csv", "tasas_mercado.csv", "colcap_oficial.csv",
              "series_banrep.csv", "ise_mensual.csv", "mercado_laboral.csv", "exportaciones_mensuales.csv", "exportaciones_destinos.csv",
              "importaciones_mensuales.csv", "importaciones_cuode_anual.csv", "importaciones_origen.csv", "pib_gasto.csv", "pib_inversion.csv",
              "pib_consumo_hogares.csv", "poblacion.csv", "pib_departamentos.csv", "pib_departamentos_ramas.csv", "laboral_ciudades.csv",
@@ -1027,7 +1028,7 @@ def explorador_curva(lang):
   <div class="curve-years"><span>{t('tes_comparar', L)}</span><div id="curva-anos"></div></div>
   <div class="stats" id="curva-stats"></div>
   <div class="curve-grid">
-    <figure class="chart"><figcaption>{t('tes_g_curva', L)}</figcaption><div class="plot" id="g-curva-tes"></div>
+    <figure class="chart"><figcaption>{t('tes_g_curva', L)} <button type="button" class="ex-q" data-dialog="exp-curva" aria-haspopup="dialog" title="{t('tes_q', L)}">?</button></figcaption><div class="plot" id="g-curva-tes"></div>
       <p class="how"><span>?</span>{t('tes_h_curva', L)}</p>{pie_ficha("g-curva-tes", L)}</figure>
     <figure class="chart"><figcaption>{t('tes_g_hist', L)}</figcaption><div class="plot" id="g-curva-hist"></div>
       <p class="how"><span>?</span>{t('tes_h_hist', L)}</p>{pie_ficha("g-curva-hist", L)}</figure>
@@ -1482,6 +1483,8 @@ def pagina(d, s, lang, generado):
     from colombiamacro.sitio.capacidad_extra import construir_capacidad
     cap_antes, cap_despues, s_ciudades = construir_capacidad(d_es, s, L)
     from colombiamacro.sitio.inflacion_extra import construir_inflacion
+    from colombiamacro.sitio.curva_extra import construir_curva
+    cv_antes, cv_despues = construir_curva(d_es, L)
     inf_antes, inf_despues = construir_inflacion(d_es, L)
     from colombiamacro.sitio.empleo_extra import construir_empleo
     emp_antes, emp_despues = construir_empleo(d_es, L, s_ciudades)
@@ -1529,7 +1532,7 @@ def pagina(d, s, lang, generado):
         "empleo": (t("nav_informal", L), t("pg_empleo", L), t("pl_empleo", L), [emp_antes, s_inf, emp_despues], True),
         "inflacion": (t("nav_inflacion", L), t("pg_inflacion", L), t("pl_inflacion", L), [inf_antes, s2, inf_despues], True),
         "tasas": (t("nav_banco", L), t("pg_tasas", L), t("pl_tasas", L), [s3], True),
-        "curva-tes": (t("nav_curva", L), t("pg_curva", L), t("pl_curva", L), [s_curva], False),
+        "curva-tes": (t("nav_curva", L), t("pg_curva", L), t("pl_curva", L), [cv_antes, s_curva, cv_despues], False),
         "mercados": (t("nav_mercados", L), t("pg_mercados", L), t("pl_mercados", L), [s4], True),
         "empresas": (t("nav_empresas", L), t("pg_empresas", L), t("pl_empresas", L), [s_emp], True),
         "externo": (t("nav_externo", L), t("pg_externo", L), t("pl_externo", L), [s5], True),

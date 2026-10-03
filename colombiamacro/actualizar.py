@@ -30,6 +30,7 @@ PASOS = [
     ("PIB por departamento y mercado laboral regional — DANE", "colombiamacro.fuentes.regional", []),
     ("Mercado laboral en detalle (ramas, posicion, sexo, jovenes) — DANE", "colombiamacro.fuentes.empleo", []),
     ("IPC en detalle (divisiones, subclases, ciudades, ingresos) — DANE", "colombiamacro.fuentes.ipc_detalle", []),
+    ("Tasas de mercado, credito y liquidez — BanRep", "colombiamacro.fuentes.tasas_mercado", []),
     ("Comercio exterior — DANE (DIAN-DANE)", "colombiamacro.fuentes.comercio", []),
     ("Canasta COLCAP (iShares) y acciones (Yahoo Finance)", "colombiamacro.fuentes.acciones", []),
 ]
